@@ -10,7 +10,7 @@ namespace EPI.Comm
 {
     public abstract class CommBase
     {
-       
+        public const int DefaultBufferSize = 8192;
     }
     public interface ICommReceive
     {

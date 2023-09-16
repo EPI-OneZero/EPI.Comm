@@ -19,10 +19,7 @@ namespace EPI.Comm.Tcp
         public bool IsConnected => Socket?.Connected ?? false;
         public IPEndPoint LocalEndPoint => Socket?.LocalEndPoint as IPEndPoint;
         public IPEndPoint RemoteEndPoint => Socket?.RemoteEndPoint as IPEndPoint;
-        internal SocketHolder(Socket socket) : this(socket, ushort.MaxValue)
-        {
-
-        }
+       
         internal SocketHolder(Socket socket, int bufferSize)
         {
             Socket = socket;

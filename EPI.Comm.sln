@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPI.Comm", "EPI.Comm\EPI.Co
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommSample", "CommSample\CommSample.csproj", "{BEFDC7F8-771C-4732-B346-F0E407F4A3D6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleTest", "ConsoleTest\ConsoleTest.csproj", "{1D4AB3B5-F49B-4D54-A281-60EB3A2E7FD7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{BEFDC7F8-771C-4732-B346-F0E407F4A3D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BEFDC7F8-771C-4732-B346-F0E407F4A3D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BEFDC7F8-771C-4732-B346-F0E407F4A3D6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1D4AB3B5-F49B-4D54-A281-60EB3A2E7FD7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1D4AB3B5-F49B-4D54-A281-60EB3A2E7FD7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1D4AB3B5-F49B-4D54-A281-60EB3A2E7FD7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1D4AB3B5-F49B-4D54-A281-60EB3A2E7FD7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -68,7 +68,7 @@ namespace CommSample.Sample
 
         private void Start(object sender, RoutedEventArgs e)
         {
-            client.Start();
+            client.Connect();
         }
 
         private void Stop(object sender, RoutedEventArgs e)

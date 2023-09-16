@@ -19,10 +19,14 @@ namespace EPI.Comm.Tcp
         protected List<Client> Clients { get; set; } = new List<Client>();
         protected object startStopLock = new object();
 
-        public Server(int port, int bufferSize = ushort.MaxValue)
+        public Server(int port, int bufferSize)
         {
             Port = port;
             BufferSize = bufferSize;
+        }
+        public Server(int port) : this(port, DefaultBufferSize)
+        {
+            
         }
         /// <summary>
         ///  서버가 클라이언트를 Accept 시작
@@ -99,7 +103,7 @@ namespace EPI.Comm.Tcp
             try
             {
                 var tcpClient = Listener.AcceptTcpClient();
-                var client = new Client(tcpClient);
+                var client = new Client(tcpClient, BufferSize);
                 SetClient(client);
 
                 Accpeted?.Invoke(client, EventArgs.Empty);

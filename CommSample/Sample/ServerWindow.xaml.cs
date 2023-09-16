@@ -49,7 +49,6 @@ namespace CommSample.Sample
             MessageBox.Show($"server local : {ip0} : {port0} , remote : {ip1} : {port1}");
         }
         private byte[] bytes = new byte[65535];
-        private bool isLooping = false;
       
         private void ServerWindow_Closed(object sender, EventArgs e)
         {

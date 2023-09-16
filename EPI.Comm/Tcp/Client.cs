@@ -16,19 +16,28 @@ namespace EPI.Comm.Tcp
 
         public string Ip { get; protected set; }
         public int Port { get; protected set; }
-        protected int BufferSize { get; set; }
+        public int BufferSize { get;protected set; }
         protected TcpClient TcpClient { get; set; }
         protected SocketHolder SocketHolder { get; set; }
         public IPEndPoint LocalEndPoint => SocketHolder?.LocalEndPoint;
         public IPEndPoint RemoteEndPoint => SocketHolder?.RemoteEndPoint;
         public bool IsConnected => SocketHolder?.IsConnected ?? false;
-        public Client(string ip, int port, int bufferSize = ushort.MaxValue)
+        public Client(string ip, int port, int bufferSize )
         {
             Ip = ip;
             Port = port;
             BufferSize = bufferSize;
         }
-        internal Client(TcpClient client, int bufferSize = ushort.MaxValue)
+        public Client(string ip, int port) : this(ip, port, DefaultBufferSize)
+        {
+
+        }
+        /// <summary>
+        /// server가 acept한 client에 대한 생성자
+        /// </summary>
+        /// <param name="client"></param>
+        /// <param name="bufferSize"></param>
+        internal Client(TcpClient client, int bufferSize)
         {
             TcpClient = client;
             var endpoint = (IPEndPoint)client.Client.RemoteEndPoint;
@@ -60,7 +69,7 @@ namespace EPI.Comm.Tcp
             }
         }
 
-        public void Start()
+        public void Connect()
         {
             try
             {
@@ -82,7 +91,7 @@ namespace EPI.Comm.Tcp
             }
             finally
             {
-                Debug.WriteLine(nameof(Start));
+                Debug.WriteLine(nameof(Connect));
             }
 
         }

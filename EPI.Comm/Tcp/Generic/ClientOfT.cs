@@ -7,25 +7,27 @@ using System.Threading.Tasks;
 
 namespace EPI.Comm.Tcp.Generic
 {
-    public class Packet<Theader, Tfooter>
+    public struct EmptyFooter
     {
-        public Theader Header { get; set; }
-        public byte[] Body { get; set; }
-        public Tfooter Footer { get; set; }
-        public Packet() 
+    }
+    public class Client<Theader,TFooter> : Client
+    {
+        public Client(string ip, int port, int bufferSize, Func<Theader, int> getPacketSize) : base(ip, port, bufferSize)
+        {
+
+        }
+        public Client(string ip, int port, Func<Theader, int> getPacketSize) : this(ip, port, 8192, getPacketSize)
         {
 
         }
     }
-    public class Client<Theader> : Client where Theader : struct
+    public class Client<Theader> : Client<Theader, EmptyFooter>
     {
-        public Client(string ip, int port, int bufferSize = ushort.MaxValue) : base(ip, port, bufferSize)
+        public Client(string ip, int port, Func<Theader, int> getPacketSize) : base(ip, port, getPacketSize)
         {
         }
-    }
-    public class Client<Theader, Tfooter> : Client<Theader> where Theader : struct where Tfooter : struct
-    {
-        public Client(string ip, int port, int bufferSize = ushort.MaxValue) : base(ip, port, bufferSize)
+
+        public Client(string ip, int port, int bufferSize, Func<Theader, int> getPacketSize) : base(ip, port, bufferSize, getPacketSize)
         {
         }
     }
