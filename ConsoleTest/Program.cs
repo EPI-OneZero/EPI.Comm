@@ -24,18 +24,36 @@ namespace ConsoleTest
         private int C = 3;
         public override string ToString()
         {
+            Queue<string> queue = new Queue<string>();
             return base.ToString(); 
         }
     }
 
-
+    enum MyEnum
+    {
+        a,
+        b,
+        c,
+    }
     unsafe internal class Program
     {
         static void Main(string[] args)
         {
-     
-          
-      
+            MyEnum x = MyEnum.a;
+            switch (x)
+            {
+                case MyEnum.a:
+                    x= MyEnum.b;
+                    break;
+                case MyEnum.b:
+                    break;
+                case MyEnum.c:
+                    break;
+                default:
+                    break;
+            }
+
+
         }
     }
 }

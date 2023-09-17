@@ -14,6 +14,9 @@ namespace EPI.Comm.Net.Generic
     public class PacketEventArgs<Theader> : EventArgs
     {
         public Packet<Theader> Packet { get; internal set; }
-        public PacketEventArgs() { }
+        public PacketEventArgs(Packet<Theader> packet) 
+        {
+            Packet = packet;
+        }
     }
 }
