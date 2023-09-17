@@ -44,13 +44,13 @@
     <Compile Include="CommBase.cs" />
     <Compile Include="Events\CommReceiveEventArgs.cs" />
     <Compile Include="Exceptions\CommException.cs" />
-    <Compile Include="Tcp\Client.cs" />
-    <Compile Include="Tcp\Generic\ClientOfT.cs" />
-    <Compile Include="Tcp\Generic\PacketEventArgs.cs" />
-    <Compile Include="Tcp\Generic\PacketOfT.cs" />
-    <Compile Include="Tcp\SocketHolder.cs" />
+    <Compile Include="Net\TcpNetClient.cs" />
+    <Compile Include="Net\Generic\TcpNetClientOfT.cs" />
+    <Compile Include="Net\Generic\PacketEventArgs.cs" />
+    <Compile Include="Net\Generic\PacketOfT.cs" />
+    <Compile Include="Net\NetSocket.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Tcp\TcpServer.cs" />
+    <Compile Include="Net\TcpNetServer.cs" />
     <Compile Include="Threading\ThreadUtil.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

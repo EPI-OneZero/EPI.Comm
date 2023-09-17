@@ -29,10 +29,7 @@ namespace CommSample.Sample
             server.Received += Server_BytesReceived;
             server.Closed += Server_Closed;
             server.Accpeted += Server_Accpeted;
-            for (int i = 0; i < bytes.Length; i++)
-            {
-                bytes[i] = (byte)i;
-            }
+           
         }
 
         private void Server_Accpeted(object sender, EventArgs e)
@@ -48,7 +45,6 @@ namespace CommSample.Sample
             var port1 = remote.Port.ToString();
             MessageBox.Show($"server local : {ip0} : {port0} , remote : {ip1} : {port1}");
         }
-        private byte[] bytes = new byte[65535];
       
         private void ServerWindow_Closed(object sender, EventArgs e)
         {
@@ -56,7 +52,7 @@ namespace CommSample.Sample
 
         }
 
-        private TcpNetServer server = new TcpNetServer(5500,15000);
+        private TcpNetServer server = new TcpNetServer(5500);
         private void Server_Closed(object sender, EventArgs e)
         {
             MessageBox.Show("Server Client Closed");
@@ -87,7 +83,7 @@ namespace CommSample.Sample
             {
                 var bytes = System.Text.Encoding.UTF8.GetBytes( text.Text);
                  
-                server.Send(new byte[15000]);
+                server.Send(bytes);
             }
         }
         private void Clear(object sender, RoutedEventArgs e)
