@@ -33,17 +33,6 @@ namespace ConsoleTest
     {
         static void Main(string[] args)
         {
-            var x = new MyClass();
-            var handle = GCHandle.Alloc(x, GCHandleType.Pinned);
-          
-            fixed (int* p1 = &x.B)
-            {
-                var p2 = (IntPtr)(p1);
-                var ptr = *(IntPtr*)(&x);
-                var ptr1 = handle.AddrOfPinnedObject();
-                var d = (long)ptr1 - (long)ptr;
-                var d1 = (long)p2 - (long)ptr;
-            }
      
           
       
