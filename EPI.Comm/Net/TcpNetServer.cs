@@ -13,8 +13,9 @@ namespace EPI.Comm.Net
     public class TcpNetServer : CommBase, IComm, IDisposable
     {
         protected TcpListener Listener { get; set; }
+        public bool IsListening { get=> isListening; }
         protected volatile bool isListening = false;
-        protected int Port { get; set; }
+        public int Port { get; set; }
         protected int BufferSize { get; set; }
         protected List<TcpNetClient> Clients { get; set; } = new List<TcpNetClient>();
         protected object startStopLock = new object();
@@ -39,8 +40,10 @@ namespace EPI.Comm.Net
                 {
                     Listener = new TcpListener(System.Net.IPAddress.Any, Port);
                     Listener.Start();
-                    ThreadUtil.Start(AcceptLoop);
                     isListening = true;
+                    ThreadUtil.Start(AcceptLoop);
+                 
+                  
                 }
             }
         }
@@ -53,10 +56,14 @@ namespace EPI.Comm.Net
             {
                 if (isListening)
                 {
+                    isListening = false;
                     Listener.Stop();
                     Listener = null;
                     DisposeAllClients();
-                    isListening = false;
+               
+                    while (acceptLoopingOn)
+                    {
+                    }
                 }
             }
         }
@@ -75,8 +82,10 @@ namespace EPI.Comm.Net
                 client?.Send(bytes);
             }
         }
+        private volatile bool acceptLoopingOn = false;
         private void AcceptLoop()
         {
+            acceptLoopingOn = true;
             while (true)
             {
                 try
@@ -97,26 +106,32 @@ namespace EPI.Comm.Net
                     Debug.WriteLine(nameof(AcceptLoop));
                 }
             }
+            acceptLoopingOn = false;
         }
         private void Accept()
         {
             try
             {
-                var tcpClient = Listener.AcceptTcpClient();
-                var client = new TcpNetClient(tcpClient, BufferSize);
-                SetClient(client);
+                var tcpClient = Listener?.AcceptTcpClient();
+                if(tcpClient!=null)
+                {
+                    var client = new TcpNetClient(tcpClient, BufferSize);
+                    SetClient(client);
 
-                Accpeted?.Invoke(client, EventArgs.Empty);
+                    Accpeted?.Invoke(client, EventArgs.Empty);
+                }
+               
 
-            }
-            catch (SocketException socketException)
-            {
-                throw CreateCommException(socketException);
             }
             catch (ObjectDisposedException disposedException)
             {
                 throw CreateCommException(disposedException);
             }
+            catch (SocketException socketException)
+            {
+                throw CreateCommException(socketException);
+            }
+           
             catch (NullReferenceException nullException)
             {
                 throw CreateCommException(nullException);
@@ -156,7 +171,7 @@ namespace EPI.Comm.Net
         }
         private void DisposeAllClients()
         {
-            var clients = Clients.ToArray();
+            var clients = Clients?.ToArray() ?? new TcpNetClient[0];
             foreach (var client in clients)
             {
                 ClearClient(client);
@@ -175,7 +190,7 @@ namespace EPI.Comm.Net
                 if (disposing)
                 {
                     // TODO: 관리형 상태(관리형 개체)를 삭제합니다.
-                    Listener.Stop();
+                    Listener?.Stop();
                     DisposeAllClients();
                 }
                 Listener = null;

@@ -13,14 +13,14 @@
             <ColumnDefinition Width="auto"/>
 
         </Grid.ColumnDefinitions>
-        <TextBox Grid.Column="0" x:Name="text" Background="AliceBlue" KeyDown="text_KeyDown"  />
+        <TextBox Grid.Column="0" x:Name="text" Background="AliceBlue" AcceptsReturn="True" AcceptsTab="True"  />
         <TextBlock Grid.Column="1" x:Name="recv" Background="AliceBlue" ScrollViewer.VerticalScrollBarVisibility="Auto" />
     
         <StackPanel Grid.Column="2" Margin="5">
             <Button Width="100" Height="50" Content="Start" Click="Start"/>
             <Button Width="100" Height="50" Content="Stop" Click="Stop"/>
             <Button Width="100" Height="50" Content="Clear" Click="Clear"/>
-            <Button Width="100" Height="50" Content="Send" Click="Button_Click"/>
+            <Button Width="100" Height="50" Content="Send" Click="Send"/>
         </StackPanel>
             
     </Grid>

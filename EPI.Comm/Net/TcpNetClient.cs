@@ -15,7 +15,7 @@ namespace EPI.Comm.Net
     {
 
         public string Ip { get; protected set; }
-        public int Port { get; protected set; }
+        public int Port { get; set; }
         public int BufferSize { get;protected set; }
         protected TcpClient TcpClient { get; set; }
         internal NetSocket ScHolder { get; private set; }

@@ -1,35 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net.Sockets;
-using System.Net;
-using System.Runtime.InteropServices;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
-using System.Threading.Tasks;
-using System.IO;
-using System.Threading;
-using System.Reflection.Emit;
-using System.Runtime.Serialization;
-using System.Runtime.Remoting.Messaging;
-using System.Reflection;
-using System.Collections;
 
-namespace ConsoleTest
+namespace EPI.Comm.Buffers
 {
-    internal class QueueBuffer
+    internal interface IBuffer
     {
-        public byte[] buffer;
+        int Count { get; }
+        byte[] GetBytes(int count);
+
+        void AddBytes(byte[] bytes);
+    }
+    internal class QueueBuffer : IBuffer
+    {
+        protected byte[] buffer;
+        public int Capacity => buffer.Length;
         protected int head;
         protected int tail;
-        protected int size;
+        protected int queueDataCount;
         protected int version;
-        public int Capacity => buffer.Length;
-        public int Count => size;
+        public int Count => queueDataCount;
 
         public QueueBuffer() : this(4)
         {
-           
+
         }
         public QueueBuffer(int capacity)
         {
@@ -38,10 +32,10 @@ namespace ConsoleTest
             tail = 0;
             version = 0;
         }
-        public byte[] Dequeue(int count)
+        public byte[] GetBytes(int count)
         {
             var array = new byte[count];
-            if (size < count)
+            if (queueDataCount < count)
             {
                 throw new ArgumentOutOfRangeException("count");
             }
@@ -68,10 +62,10 @@ namespace ConsoleTest
 
             return array;
         }
-        public void Enqueue(byte[] bytes)
+        public void AddBytes(byte[] bytes)
         {
             var count = bytes.Length;
-            if (Capacity < count + size)
+            if (Capacity < count + queueDataCount)
             {
                 int newCapacity = (int)(count * 2);
                 if (newCapacity < buffer.Length + 4)
@@ -95,27 +89,27 @@ namespace ConsoleTest
             UpdateTail(count);
             UpdateSize(count);
         }
-        private void UpdateHead(int num)
+        private void UpdateHead(int count)
         {
-            head = (head + num) % buffer.Length;
+            head = (head + count) % buffer.Length;
         }
-        private void UpdateTail(int num)
+        private void UpdateTail(int count)
         {
-            tail = (tail + num) % buffer.Length;
+            tail = (tail + count) % buffer.Length;
         }
         private void UpdateSize(int num)
         {
-            size += num;
+            queueDataCount += num;
         }
 
         private void SetCapacity(int capacity)
         {
             byte[] array = new byte[capacity];
-            if (size > 0)
+            if (queueDataCount > 0)
             {
                 if (head < tail)
                 {
-                    Buffer.BlockCopy(buffer, head, array, 0, size);
+                    Buffer.BlockCopy(buffer, head, array, 0, queueDataCount);
                 }
                 else
                 {
@@ -126,25 +120,36 @@ namespace ConsoleTest
             }
             buffer = array;
             head = 0;
-            tail = ((size != capacity) ? size : 0);
+            tail = ((queueDataCount != capacity) ? queueDataCount : 0);
             version++;
         }
     }
-
-    /// <summary>
-    /// 프로그램
-    /// </summary>
-    public class Program
+    internal class RefreshBuffer : IBuffer
     {
-        /// <summary>
-        /// 메인함수
-        /// </summary>
-        /// <param name="args"></param>
-        public static void Main(string[] args)
+        protected byte[] buffer;
+
+        public int Count => buffer?.Length ?? 0;
+       
+        public RefreshBuffer()
         {
-         
         }
        
-     
+        public void AddBytes(byte[] bytes)
+        {
+            buffer = bytes;
+        }
+        public byte[] GetBytes(int count)
+        {
+            if(buffer.Length < count)
+            {
+                throw new ArgumentOutOfRangeException("count");
+            }
+            else
+            {
+                Array.Resize(ref buffer, count);
+                return buffer;
+            }
+        }
     }
+
 }

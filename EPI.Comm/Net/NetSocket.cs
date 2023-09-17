@@ -14,16 +14,16 @@ namespace EPI.Comm.Net
     internal class NetSocket : CommBase, IComm
     {
         protected Socket Socket { get; set; }
-        protected byte[] Buffer { get; set; }
+        protected byte[] ArrayBuffer { get; set; }
         protected AsyncCallback SendCallback { get; private set; }
         public bool IsConnected => Socket?.Connected ?? false;
         public IPEndPoint LocalEndPoint => Socket?.LocalEndPoint as IPEndPoint;
         public IPEndPoint RemoteEndPoint => Socket?.RemoteEndPoint as IPEndPoint;
-       
+        private static readonly LingerOption lingerOption = new LingerOption(true, 0);
         internal NetSocket(Socket socket, int bufferSize)
         {
             Socket = socket;
-            Buffer = new byte[bufferSize];
+            ArrayBuffer = new byte[bufferSize];
             SetSocketOption(socket);
             InitCallback();
             ThreadUtil.Start(OnReceive);
@@ -34,14 +34,10 @@ namespace EPI.Comm.Net
         }
         private void SetSocketOption(Socket socket)
         {
-            socket.ReceiveBufferSize = Buffer.Length;
-            socket.SendBufferSize = Buffer.Length;
+            socket.ReceiveBufferSize = ArrayBuffer.Length;
+            socket.SendBufferSize = ArrayBuffer.Length;
             socket.NoDelay = true;
-            //var y = socket.GetSocketOption(SocketOptionLevel.Socket, SocketOptionName.DontLinger);
-            //var yy = socket.GetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Linger);
-            socket.LingerState = new LingerOption(true, 0);
-            //var x = socket.GetSocketOption(SocketOptionLevel.Socket, SocketOptionName.DontLinger);
-            //var xx = socket.GetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Linger);
+            socket.LingerState = lingerOption;
         }
         private void InitCallback()
         {
@@ -60,14 +56,18 @@ namespace EPI.Comm.Net
         {
             try
             {
-                int count = Socket.Receive(Buffer);
-                byte[] result = new byte[count];
-                Array.Copy(Buffer, result, count);
-                if(count <= 0)
+                lock (this)
                 {
-                    throw CreateCommException();
+                    int count = Socket.Receive(ArrayBuffer);
+                    byte[] result = new byte[count];
+                    Buffer.BlockCopy(ArrayBuffer, 0, result, 0, count);
+                    if (count <= 0)
+                    {
+                        throw CreateCommException();
+                    }
+                    return result;
                 }
-                return result;
+
             }
             catch (SocketException e)
             {
@@ -105,7 +105,6 @@ namespace EPI.Comm.Net
 
             }
         }
-
         private void RaiseClosed()
         {
             Closed?.Invoke(this, EventArgs.Empty);

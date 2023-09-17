@@ -26,12 +26,13 @@ namespace CommSample.Sample
         {
             InitializeComponent();
             Closed += ServerWindow_Closed;
+            server = new TcpNetServer(int.Parse(port.Text));
             server.Received += Server_BytesReceived;
             server.Closed += Server_Closed;
             server.Accpeted += Server_Accpeted;
-           
-        }
 
+        }
+        public static int ServerPort { get; set; }
         private void Server_Accpeted(object sender, EventArgs e)
         {
             var client = sender as TcpNetClient;
@@ -45,14 +46,14 @@ namespace CommSample.Sample
             var port1 = remote.Port.ToString();
             MessageBox.Show($"server local : {ip0} : {port0} , remote : {ip1} : {port1}");
         }
-      
+
         private void ServerWindow_Closed(object sender, EventArgs e)
         {
             server.Stop();
 
         }
 
-        private TcpNetServer server = new TcpNetServer(5500);
+        private TcpNetServer server;
         private void Server_Closed(object sender, EventArgs e)
         {
             MessageBox.Show("Server Client Closed");
@@ -62,34 +63,74 @@ namespace CommSample.Sample
         {
             Dispatcher.BeginInvoke(new Action(() =>
             {
-                recv.Text += System.Text.Encoding.UTF8.GetString(e.ReceivedBytes) + "\r\n";
+                var build = new StringBuilder();
+                build.AppendLine($"받은 바이트 수 :  {e.ReceivedBytes.Length}");
+                for (int i = 0; i < e.ReceivedBytes.Length; i++)
+                {
+                    if (i % 8 == 0)
+                    {
+                        build.AppendLine();
+                    }
+                    var b = e.ReceivedBytes[i];
+                    build.Append(b + " ");
+
+                }
+                build.AppendLine();
+                recv.Text += build.ToString();
 
             }));
         }
 
         private void Start(object sender, RoutedEventArgs e)
         {
-            server.Start();
+            if (ushort.TryParse(port.Text, out ushort p))
+            {
+                if (!server.IsListening || server.Port != p)
+                {
+                    server.Stop();
+                    server.Port = p;
+                    server.Start();
+                    ServerPort = p;
+                }
+             
+            }
+            else
+            {
+                MessageBox.Show("포트번호 이상");
+            }
+
         }
 
         private void Stop(object sender, RoutedEventArgs e)
         {
+   
             server.Stop();
+
         }
 
-        private void text_KeyDown(object sender, KeyEventArgs e)
+        private void Send(object sender, RoutedEventArgs e)
         {
-            if (e.Key == Key.Enter)
+            var split = text.Text.Split((char[])null, StringSplitOptions.RemoveEmptyEntries);
+            var bytes = new List<byte>();
+
+            foreach (var s in split)
             {
-                var bytes = System.Text.Encoding.UTF8.GetBytes( text.Text);
-                 
-                server.Send(bytes);
+                try
+                {
+                    var b = byte.Parse(s);
+                    bytes.Add(b);
+                }
+                catch (Exception)
+                {
+
+                }
             }
+            server.Send(bytes.ToArray());
         }
         private void Clear(object sender, RoutedEventArgs e)
         {
-            recv.Text= string.Empty;
+            recv.Text = string.Empty;
         }
     }
-  
+
 }

@@ -50,7 +50,7 @@ namespace CommSample.Sample
             client.Stop();
         }
 
-        private TcpNetClient client = new TcpNetClient("127.0.0.1", 5500);
+        private TcpNetClient client = new TcpNetClient("127.0.0.1", ServerWindow.ServerPort);
         private void Client_Closed(object sender, EventArgs e)
         {
             MessageBox.Show("Client Closed");
@@ -60,14 +60,31 @@ namespace CommSample.Sample
         {
             Dispatcher.BeginInvoke(new Action(() =>
             {
-                //recv.Text = System.Text.Encoding.UTF8.GetString(e.ReceivedBytes) + "\r\n";
-                recv.Text += e.ReceivedBytes.Length + "\r\n";
+                var build = new StringBuilder();
+                build.AppendLine($"받은 바이트 수 :  {e.ReceivedBytes.Length}");
+                for (int i = 0; i < e.ReceivedBytes.Length; i++)
+                {
+                    if (i % 8 == 0)
+                    {
+                        build.AppendLine();
+                    }
+                    var b = e.ReceivedBytes[i];
+                    build.Append(b + " ");
+
+                }
+                build.AppendLine();
+                recv.Text += build.ToString();
 
             }));
         }
 
         private void Start(object sender, RoutedEventArgs e)
         {
+            if(client.IsConnected)
+            {
+                client.Stop();
+            }
+            client.Port = ServerWindow.ServerPort;
             client.Connect();
         }
 
@@ -76,14 +93,24 @@ namespace CommSample.Sample
             client.Stop();
         }
 
-        private void text_KeyDown(object sender, KeyEventArgs e)
+        private void Send(object sender, RoutedEventArgs e)
         {
-            if(e.Key == Key.Enter)
+            var split = text.Text.Split((char[])null, StringSplitOptions.RemoveEmptyEntries);
+            var bytes = new List<byte>();
+
+            foreach (var s in split)
             {
-                var bytes = text.Text;
-                client.Send(bytes);
+                try
+                {
+                    var b = byte.Parse(s);
+                    bytes.Add(b);
+                }
+                catch (Exception)
+                {
+
+                }
             }
-      
+            client.Send(bytes.ToArray());
         }
 
         private void Clear(object sender, RoutedEventArgs e)
