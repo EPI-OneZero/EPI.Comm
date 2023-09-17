@@ -9,9 +9,9 @@ using System.Text;
 using System.Threading.Tasks;
 using static EPI.Comm.CommException;
 
-namespace EPI.Comm.Tcp
+namespace EPI.Comm.Net
 {
-    public class SocketHolder : CommBase, IComm
+    internal class NetSocket : CommBase, IComm
     {
         protected Socket Socket { get; set; }
         protected byte[] Buffer { get; set; }
@@ -20,7 +20,7 @@ namespace EPI.Comm.Tcp
         public IPEndPoint LocalEndPoint => Socket?.LocalEndPoint as IPEndPoint;
         public IPEndPoint RemoteEndPoint => Socket?.RemoteEndPoint as IPEndPoint;
        
-        internal SocketHolder(Socket socket, int bufferSize)
+        internal NetSocket(Socket socket, int bufferSize)
         {
             Socket = socket;
             Buffer = new byte[bufferSize];

@@ -1,5 +1,5 @@
 ﻿using EPI.Comm;
-using EPI.Comm.Tcp;
+using EPI.Comm.Net;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,7 +33,7 @@ namespace CommSample.Sample
 
         private void Client_Connected(object sender, EventArgs e)
         {
-            var client = sender as Client;
+            var client = sender as TcpNetClient;
             var local = client.LocalEndPoint;
             var remote = client.RemoteEndPoint;
 
@@ -50,7 +50,7 @@ namespace CommSample.Sample
             client.Stop();
         }
 
-        private Client client = new Client("127.0.0.1", 5500);
+        private TcpNetClient client = new TcpNetClient("127.0.0.1", 5500);
         private void Client_Closed(object sender, EventArgs e)
         {
             MessageBox.Show("Client Closed");
@@ -60,8 +60,8 @@ namespace CommSample.Sample
         {
             Dispatcher.BeginInvoke(new Action(() =>
             {
-                recv.Text = System.Text.Encoding.UTF8.GetString(e.ReceivedBytes) + "\r\n";
-                recv.Text =e.ReceivedBytes.Length + "\r\n";
+                //recv.Text = System.Text.Encoding.UTF8.GetString(e.ReceivedBytes) + "\r\n";
+                recv.Text += e.ReceivedBytes.Length + "\r\n";
 
             }));
         }

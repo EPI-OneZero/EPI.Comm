@@ -1,5 +1,5 @@
 ﻿using EPI.Comm;
-using EPI.Comm.Tcp;
+using EPI.Comm.Net;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,7 +37,7 @@ namespace CommSample.Sample
 
         private void Server_Accpeted(object sender, EventArgs e)
         {
-            var client = sender as Client;
+            var client = sender as TcpNetClient;
             var local = client.LocalEndPoint;
             var remote = client.RemoteEndPoint;
 
@@ -56,7 +56,7 @@ namespace CommSample.Sample
 
         }
 
-        private Server server = new Server(5500);
+        private TcpNetServer server = new TcpNetServer(5500,15000);
         private void Server_Closed(object sender, EventArgs e)
         {
             MessageBox.Show("Server Client Closed");
@@ -86,10 +86,8 @@ namespace CommSample.Sample
             if (e.Key == Key.Enter)
             {
                 var bytes = System.Text.Encoding.UTF8.GetBytes( text.Text);
-                var size = BitConverter.GetBytes(bytes.Length);
-                Array.Resize(ref size, size.Length + bytes.Length);
-                bytes.CopyTo(size, 4);    
-                server.Send(bytes);
+                 
+                server.Send(new byte[15000]);
             }
         }
         private void Clear(object sender, RoutedEventArgs e)

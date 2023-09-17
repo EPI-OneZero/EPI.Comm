@@ -8,23 +8,23 @@ using System.Text;
 using System.Threading.Tasks;
 using static EPI.Comm.CommException;
 
-namespace EPI.Comm.Tcp
+namespace EPI.Comm.Net
 {
-    public class Server : CommBase, IComm, IDisposable
+    public class TcpNetServer : CommBase, IComm, IDisposable
     {
         protected TcpListener Listener { get; set; }
         protected volatile bool isListening = false;
         protected int Port { get; set; }
         protected int BufferSize { get; set; }
-        protected List<Client> Clients { get; set; } = new List<Client>();
+        protected List<TcpNetClient> Clients { get; set; } = new List<TcpNetClient>();
         protected object startStopLock = new object();
 
-        public Server(int port, int bufferSize)
+        public TcpNetServer(int port, int bufferSize)
         {
             Port = port;
             BufferSize = bufferSize;
         }
-        public Server(int port) : this(port, DefaultBufferSize)
+        public TcpNetServer(int port) : this(port, DefaultBufferSize)
         {
             
         }
@@ -103,7 +103,7 @@ namespace EPI.Comm.Tcp
             try
             {
                 var tcpClient = Listener.AcceptTcpClient();
-                var client = new Client(tcpClient, BufferSize);
+                var client = new TcpNetClient(tcpClient, BufferSize);
                 SetClient(client);
 
                 Accpeted?.Invoke(client, EventArgs.Empty);
@@ -126,7 +126,7 @@ namespace EPI.Comm.Tcp
                 Debug.WriteLine(nameof(Accept));
             }
         }
-        private void SetClient(Client client)
+        private void SetClient(TcpNetClient client)
         {
             client.Received += ClientReceived;
             client.Closed += ClientClosed;
@@ -136,7 +136,7 @@ namespace EPI.Comm.Tcp
         /// 클라이언트 연결해제
         /// </summary>
         /// <param name="client"></param>
-        private void ClearClient(Client client)
+        private void ClearClient(TcpNetClient client)
         {
             client.Received -= ClientReceived;
             client.Closed -= ClientClosed;
@@ -150,7 +150,7 @@ namespace EPI.Comm.Tcp
 
         private void ClientClosed(object sender, EventArgs e)
         {
-            var client = sender as Client;
+            var client = sender as TcpNetClient;
             ClearClient(client);
          
         }

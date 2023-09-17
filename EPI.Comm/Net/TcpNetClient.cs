@@ -9,35 +9,34 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EPI.Comm.Tcp
+namespace EPI.Comm.Net
 {
-    public class Client : CommBase, IComm, IDisposable
+    public partial class TcpNetClient : CommBase, IComm, IDisposable
     {
 
         public string Ip { get; protected set; }
         public int Port { get; protected set; }
         public int BufferSize { get;protected set; }
         protected TcpClient TcpClient { get; set; }
-        protected SocketHolder SocketHolder { get; set; }
-        public IPEndPoint LocalEndPoint => SocketHolder?.LocalEndPoint;
-        public IPEndPoint RemoteEndPoint => SocketHolder?.RemoteEndPoint;
-        public bool IsConnected => SocketHolder?.IsConnected ?? false;
-        public Client(string ip, int port, int bufferSize )
+        internal NetSocket ScHolder { get; private set; }
+        public IPEndPoint LocalEndPoint => ScHolder?.LocalEndPoint;
+        public IPEndPoint RemoteEndPoint => ScHolder?.RemoteEndPoint;
+        public bool IsConnected => ScHolder?.IsConnected ?? false;
+        public TcpNetClient(string ip, int port, int bufferSize )
         {
             Ip = ip;
             Port = port;
             BufferSize = bufferSize;
         }
-        public Client(string ip, int port) : this(ip, port, DefaultBufferSize)
+        public TcpNetClient(string ip, int port) : this(ip, port, DefaultBufferSize)
         {
-
         }
         /// <summary>
         /// server가 acept한 client에 대한 생성자
         /// </summary>
         /// <param name="client"></param>
         /// <param name="bufferSize"></param>
-        internal Client(TcpClient client, int bufferSize)
+        internal TcpNetClient(TcpClient client, int bufferSize)
         {
             TcpClient = client;
             var endpoint = (IPEndPoint)client.Client.RemoteEndPoint;
@@ -52,20 +51,20 @@ namespace EPI.Comm.Tcp
         /// <param name="client"></param>
         private void SetSocketHolder(TcpClient client)
         {
-            SocketHolder = new SocketHolder(client.Client, BufferSize);
-            SocketHolder.Received += SocketReceived;
-            SocketHolder.Closed += SocketClosed;
+            ScHolder = new NetSocket(client.Client, BufferSize);
+            ScHolder.Received += SocketReceived;
+            ScHolder.Closed += SocketClosed;
         }
         /// <summary>
         /// 소켓 이벤트 연결해제
         /// </summary>
         private void ClearSocketHolder()
         {
-            if (SocketHolder != null)
+            if (ScHolder != null)
             {
-                SocketHolder.Received -= SocketReceived;
-                SocketHolder.Closed -= SocketClosed;
-                SocketHolder = null;
+                ScHolder.Received -= SocketReceived;
+                ScHolder.Closed -= SocketClosed;
+                ScHolder = null;
             }
         }
 
@@ -136,7 +135,7 @@ namespace EPI.Comm.Tcp
         }
         public void Send(byte[] bytes)
         {
-            SocketHolder?.Send(bytes);
+            ScHolder?.Send(bytes);
         }
         public event EventHandler Closed;
         public event EventHandler Connected;

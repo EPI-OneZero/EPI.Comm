@@ -50,7 +50,7 @@
     <Compile Include="Tcp\Generic\PacketOfT.cs" />
     <Compile Include="Tcp\SocketHolder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Tcp\Server.cs" />
+    <Compile Include="Tcp\TcpServer.cs" />
     <Compile Include="Threading\ThreadUtil.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

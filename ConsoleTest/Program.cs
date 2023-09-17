@@ -1,31 +1,52 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Sockets;
+using System.Net;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
+using System.Threading;
+using System.Reflection.Emit;
+using System.Runtime.Serialization;
+using System.Runtime.Remoting.Messaging;
+using System.Reflection;
 
 namespace ConsoleTest
 {
-    internal class Program
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    class MyClass
     {
-        [StructLayout(LayoutKind.Sequential,CharSet = CharSet.Unicode, Pack =1)]
-        public class MyClass
+        public int A  = 1;
+        internal int B  = 2;
+        private int C = 3;
+        public override string ToString()
         {
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 8)]
-            public string c;
-            public int A;
-            public short a;
-            public int B;
-            public short b;
+            return base.ToString(); 
         }
+    }
+
+
+    unsafe internal class Program
+    {
         static void Main(string[] args)
         {
-            var handle = GCHandle.Alloc(new char[] { '가', '나', '\0','b', (char)1,(char)0,(char)3, (char)2, (char)0,(char)4 }, GCHandleType.Pinned);
-            var size = Marshal.SizeOf(typeof(MyClass));
-            object s = Marshal.PtrToStructure<MyClass>(handle.AddrOfPinnedObject());
-            handle.Free();
+            var x = new MyClass();
+            var handle = GCHandle.Alloc(x, GCHandleType.Pinned);
+          
+            fixed (int* p1 = &x.B)
+            {
+                var p2 = (IntPtr)(p1);
+                var ptr = *(IntPtr*)(&x);
+                var ptr1 = handle.AddrOfPinnedObject();
+                var d = (long)ptr1 - (long)ptr;
+                var d1 = (long)p2 - (long)ptr;
+            }
+     
+          
+      
         }
     }
 }
