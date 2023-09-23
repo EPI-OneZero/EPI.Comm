@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace EPI.Comm.Threading
+namespace EPI.Comm.UTils
 {
     internal static class ThreadUtil
     {

@@ -1,215 +1,114 @@
-﻿using System;
+﻿using EPI.Comm.Buffers;
+using EPI.Comm.Net.Events;
+using EPI.Comm.Net.Generic.Events;
+using EPI.Comm.Net.Generic.Packets;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
+using System.Net;
+using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace EPI.Comm.Net.Generic
 {
-    public class TcpNetClient<Theader, TFooter> : TcpNetClient<Theader>
+    public class TcpNetClient<Theader> : TcpNetClient, IComm<Theader>
     {
-        private Packet<Theader,TFooter> Packet { get; set; }
-
-        private SerializeState serializeState = SerializeState.Initial;
-
-        private object recvLock = new object();
-        public TcpNetClient(string ip, int port, int bufferSize, Func<Theader, int> getBodySize) : base(ip, port, bufferSize, getBodySize)
-        {
-            HeaderSize = Marshal.SizeOf(typeof(Theader));
-        }
-
-      
-        public TcpNetClient(string ip, int port, Func<Theader, int> getPacketSize) : this(ip, port, DefaultBufferSize, getPacketSize)
-        {
-
-        }
-        protected override void ClientReceived(object sender, CommReceiveEventArgs e)
-        {
-            
-        }
-
-         new public event EventHandler<PacketEventArgs<Theader, TFooter>> PacketReceived;
-    }
-    public class TcpNetClient<Theader> : TcpNetClient
-    {
-        protected enum SerializeState
-        {
-            Initial,
-            HeaderSerialized,
-            BodySerialized,
-            FooterSerialized
-        }
-
-        protected Func<Theader, int> GetBodySizeFunc { get; private set; }
-        private Queue<byte> buffer;
-        internal int BufferCount => buffer.Count;
         internal int HeaderSize { get; set; }
-        private Packet<Theader> Packet { get; set; } = new Packet<Theader>();
-
-        private SerializeState serializeState = SerializeState.Initial;
-
-        private object recvLock = new object();
-        public TcpNetClient(string ip, int port, int bufferSize, Func<Theader, int> getBodySize) : base(ip, port, bufferSize)
+        internal IBuffer ReceiveBuffer { get; set; } = new QueueBuffer();
+        internal Func<Theader, int> GetBodySize { get; private set; }
+        internal Packet<Theader> Packet { get; set; }
+        public TcpNetClient(int bufferSize, Func<Theader, int> getBodySize) : base(bufferSize)
         {
             HeaderSize = Marshal.SizeOf(typeof(Theader));
-            buffer = new Queue<byte>(bufferSize);
-            GetBodySizeFunc = getBodySize;  
-            Received += ClientReceived;
+            GetBodySize = getBodySize;
+            base.Received += ClientReceived;
         }
-        public TcpNetClient(string ip, int port, Func<Theader, int> getBodySize) : this(ip, port, DefaultBufferSize, getBodySize)
+        public TcpNetClient(Func<Theader, int> getBodySize) : this(DefaultBufferSize, getBodySize)
         {
-
-        }
-        protected virtual void ClientReceived(object sender, CommReceiveEventArgs e)
-        {
-            lock (recvLock)
-            {
-                Enqueue(e.ReceivedBytes);
-                if (TrySerializePacket(Packet))
-                {
-                    PacketReceived?.Invoke(this, new PacketEventArgs<Theader>(Packet));
-                    serializeState = SerializeState.Initial;
-                    Packet = new Packet<Theader>();
-                }
-            }
-        }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns>isFinished</returns>
-        protected virtual bool TrySerializePacket(Packet<Theader> packet)
-        {
-            serializeState = SerializePacket(serializeState, packet);
-            return serializeState == SerializeState.BodySerialized;
-        }
-        protected virtual SerializeState SerializePacket(SerializeState state, Packet<Theader> packet)
-        {
-            switch (state)
-            {
-                case SerializeState.Initial:
-                    if (TrySerializeHeader(packet))
-                    {
-                        return SerializePacket(SerializeState.HeaderSerialized, packet);
-                    }
-                    else
-                    {
-                        return state;
-                    }
-                case SerializeState.HeaderSerialized:
-                    if (TrySerializeBody(packet))
-                    {
-                        return SerializeState.BodySerialized;
-                    }
-                    else
-                    {
-                        return state;
-                    }
-                default:
-                    throw new InvalidOperationException();
-            }
-        }
-        private bool TrySerializeHeader(Packet<Theader> packet)
-        {
-            if (PacketSerializer.IsEnoughSize(BufferCount, 0, HeaderSize))
-            {
-                var headerBytes = Dequeue(HeaderSize);
-                packet.Header = PacketSerializer.Deserialize<Theader>(headerBytes, HeaderSize, 0);
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-        private bool TrySerializeBody(Packet<Theader> packet)
-        {
-            int bodySize = GetBodySize(packet.Header);
-            if (bodySize < 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(bodySize));
-            }
-            if (PacketSerializer.IsEnoughSize(BufferCount, 0, bodySize))
-            {
-                packet.Body = Dequeue(bodySize);
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-        
-        public event EventHandler<PacketEventArgs<Theader>> PacketReceived;
-        private int GetBodySize(Theader t)
-        {
-            return GetBodySizeFunc?.Invoke(t) ?? 0;
-        }
-        protected void Enqueue(byte[] bytes)
-        {
-            foreach (var b in bytes)
-            {
-                buffer.Enqueue(b);
-            }
-        }
-        protected byte[] Dequeue(int size)
-        {
-            var bytes = new byte[size];
-            for (int i = 0; i < size; i++)
-            {
-                bytes[i] = buffer.Dequeue();
-            }
-            return bytes;
         }
 
+        internal TcpNetClient(TcpClient client, int bufferSize, Func<Theader, int> getBodySize) : base(client, bufferSize)
+        {
+            HeaderSize = Marshal.SizeOf(typeof(Theader));
+            GetBodySize = getBodySize;
+            base.Received += ClientReceived;
+        }
+        public void Send(Theader header, byte[] body)
+        {
+            var fullPacketBytes = new byte[HeaderSize + body.Length];
+            PacketSerializer.Serialize(header, fullPacketBytes, 0, HeaderSize);
+            Buffer.BlockCopy(body, 0, fullPacketBytes, HeaderSize, body.Length);
+            Send(fullPacketBytes);
+        }
+        private void ClientReceived(object sender, CommReceiveEventArgs e)
+        {
+            Packet = new Packet<Theader>(GetBodySize);
+            ReceiveBuffer.AddBytes(e.ReceivedBytes);
+            if (Packet.TryDeserializePacket(ReceiveBuffer))
+            {
+                Received?.Invoke(this, new PacketEventArgs<Theader>(Packet));
+            }
+        }
+        new public event PacketEventHandler<Theader> Received;
     }
-    
-    internal static class PacketSerializer
+    public class TcpNetClient<Theader, Tfooter> : TcpNetClient, IComm<Theader,Tfooter>
     {
-        public static bool IsEnoughSize(int sourceSize, int targetSize, int offset)
+        internal int HeaderSize { get; set; }
+        internal int FooterSize { get; set; }
+        internal IBuffer ReceiveBuffer { get; set; } = new QueueBuffer();
+        private Packet<Theader, Tfooter> Packet { get; set; }
+        internal Func<Theader, int> GetBodySize { get; private set; }
+        public TcpNetClient(int bufferSize, Func<Theader, int> getBodySize) : base(bufferSize)
         {
-            return sourceSize - offset >= targetSize;
+            GetBodySize = getBodySize;
+            HeaderSize = Marshal.SizeOf(typeof(Theader));
+            FooterSize = Marshal.SizeOf(typeof(Tfooter));
+            base.Received += ClientReceived;
         }
-        public static byte[] Deserialize(byte[] bytes, int targetSize, int offset)
+        public TcpNetClient(Func<Theader, int> getBodySize) : this(DefaultBufferSize, getBodySize)
         {
-            if (IsEnoughSize(bytes?.Length ?? 0, offset, targetSize))
+        }
+        internal TcpNetClient(TcpClient client, int bufferSize, Func<Theader, int> getBodySize) : base(client, bufferSize)
+        {
+            HeaderSize = Marshal.SizeOf(typeof(Theader));
+            GetBodySize = getBodySize;
+            base.Received += ClientReceived;
+        }
+        public void Send(Theader header, byte[] body, Tfooter footer)
+        {
+            int bodySize = body.Length;
+            var fullPacketBytes = new byte[HeaderSize + bodySize + FooterSize];
+
+            PacketSerializer.Serialize(header, fullPacketBytes, 0, HeaderSize);
+
+            Buffer.BlockCopy(body, 0, fullPacketBytes, HeaderSize, bodySize);
+
+            PacketSerializer.Serialize(footer, fullPacketBytes, HeaderSize + bodySize, FooterSize);
+
+            Send(fullPacketBytes);
+        }
+        private void ClientReceived(object sender, CommReceiveEventArgs e)
+        {
+            lock (this)
             {
-                var result = new byte[targetSize];
-                if(targetSize > 0)
+                if (Packet == null)
                 {
-                    Array.Copy(bytes, offset, result, 0, targetSize);
+                    Packet = new Packet<Theader, Tfooter>(GetBodySize);
                 }
-                return result;
+                ReceiveBuffer.AddBytes(e.ReceivedBytes);
+
+                if (Packet.TryDeserializePacket(ReceiveBuffer))
+                {
+                    var packet = Packet;
+                    Packet = null;
+                    Received?.Invoke(this, new PacketEventArgs<Theader, Tfooter>(packet));
+                }
             }
-            else
-            {
-                throw new IndexOutOfRangeException(nameof(bytes));
-            }
+           
         }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="bytes"></param>
-        /// <param name="targetSize"></param>
-        /// <param name="offset"></param>
-        /// <param name="caller"></param>
-        /// <returns></returns>
-        /// <exception cref="IndexOutOfRangeException"></exception>
-        public static T Deserialize<T>(byte[] bytes, int targetSize, int offset, [CallerMemberName] string caller = "")
-        {
-            if (IsEnoughSize(bytes?.Length ?? 0, offset, targetSize))
-            {
-                var handle = GCHandle.Alloc(bytes, GCHandleType.Pinned);
-                var result = Marshal.PtrToStructure<T>(handle.AddrOfPinnedObject() + offset);
-                handle.Free();
-                return result;
-            }
-            else
-            {
-                throw new IndexOutOfRangeException($"{caller} : nameof(bytes)");
-            }
-        }
+        new public event PacketEventHandler<Theader, Tfooter> Received;
     }
+   
 }

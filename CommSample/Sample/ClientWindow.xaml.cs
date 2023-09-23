@@ -1,5 +1,5 @@
-﻿using EPI.Comm;
-using EPI.Comm.Net;
+﻿using EPI.Comm.Net;
+using EPI.Comm.Net.Events;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,6 +25,12 @@ namespace CommSample.Sample
         public ClientWindow()
         {
             InitializeComponent();
+
+           
+        }
+        private void InitClient()
+        {
+            client = new TcpNetClient();
             client.Received += Client_BytesReceived;
             client.Closed += Client_Closed;
             client.Connected += Client_Connected; ;
@@ -47,10 +53,10 @@ namespace CommSample.Sample
 
         private void ClientWindow_Closed(object sender, EventArgs e)
         {
-            client.Stop();
+            client?.Dispose();
         }
 
-        private TcpNetClient client = new TcpNetClient("127.0.0.1", ServerWindow.ServerPort);
+        private TcpNetClient client = new TcpNetClient();
         private void Client_Closed(object sender, EventArgs e)
         {
             MessageBox.Show("Client Closed");
@@ -80,17 +86,17 @@ namespace CommSample.Sample
 
         private void Start(object sender, RoutedEventArgs e)
         {
-            if(client.IsConnected)
-            {
-                client.Stop();
-            }
-            client.Port = ServerWindow.ServerPort;
-            client.Connect();
+            client?.Dispose();
+            client = null;
+            InitClient();
+            client.Connect("127.0.0.1", ServerWindow.ServerPort);
         }
 
         private void Stop(object sender, RoutedEventArgs e)
         {
-            client.Stop();
+            client?.Dispose();
+            client = null;
+
         }
 
         private void Send(object sender, RoutedEventArgs e)

@@ -1,5 +1,5 @@
-﻿using EPI.Comm;
-using EPI.Comm.Net;
+﻿using EPI.Comm.Net;
+using EPI.Comm.Net.Events;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,14 +28,14 @@ namespace CommSample.Sample
             Closed += ServerWindow_Closed;
             server = new TcpNetServer(int.Parse(port.Text));
             server.Received += Server_BytesReceived;
-            server.Closed += Server_Closed;
-            server.Accpeted += Server_Accpeted;
+            server.ClientClosed += Server_Closed;
+            server.ClientAccpeted += Server_Accpeted;
 
         }
         public static int ServerPort { get; set; }
-        private void Server_Accpeted(object sender, EventArgs e)
+        private void Server_Accpeted(object sender, TcpEventArgs e)
         {
-            var client = sender as TcpNetClient;
+            var client = e.TcpNetClient;
             var local = client.LocalEndPoint;
             var remote = client.RemoteEndPoint;
 
@@ -54,7 +54,7 @@ namespace CommSample.Sample
         }
 
         private TcpNetServer server;
-        private void Server_Closed(object sender, EventArgs e)
+        private void Server_Closed(object sender, TcpEventArgs e)
         {
             MessageBox.Show("Server Client Closed");
         }
@@ -88,8 +88,7 @@ namespace CommSample.Sample
                 if (!server.IsListening || server.Port != p)
                 {
                     server.Stop();
-                    server.Port = p;
-                    server.Start();
+                    server.StartListen(p);
                     ServerPort = p;
                 }
              

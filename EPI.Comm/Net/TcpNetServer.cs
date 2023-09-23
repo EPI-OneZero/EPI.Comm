@@ -1,8 +1,12 @@
-﻿using EPI.Comm.Threading;
+﻿using EPI.Comm.Net.Events;
+using EPI.Comm.Net.Generic;
+using EPI.Comm.UTils;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,37 +17,39 @@ namespace EPI.Comm.Net
     public class TcpNetServer : CommBase, IComm, IDisposable
     {
         protected TcpListener Listener { get; set; }
-        public bool IsListening { get=> isListening; }
+        public IPEndPoint LocalEndPoint => Listener?.Server?.LocalEndPoint as IPEndPoint;
+        public int Port  => ((IPEndPoint)Listener?.LocalEndpoint)?.Port ?? -1;
+        public bool IsListening { get => isListening; }
+
         protected volatile bool isListening = false;
-        public int Port { get; set; }
         protected int BufferSize { get; set; }
-        protected List<TcpNetClient> Clients { get; set; } = new List<TcpNetClient>();
+        private List<TcpNetClient> clients = new List<TcpNetClient>();
+        public ClientCollection Clients { get; private set; }
+
         protected object startStopLock = new object();
 
-        public TcpNetServer(int port, int bufferSize)
+        public TcpNetServer(int bufferSize)
         {
-            Port = port;
             BufferSize = bufferSize;
+            Clients = new ClientCollection(clients);
         }
-        public TcpNetServer(int port) : this(port, DefaultBufferSize)
+        public TcpNetServer() : this( DefaultBufferSize)
         {
             
         }
         /// <summary>
         ///  서버가 클라이언트를 Accept 시작
         /// </summary>
-        public void Start()
+        public void StartListen(int port)
         {
             lock (startStopLock)
             {
                 if (!isListening)
                 {
-                    Listener = new TcpListener(System.Net.IPAddress.Any, Port);
+                    Listener = new TcpListener(System.Net.IPAddress.Any, port);
                     Listener.Start();
                     isListening = true;
                     ThreadUtil.Start(AcceptLoop);
-                 
-                  
                 }
             }
         }
@@ -68,8 +74,8 @@ namespace EPI.Comm.Net
             }
         }
         public event CommReceiveEventHandler Received;
-        public event EventHandler Closed;
-        public event EventHandler Accpeted;
+        public event CommEventHandler ClientClosed;
+        public event CommEventHandler ClientAccpeted;
         public void Send(string message)
         {
             var bytes = Encoding.UTF8.GetBytes(message);
@@ -77,16 +83,17 @@ namespace EPI.Comm.Net
         }
         public void Send(byte[] bytes)
         {
-            foreach (var client in Clients)
+
+            var result = Parallel.ForEach(clients, c=>
             {
-                client?.Send(bytes);
-            }
+                c.Send(bytes);
+            });
         }
         private volatile bool acceptLoopingOn = false;
         private void AcceptLoop()
         {
             acceptLoopingOn = true;
-            while (true)
+            while (isListening)
             {
                 try
                 {
@@ -115,10 +122,10 @@ namespace EPI.Comm.Net
                 var tcpClient = Listener?.AcceptTcpClient();
                 if(tcpClient!=null)
                 {
-                    var client = new TcpNetClient(tcpClient, BufferSize);
-                    SetClient(client);
+                    var client = CreateClient(tcpClient);
+                    AttachClient(client);
 
-                    Accpeted?.Invoke(client, EventArgs.Empty);
+                    ClientAccpeted?.Invoke(this, new TcpEventArgs(client));
                 }
                
 
@@ -141,45 +148,46 @@ namespace EPI.Comm.Net
                 Debug.WriteLine(nameof(Accept));
             }
         }
-        private void SetClient(TcpNetClient client)
+        private protected virtual TcpNetClient CreateClient(TcpClient client)
         {
-            client.Received += ClientReceived;
-            client.Closed += ClientClosed;
-            Clients.Add(client);
+            return new TcpNetClient(client, BufferSize);
         }
-        /// <summary>
-        /// 클라이언트 연결해제
-        /// </summary>
-        /// <param name="client"></param>
-        private void ClearClient(TcpNetClient client)
+        private void AttachClient(TcpNetClient client)
         {
-            client.Received -= ClientReceived;
-            client.Closed -= ClientClosed;
-            if (Clients.Contains(client))
+            client.Received += OnClientReceived;
+            client.Closed += OnClientClosed;
+            clients.Add(client);
+        }
+  
+        private void DetachClient(TcpNetClient client)
+        {
+            client.Received -= OnClientReceived;
+            client.Closed -= OnClientClosed;
+            if (clients.Contains(client))
             {
-                Clients.Remove(client);
-                Closed?.Invoke(client, EventArgs.Empty);
+                clients.Remove(client);
+                ClientClosed?.Invoke(this, new TcpEventArgs(client));
                 client.Dispose();
             }
         }
 
-        private void ClientClosed(object sender, EventArgs e)
+        private void OnClientClosed(object sender, EventArgs e)
         {
             var client = sender as TcpNetClient;
-            ClearClient(client);
+            DetachClient(client);
          
         }
         private void DisposeAllClients()
         {
-            var clients = Clients?.ToArray() ?? new TcpNetClient[0];
+            var clients = this.clients?.ToArray() ?? new TcpNetClient[0];
             foreach (var client in clients)
             {
-                ClearClient(client);
+                DetachClient(client);
             }
         }
-        private void ClientReceived(object sender, CommReceiveEventArgs e)
+        private void OnClientReceived(object sender, CommReceiveEventArgs e)
         {
-            Received?.Invoke(sender, e);
+            Received?.Invoke(this, e);
         }
 
         #region IDISPOSE
@@ -217,5 +225,12 @@ namespace EPI.Comm.Net
             GC.SuppressFinalize(this);
         }
         #endregion
+    }
+    public sealed class ClientCollection : ReadOnlyCollection<TcpNetClient>
+    {
+
+        internal ClientCollection(IList<TcpNetClient> list) : base(list)
+        {
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using EPI.Comm.Threading;
+﻿using EPI.Comm.Net.Events;
+using EPI.Comm.UTils;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -13,8 +14,10 @@ namespace EPI.Comm.Net
 {
     internal class NetSocket : CommBase, IComm
     {
+        private readonly object SendLock = new object();
+        private readonly object ReceiveLock = new object();
         protected Socket Socket { get; set; }
-        protected byte[] ArrayBuffer { get; set; }
+        protected byte[] ReceiveBuffer { get; set; }
         protected AsyncCallback SendCallback { get; private set; }
         public bool IsConnected => Socket?.Connected ?? false;
         public IPEndPoint LocalEndPoint => Socket?.LocalEndPoint as IPEndPoint;
@@ -23,7 +26,7 @@ namespace EPI.Comm.Net
         internal NetSocket(Socket socket, int bufferSize)
         {
             Socket = socket;
-            ArrayBuffer = new byte[bufferSize];
+            ReceiveBuffer = new byte[bufferSize];
             SetSocketOption(socket);
             InitCallback();
             ThreadUtil.Start(OnReceive);
@@ -34,8 +37,8 @@ namespace EPI.Comm.Net
         }
         private void SetSocketOption(Socket socket)
         {
-            socket.ReceiveBufferSize = ArrayBuffer.Length;
-            socket.SendBufferSize = ArrayBuffer.Length;
+            socket.ReceiveBufferSize = ReceiveBuffer.Length;
+            socket.SendBufferSize = ReceiveBuffer.Length;
             socket.NoDelay = true;
             socket.LingerState = lingerOption;
         }
@@ -45,28 +48,40 @@ namespace EPI.Comm.Net
         }
         public void Send(byte[] bytes)
         {
-            Socket.Send(bytes);
+            try
+            {
+                lock (SendLock)
+                {
+                    Socket.Send(bytes);
+                }
+            }
+            catch (SocketException e)
+            {
+                throw CreateCommException(e);
+            }
+            catch (ObjectDisposedException e)
+            {
+                throw CreateCommException(e);
+            }
+            finally
+            {
+                Debug.WriteLine(nameof(Receive));
+            }
+         
         }
-        internal IAsyncResult SendAsync(byte[] bytes)
-        {
-            var result = Socket.BeginSend(bytes, 0, bytes.Length, SocketFlags.None, SendCallback, Socket);
-            return result;
-        }
+      
         private byte[] Receive()
         {
             try
             {
-                lock (this)
+                int count = Socket.Receive(ReceiveBuffer);
+                byte[] result = new byte[count];
+                Buffer.BlockCopy(ReceiveBuffer, 0, result, 0, count);
+                if (count <= 0)
                 {
-                    int count = Socket.Receive(ArrayBuffer);
-                    byte[] result = new byte[count];
-                    Buffer.BlockCopy(ArrayBuffer, 0, result, 0, count);
-                    if (count <= 0)
-                    {
-                        throw CreateCommException();
-                    }
-                    return result;
+                    throw CreateCommException();
                 }
+                return result;
 
             }
             catch (SocketException e)
@@ -89,7 +104,11 @@ namespace EPI.Comm.Net
             {
                 try
                 {
-                    var recv = Receive();
+                    byte[] recv;
+                    lock (ReceiveLock)
+                    {
+                        recv = Receive();
+                    }
                     Received?.Invoke(this, new CommReceiveEventArgs(recv));
                 }
                 catch(CommException e) // 연결을 끊었을 때

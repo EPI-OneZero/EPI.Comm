@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace EPI.Comm
+namespace EPI.Comm.Net.Events
 {
     public class CommReceiveEventArgs : EventArgs
     {

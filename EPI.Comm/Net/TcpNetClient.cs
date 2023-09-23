@@ -8,27 +8,26 @@ using System.Net.Sockets;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
+using EPI.Comm.Net.Events;
 
 namespace EPI.Comm.Net
 {
     public partial class TcpNetClient : CommBase, IComm, IDisposable
     {
-
-        public string Ip { get; protected set; }
-        public int Port { get; set; }
-        public int BufferSize { get;protected set; }
+        private readonly object ConnectLock = new object();
+        public int BufferSize { get; set; }
         protected TcpClient TcpClient { get; set; }
-        internal NetSocket ScHolder { get; private set; }
-        public IPEndPoint LocalEndPoint => ScHolder?.LocalEndPoint;
-        public IPEndPoint RemoteEndPoint => ScHolder?.RemoteEndPoint;
-        public bool IsConnected => ScHolder?.IsConnected ?? false;
-        public TcpNetClient(string ip, int port, int bufferSize )
+        internal NetSocket NetSocket { get; private set; }
+        public IPEndPoint LocalEndPoint => NetSocket?.LocalEndPoint;
+        public IPEndPoint RemoteEndPoint => NetSocket?.RemoteEndPoint;
+        public bool IsConnected => NetSocket?.IsConnected ?? false;
+        public bool AutoReconnect { get; set; }
+        public TcpNetClient(int bufferSize)
         {
-            Ip = ip;
-            Port = port;
+           
             BufferSize = bufferSize;
         }
-        public TcpNetClient(string ip, int port) : this(ip, port, DefaultBufferSize)
+        public TcpNetClient() : this(DefaultBufferSize)
         {
         }
         /// <summary>
@@ -39,65 +38,56 @@ namespace EPI.Comm.Net
         internal TcpNetClient(TcpClient client, int bufferSize)
         {
             TcpClient = client;
-            var endpoint = (IPEndPoint)client.Client.RemoteEndPoint;
-            Ip = endpoint.Address.ToString();
-            Port = endpoint.Port;
             BufferSize = bufferSize;
-            SetSocketHolder(TcpClient);
+            AttachSocket(TcpClient);
         }
-        /// <summary>
-        /// 소켓 이벤트 연결
-        /// </summary>
-        /// <param name="client"></param>
-        private void SetSocketHolder(TcpClient client)
+        private void AttachSocket(TcpClient client)
         {
-            ScHolder = new NetSocket(client.Client, BufferSize);
-            ScHolder.Received += SocketReceived;
-            ScHolder.Closed += SocketClosed;
+            NetSocket = new NetSocket(client.Client, BufferSize);
+            NetSocket.Received += SocketReceived;
+            NetSocket.Closed += SocketClosed;
         }
-        /// <summary>
-        /// 소켓 이벤트 연결해제
-        /// </summary>
-        private void ClearSocketHolder()
+    
+        private void DetachSocket()
         {
-            if (ScHolder != null)
+            if (NetSocket != null)
             {
-                ScHolder.Received -= SocketReceived;
-                ScHolder.Closed -= SocketClosed;
-                ScHolder = null;
+                NetSocket.Received -= SocketReceived;
+                NetSocket.Closed -= SocketClosed;
+                NetSocket = null;
             }
         }
 
-        public void Connect()
+        public void Connect(string ip, int port)
         {
-            try
+            lock (ConnectLock)
             {
-             
-                if(!IsConnected)
+                try
                 {
-                    TcpClient = new TcpClient();
-                    TcpClient.Connect(Ip, Port);
-                    SetSocketHolder(TcpClient);
-                    Connected?.Invoke(this, EventArgs.Empty);
+                    if (!IsConnected)
+                    {
+                        TcpClient = new TcpClient();
+                        TcpClient.Connect(ip, port);
+                        AttachSocket(TcpClient);
+                        Connected?.Invoke(this, EventArgs.Empty);
+                    }
                 }
-                else
+                catch (SocketException e)
                 {
+                    Debug.WriteLine(e.Message);
+                }
+                finally
+                {
+                    Debug.WriteLine(nameof(Connect));
                 }
             }
-            catch (SocketException e)
-            {
-                Debug.WriteLine(e.Message);
-            }
-            finally
-            {
-                Debug.WriteLine(nameof(Connect));
-            }
+     
 
         }
 
         private void SocketClosed(object sender, EventArgs e)
         {
-            ClearSocketHolder();
+            DetachSocket();
             TcpClient?.Close();
             TcpClient = null;
             RaiseCloseEvent();
@@ -112,13 +102,17 @@ namespace EPI.Comm.Net
         /// </summary>
         public void Stop()
         {
-            if(IsConnected)
+            lock (ConnectLock)
             {
-                ClearSocketHolder();
-                TcpClient?.Close();
-                TcpClient = null;
-                RaiseCloseEvent();
+                if (IsConnected)
+                {
+                    DetachSocket();
+                    TcpClient?.Close();
+                    TcpClient = null;
+                    RaiseCloseEvent();
+                }
             }
+          
           
         }
         /// <summary>
@@ -135,7 +129,14 @@ namespace EPI.Comm.Net
         }
         public void Send(byte[] bytes)
         {
-            ScHolder?.Send(bytes);
+            try
+            {
+                NetSocket?.Send(bytes);
+            }
+            catch (CommException e)
+            {
+                Debug.WriteLine(e.Message);
+            }
         }
         public event EventHandler Closed;
         public event EventHandler Connected;
@@ -149,9 +150,10 @@ namespace EPI.Comm.Net
             {
                 if (disposing)
                 {
-                    ClearSocketHolder();
-                    TcpClient?.Dispose();
-                    RaiseCloseEvent();
+                    Stop();
+                    //DetachSocket();
+                    //TcpClient?.Dispose();
+                    //RaiseCloseEvent();
                     // TODO: 관리형 상태(관리형 개체)를 삭제합니다.
                 }
                 TcpClient = null;
