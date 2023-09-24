@@ -112,16 +112,16 @@ namespace EPI.Comm.Net
         private void StopAutoConnectIfLoopOn()
         {
            
-            connectHelper.StopAutoConnectIfLoopOn();
+            connectHelper?.StopAutoConnectIfLoopOn();
            
         }
         private void RunAutoConnectIfUserWant()
         {
-            connectHelper.RunAutoConnectIfUserWant();
+            connectHelper?.RunAutoConnectIfUserWant();
         }
     
 
-        private void SocketReceived(object sender, CommReceiveEventArgs e)
+        private void SocketReceived(object sender, DataReceiveEventArgs e)
         {
             Received?.Invoke(this, e);
         }
@@ -165,7 +165,7 @@ namespace EPI.Comm.Net
         }
         public event EventHandler Closed;
         public event EventHandler Connected;
-        public event CommReceiveEventHandler Received;
+        public event DataReceiveEventHandler Received;
         #region IDISPOSE
         private bool disposedValue;
 

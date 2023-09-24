@@ -19,7 +19,7 @@ namespace EPI.Comm
     public interface IComm
     {
         void Send(byte[] bytes);
-        event CommReceiveEventHandler Received;
+        event DataReceiveEventHandler Received;
     }
 
     public interface IComm<Theader, Tfooter> : IComm

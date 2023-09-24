@@ -48,7 +48,7 @@ namespace CommSample.Sample
 
             var ip1 = remote.Address.ToString();
             var port1 = remote.Port.ToString();
-            MessageBox.Show($"client local : {ip0} : {port0} , remote : {ip1} : {port1}");
+            //MessageBox.Show($"client local : {ip0} : {port0} , remote : {ip1} : {port1}");
         }
 
         private void ClientWindow_Closed(object sender, EventArgs e)
@@ -59,10 +59,10 @@ namespace CommSample.Sample
         private TcpNetClient client = new TcpNetClient();
         private void Client_Closed(object sender, EventArgs e)
         {
-            MessageBox.Show("Client Closed");
+            //MessageBox.Show("Client Closed");
         }
 
-        private void Client_BytesReceived(object sender, CommReceiveEventArgs e)
+        private void Client_BytesReceived(object sender, DataReceiveEventArgs e)
         {
             Dispatcher.BeginInvoke(new Action(() =>
             {
@@ -90,6 +90,11 @@ namespace CommSample.Sample
             client = null;
             InitClient();
             client.Connect("127.0.0.1", ServerWindow.ServerPort);
+            //if(client.IsConnected)
+            //{
+            //    client.Send(new byte[] { 1,2,3});
+            //    client.Stop();
+            //}
         }
 
         private void Stop(object sender, RoutedEventArgs e)

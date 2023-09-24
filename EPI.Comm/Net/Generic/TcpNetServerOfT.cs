@@ -57,7 +57,7 @@ namespace EPI.Comm.Net.Generic
         {
             return client is TcpNetClient<Theader>;
         }
-        private void TcpNetServerReceived(object sender, CommReceiveEventArgs e)
+        private void TcpNetServerReceived(object sender, DataReceiveEventArgs e)
         {
         }
         public TcpNetServer(Func<Theader, int> getBodySize) : this(DefaultBufferSize, getBodySize)

@@ -13,7 +13,7 @@ namespace EPI.Comm.Buffers
         protected int queueDataCount;
         public int Count => queueDataCount;
 
-        public QueueBuffer() : this(4)
+        public QueueBuffer() : this(8192)
         {
 
         }
@@ -80,6 +80,7 @@ namespace EPI.Comm.Buffers
             tail = (tail + count) % buffer.Length;
             queueDataCount += count;
         }
+
         public void Clear()
         {
             head = 0;

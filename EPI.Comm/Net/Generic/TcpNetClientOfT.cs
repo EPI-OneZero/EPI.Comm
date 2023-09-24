@@ -52,7 +52,7 @@ namespace EPI.Comm.Net.Generic
             Buffer.BlockCopy(body, 0, fullPacketBytes, HeaderSize, body.Length);
             Send(fullPacketBytes);
         }
-        private void ClientReceived(object sender, CommReceiveEventArgs e)
+        private void ClientReceived(object sender, DataReceiveEventArgs e)
         {
             Packet = new Packet<Theader>(GetBodySize);
             ReceiveBuffer.AddBytes(e.ReceivedBytes);
@@ -110,7 +110,7 @@ namespace EPI.Comm.Net.Generic
 
             Send(fullPacketBytes);
         }
-        private void ClientReceived(object sender, CommReceiveEventArgs e)
+        private void ClientReceived(object sender, DataReceiveEventArgs e)
         {
             lock (this)
             {

@@ -21,7 +21,7 @@ namespace EPI.Comm.Net
         public bool IsConnected => Socket?.Connected ?? false;
         public IPEndPoint LocalEndPoint => Socket?.LocalEndPoint as IPEndPoint;
         public IPEndPoint RemoteEndPoint => Socket?.RemoteEndPoint as IPEndPoint;
-        private static readonly LingerOption lingerOption = new LingerOption(true, 0);
+        private static readonly LingerOption lingerOption = new LingerOption(false, 0);
         internal NetSocket(Socket socket, int bufferSize)
         {
             Socket = socket;
@@ -104,7 +104,7 @@ namespace EPI.Comm.Net
                     {
                         recv = Receive();
                     }
-                    Received?.Invoke(this, new CommReceiveEventArgs(RemoteEndPoint, recv));
+                    Received?.Invoke(this, new DataReceiveEventArgs(RemoteEndPoint, recv));
                 }
                 catch(CommException e) // 연결을 끊었을 때
                 {
@@ -124,7 +124,7 @@ namespace EPI.Comm.Net
             Closed?.Invoke(this, EventArgs.Empty);
 
         }
-        public event CommReceiveEventHandler Received;
+        public event DataReceiveEventHandler Received;
         public event EventHandler Closed;
     }
 }

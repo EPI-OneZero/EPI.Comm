@@ -7,6 +7,7 @@ namespace EPI.Comm.Net.Generic.Packets
 {
     public class Packet<Theader> 
     {
+        public byte[] FullPacket { get; private set; }
         public Theader Header { get; private set; }
         public byte[] Body { get; private set; }
         public int HeaderSize { get; private set; }
