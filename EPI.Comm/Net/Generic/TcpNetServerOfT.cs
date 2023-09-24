@@ -9,12 +9,12 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Collections;
-using System.Collections.ObjectModel;
 
 namespace EPI.Comm.Net.Generic
 {
-   
+
     public class TcpNetServer<Theader> : TcpNetServer, IComm<Theader>
+        where Theader : new()
     {
         private List<TcpNetClient<Theader>> clients = new List<TcpNetClient<Theader>>(); 
         new public ClientCollection<Theader> Clients { get; private set; } 
@@ -36,23 +36,28 @@ namespace EPI.Comm.Net.Generic
             return result;
         }
         #region Event
-        private void OnClientClosed(object sender, Net.Events.TcpEventArgs e)
+        private void OnClientClosed(object sender, TcpEventArgs e)
         {
-            if(e.TcpNetClient is TcpNetClient<Theader> client && clients.Contains(client))
+            var oldClient = e.TcpNetClient as TcpNetClient<Theader>;
+            if (IsValidClientType(oldClient) && clients.Contains(oldClient))
             {
-                clients.Remove(client);
+                clients.Remove(oldClient);
             }
         }
 
-        private void OnClientAccpeted(object sender, Net.Events.TcpEventArgs e)
+        private void OnClientAccpeted(object sender, TcpEventArgs e)
         {
-            if (e.TcpNetClient is TcpNetClient<Theader> client && !clients.Contains(client))
+            var newClient = e.TcpNetClient as TcpNetClient<Theader>;
+            if (IsValidClientType(newClient) && !clients.Contains(newClient))
             {
-                clients.Add(client);
+                clients.Add(newClient);
             }
         }
-
-        private void TcpNetServerReceived(object sender, Net.Events.CommReceiveEventArgs e)
+        private bool IsValidClientType(TcpNetClient client)
+        {
+            return client is TcpNetClient<Theader>;
+        }
+        private void TcpNetServerReceived(object sender, CommReceiveEventArgs e)
         {
         }
         public TcpNetServer(Func<Theader, int> getBodySize) : this(DefaultBufferSize, getBodySize)
@@ -60,26 +65,13 @@ namespace EPI.Comm.Net.Generic
 
         }
         new public event PacketEventHandler<Theader> Received;
-        new public event CommEventHandler ClientAccpeted;
-        new public event CommEventHandler ClientClosed;
+        new public event TcpEventHandler ClientAccpeted;
+        new public event TcpEventHandler ClientClosed;
         #endregion
 
         public void Send(Theader header, byte[] body)
         {
             throw new NotImplementedException();
-        }
-    }
-
-    public sealed class ClientCollection<Theader> : ReadOnlyCollection<TcpNetClient<Theader>>
-    {
-        internal ClientCollection(IList<TcpNetClient<Theader>> list) : base(list)
-        {
-        }
-    }
-    public sealed class ClientCollection<Theader, Tfooter> : ReadOnlyCollection<TcpNetClient<Theader, Tfooter>>
-    {
-        internal ClientCollection(IList<TcpNetClient<Theader, Tfooter>> list) : base(list)
-        {
         }
     }
 }

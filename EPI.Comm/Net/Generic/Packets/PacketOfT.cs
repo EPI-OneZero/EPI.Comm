@@ -1,4 +1,5 @@
 ﻿using EPI.Comm.Buffers;
+using EPI.Comm.Utils;
 using System;
 using System.Runtime.InteropServices;
 using static EPI.Comm.Net.Generic.Packets.PacketSerializer;
@@ -9,12 +10,13 @@ namespace EPI.Comm.Net.Generic.Packets
         public Theader Header { get; private set; }
         public byte[] Body { get; private set; }
         public int HeaderSize { get; private set; }
-        public virtual int FullSize => HeaderSize + Body?.Length ?? 0;
+        public int BodySize => Body?.Length ?? 0;
+        public virtual int FullSize => HeaderSize + BodySize;
         public Func<Theader, int> GetBodySize { get; set; }
         internal Packet(Func<Theader, int> getBodySize)
         {
             GetBodySize = getBodySize;
-            HeaderSize = Marshal.SizeOf(Header);
+            HeaderSize = ObjectUtil.SizeOf<Theader>();
         }
         private protected bool HeaderDeserialized { get; private set; } = false;
         internal virtual bool TryDeserializePacket(IBuffer buffer)
@@ -37,7 +39,7 @@ namespace EPI.Comm.Net.Generic.Packets
         {
             if (IsEnoughSize(buffer.Count, HeaderSize, 0))
             {
-                Header = Deserialize<Theader>(buffer.GetBytes(HeaderSize), HeaderSize, 0);
+                Header = DeserializeByMarshal<Theader>(buffer.GetBytes(HeaderSize), HeaderSize, 0);
                 return true;
             }
             else
@@ -61,12 +63,12 @@ namespace EPI.Comm.Net.Generic.Packets
     }
     public sealed class Packet<Theader, Tfooter> : Packet<Theader>
     {
-        public override int FullSize => base.FullSize + Marshal.SizeOf<Tfooter>();
+        public override int FullSize => base.FullSize + ObjectUtil.SizeOf<Tfooter>();
         public Tfooter Footer { get; private set; }
         public int FooterSize { get; private set; }
         internal Packet(Func<Theader, int> getBodySize) : base(getBodySize)
         {
-            FooterSize = Marshal.SizeOf<Tfooter>();
+            FooterSize = ObjectUtil.SizeOf<Tfooter>();
         }
         internal override bool TryDeserializePacket(IBuffer buffer)
         {
@@ -83,7 +85,7 @@ namespace EPI.Comm.Net.Generic.Packets
         {
             if (IsEnoughSize(buffer.Count, HeaderSize, 0))
             {
-                Footer = Deserialize<Tfooter>(buffer.GetBytes(HeaderSize), HeaderSize, 0);
+                Footer = DeserializeByMarshal<Tfooter>(buffer.GetBytes(HeaderSize), HeaderSize, 0);
                 return true;
             }
             else

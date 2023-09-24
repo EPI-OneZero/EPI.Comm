@@ -2,6 +2,7 @@
 using EPI.Comm.Net.Events;
 using EPI.Comm.Net.Generic.Events;
 using EPI.Comm.Net.Generic.Packets;
+using EPI.Comm.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,15 +14,24 @@ using System.Threading.Tasks;
 
 namespace EPI.Comm.Net.Generic
 {
-    public class TcpNetClient<Theader> : TcpNetClient, IComm<Theader>
+    /// <summary>
+    /// https://learn.microsoft.com/ko-kr/dotnet/csharp/language-reference/keywords/where-generic-type-constraint
+    /// https://learn.microsoft.com/ko-kr/dotnet/api/system.runtime.interopservices.structlayoutattribute?view=netframework-4.7.2
+    /// https://www.csharpstudy.com/DevNote/Article/10
+    /// </summary>
+    /// <typeparam name="Theader">ObjectUtil.SizeOf 가능 및 레이아웃 Sequential 확인 필수</typeparam>
+    public class TcpNetClient<Theader> : TcpNetClient, IComm<Theader> 
+        where Theader : new()
+        // https://learn.microsoft.com/ko-kr/dotnet/csharp/language-reference/keywords/new-constraint
+        // https://learn.microsoft.com/ko-kr/dotnet/csharp/language-reference/keywords/where-generic-type-constraint
     {
-        internal int HeaderSize { get; set; }
+        public int HeaderSize { get;private set; }
         internal IBuffer ReceiveBuffer { get; set; } = new QueueBuffer();
         internal Func<Theader, int> GetBodySize { get; private set; }
         internal Packet<Theader> Packet { get; set; }
         public TcpNetClient(int bufferSize, Func<Theader, int> getBodySize) : base(bufferSize)
         {
-            HeaderSize = Marshal.SizeOf(typeof(Theader));
+            HeaderSize = ObjectUtil.SizeOf<Theader>();
             GetBodySize = getBodySize;
             base.Received += ClientReceived;
         }
@@ -31,14 +41,14 @@ namespace EPI.Comm.Net.Generic
 
         internal TcpNetClient(TcpClient client, int bufferSize, Func<Theader, int> getBodySize) : base(client, bufferSize)
         {
-            HeaderSize = Marshal.SizeOf(typeof(Theader));
+            HeaderSize = ObjectUtil.SizeOf<Theader>();
             GetBodySize = getBodySize;
             base.Received += ClientReceived;
         }
         public void Send(Theader header, byte[] body)
         {
             var fullPacketBytes = new byte[HeaderSize + body.Length];
-            PacketSerializer.Serialize(header, fullPacketBytes, 0, HeaderSize);
+            PacketSerializer.SerializeByMarshal(header, fullPacketBytes, 0, HeaderSize);
             Buffer.BlockCopy(body, 0, fullPacketBytes, HeaderSize, body.Length);
             Send(fullPacketBytes);
         }
@@ -53,7 +63,18 @@ namespace EPI.Comm.Net.Generic
         }
         new public event PacketEventHandler<Theader> Received;
     }
+
+    /// <summary>
+    ///  https://learn.microsoft.com/ko-kr/dotnet/csharp/language-reference/keywords/where-generic-type-constraint
+    ///  https://learn.microsoft.com/ko-kr/dotnet/api/system.runtime.interopservices.structlayoutattribute?view=netframework-4.7.2
+    ///  https://www.csharpstudy.com/DevNote/Article/10
+    /// </summary>
+    /// <typeparam name="Theader">ObjectUtil.SizeOf 가능 및 레이아웃 Sequential 확인 필수</typeparam>
+    /// <typeparam name="Tfooter">ObjectUtil.SizeOf 가능 및 레이아웃 Sequential 확인 필수</typeparam>
     public class TcpNetClient<Theader, Tfooter> : TcpNetClient, IComm<Theader,Tfooter>
+        where Theader : new()
+        // https://learn.microsoft.com/ko-kr/dotnet/csharp/language-reference/keywords/new-constraint
+        // https://learn.microsoft.com/ko-kr/dotnet/csharp/language-reference/keywords/where-generic-type-constraint
     {
         internal int HeaderSize { get; set; }
         internal int FooterSize { get; set; }
@@ -63,8 +84,8 @@ namespace EPI.Comm.Net.Generic
         public TcpNetClient(int bufferSize, Func<Theader, int> getBodySize) : base(bufferSize)
         {
             GetBodySize = getBodySize;
-            HeaderSize = Marshal.SizeOf(typeof(Theader));
-            FooterSize = Marshal.SizeOf(typeof(Tfooter));
+            HeaderSize = ObjectUtil.SizeOf<Theader>();
+            FooterSize = ObjectUtil.SizeOf<Tfooter>();
             base.Received += ClientReceived;
         }
         public TcpNetClient(Func<Theader, int> getBodySize) : this(DefaultBufferSize, getBodySize)
@@ -72,7 +93,7 @@ namespace EPI.Comm.Net.Generic
         }
         internal TcpNetClient(TcpClient client, int bufferSize, Func<Theader, int> getBodySize) : base(client, bufferSize)
         {
-            HeaderSize = Marshal.SizeOf(typeof(Theader));
+            HeaderSize = ObjectUtil.SizeOf<Theader>();
             GetBodySize = getBodySize;
             base.Received += ClientReceived;
         }
@@ -81,11 +102,11 @@ namespace EPI.Comm.Net.Generic
             int bodySize = body.Length;
             var fullPacketBytes = new byte[HeaderSize + bodySize + FooterSize];
 
-            PacketSerializer.Serialize(header, fullPacketBytes, 0, HeaderSize);
+            PacketSerializer.SerializeByMarshal(header, fullPacketBytes, 0, HeaderSize);
 
             Buffer.BlockCopy(body, 0, fullPacketBytes, HeaderSize, bodySize);
 
-            PacketSerializer.Serialize(footer, fullPacketBytes, HeaderSize + bodySize, FooterSize);
+            PacketSerializer.SerializeByMarshal(footer, fullPacketBytes, HeaderSize + bodySize, FooterSize);
 
             Send(fullPacketBytes);
         }

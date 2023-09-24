@@ -18,7 +18,6 @@ namespace EPI.Comm.Net
         private readonly object ReceiveLock = new object();
         protected Socket Socket { get; set; }
         protected byte[] ReceiveBuffer { get; set; }
-        protected AsyncCallback SendCallback { get; private set; }
         public bool IsConnected => Socket?.Connected ?? false;
         public IPEndPoint LocalEndPoint => Socket?.LocalEndPoint as IPEndPoint;
         public IPEndPoint RemoteEndPoint => Socket?.RemoteEndPoint as IPEndPoint;
@@ -31,10 +30,7 @@ namespace EPI.Comm.Net
             InitCallback();
             ThreadUtil.Start(OnReceive);
         }
-        public void Close()
-        {
-            Socket?.Close();
-        }
+        
         private void SetSocketOption(Socket socket)
         {
             socket.ReceiveBufferSize = ReceiveBuffer.Length;
@@ -44,7 +40,6 @@ namespace EPI.Comm.Net
         }
         private void InitCallback()
         {
-            SendCallback = new AsyncCallback(OnSend);
         }
         public void Send(byte[] bytes)
         {
@@ -100,7 +95,7 @@ namespace EPI.Comm.Net
         }
         private void OnReceive()
         {
-            while (true)
+            while (IsConnected)
             {
                 try
                 {
@@ -109,7 +104,7 @@ namespace EPI.Comm.Net
                     {
                         recv = Receive();
                     }
-                    Received?.Invoke(this, new CommReceiveEventArgs(recv));
+                    Received?.Invoke(this, new CommReceiveEventArgs(RemoteEndPoint, recv));
                 }
                 catch(CommException e) // 연결을 끊었을 때
                 {
@@ -131,10 +126,5 @@ namespace EPI.Comm.Net
         }
         public event CommReceiveEventHandler Received;
         public event EventHandler Closed;
-        private void OnSend(IAsyncResult result)
-        {
-
-        }
-
     }
 }

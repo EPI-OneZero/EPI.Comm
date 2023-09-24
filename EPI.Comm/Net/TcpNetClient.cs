@@ -7,8 +7,10 @@ using System.Net.Http.Headers;
 using System.Net.Sockets;
 using System.Runtime.Serialization;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using EPI.Comm.Net.Events;
+using EPI.Comm.UTils;
 
 namespace EPI.Comm.Net
 {
@@ -21,11 +23,22 @@ namespace EPI.Comm.Net
         public IPEndPoint LocalEndPoint => NetSocket?.LocalEndPoint;
         public IPEndPoint RemoteEndPoint => NetSocket?.RemoteEndPoint;
         public bool IsConnected => NetSocket?.IsConnected ?? false;
-        public bool AutoReconnect { get; set; }
+        public bool AutoConnect
+        {
+            get => connectHelper?.AutoConnect ?? false;
+            set
+            {
+                if (connectHelper != null)
+                    connectHelper.AutoConnect = value;
+            }
+        }
+
+        private AutoConnectHelper connectHelper;
         public TcpNetClient(int bufferSize)
         {
-           
+            connectHelper = new AutoConnectHelper(this);
             BufferSize = bufferSize;
+            AutoConnect = true;
         }
         public TcpNetClient() : this(DefaultBufferSize)
         {
@@ -47,7 +60,7 @@ namespace EPI.Comm.Net
             NetSocket.Received += SocketReceived;
             NetSocket.Closed += SocketClosed;
         }
-    
+
         private void DetachSocket()
         {
             if (NetSocket != null)
@@ -66,6 +79,7 @@ namespace EPI.Comm.Net
                 {
                     if (!IsConnected)
                     {
+                        connectHelper.SetEndPoint(ip, port, true);
                         TcpClient = new TcpClient();
                         TcpClient.Connect(ip, port);
                         AttachSocket(TcpClient);
@@ -74,6 +88,7 @@ namespace EPI.Comm.Net
                 }
                 catch (SocketException e)
                 {
+                    RunAutoConnectIfUserWant();
                     Debug.WriteLine(e.Message);
                 }
                 finally
@@ -81,7 +96,7 @@ namespace EPI.Comm.Net
                     Debug.WriteLine(nameof(Connect));
                 }
             }
-     
+
 
         }
 
@@ -91,7 +106,20 @@ namespace EPI.Comm.Net
             TcpClient?.Close();
             TcpClient = null;
             RaiseCloseEvent();
+
+            RunAutoConnectIfUserWant();
         }
+        private void StopAutoConnectIfLoopOn()
+        {
+           
+            connectHelper.StopAutoConnectIfLoopOn();
+           
+        }
+        private void RunAutoConnectIfUserWant()
+        {
+            connectHelper.RunAutoConnectIfUserWant();
+        }
+    
 
         private void SocketReceived(object sender, CommReceiveEventArgs e)
         {
@@ -102,6 +130,8 @@ namespace EPI.Comm.Net
         /// </summary>
         public void Stop()
         {
+            StopAutoConnectIfLoopOn();
+           
             lock (ConnectLock)
             {
                 if (IsConnected)
@@ -112,8 +142,8 @@ namespace EPI.Comm.Net
                     RaiseCloseEvent();
                 }
             }
-          
-          
+
+
         }
         /// <summary>
         ///연결을 끊었을 때
@@ -121,11 +151,6 @@ namespace EPI.Comm.Net
         private void RaiseCloseEvent()
         {
             Closed?.Invoke(this, EventArgs.Empty);
-        }
-        public void Send(string message)
-        {
-            var bytes = Encoding.UTF8.GetBytes(message);
-            Send(bytes);
         }
         public void Send(byte[] bytes)
         {
@@ -151,9 +176,6 @@ namespace EPI.Comm.Net
                 if (disposing)
                 {
                     Stop();
-                    //DetachSocket();
-                    //TcpClient?.Dispose();
-                    //RaiseCloseEvent();
                     // TODO: 관리형 상태(관리형 개체)를 삭제합니다.
                 }
                 TcpClient = null;
@@ -177,5 +199,70 @@ namespace EPI.Comm.Net
             GC.SuppressFinalize(this);
         }
         #endregion
+
+        private class AutoConnectHelper
+        {
+            public bool AutoConnect { get; set; }
+            private volatile bool isAutoConnectLoopOn = false;
+            private volatile bool userRequestConnect = false;
+            private volatile string userConnectIp = null;
+            private volatile int userConnectPort = -1;
+            public TcpNetClient Tcp { get; private set; }
+   
+            public AutoConnectHelper(TcpNetClient tcp)
+            {
+                Tcp = tcp;
+            }
+            public void SetEndPoint(string ip, int port, bool requestConnect)
+            {
+                
+                userConnectIp = ip;
+                userConnectPort = port;
+                userRequestConnect = requestConnect;
+            }
+            public void RunAutoConnectIfUserWant()
+            {
+                if (AutoConnect && userRequestConnect && !isAutoConnectLoopOn)
+                    RunAutoConnect();
+            }
+            private void RunAutoConnect()
+            {
+                ThreadUtil.Start(() =>
+                {
+                    lock (this)
+                    {
+                        isAutoConnectLoopOn = true;
+                        while (AutoConnect && userRequestConnect)
+                        {
+                            if (Tcp != null)
+                            {
+                                Tcp?.Connect(userConnectIp, userConnectPort);
+                                if (Tcp?.IsConnected ?? true)
+                                {
+                                    break;
+                                }
+                            }
+                            else
+                            {
+                                break;
+                            }
+
+                            Thread.Sleep(3000);
+                        }
+                        isAutoConnectLoopOn = false;
+                    }
+                    
+                });
+
+            }
+            public void StopAutoConnectIfLoopOn()
+            {
+                userRequestConnect = false;
+                while (isAutoConnectLoopOn)
+                {
+                }
+            }
+        }
     }
+
 }

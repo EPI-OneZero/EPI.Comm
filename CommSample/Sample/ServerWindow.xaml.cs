@@ -32,7 +32,7 @@ namespace CommSample.Sample
             server.ClientAccpeted += Server_Accpeted;
 
         }
-        public static int ServerPort { get; set; }
+        public static int ServerPort { get; set; } = 4101;
         private void Server_Accpeted(object sender, TcpEventArgs e)
         {
             var client = e.TcpNetClient;

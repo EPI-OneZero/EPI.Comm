@@ -46,7 +46,7 @@ namespace EPI.Comm.Net
             {
                 if (!isListening)
                 {
-                    Listener = new TcpListener(System.Net.IPAddress.Any, port);
+                    Listener = new TcpListener(IPAddress.Any, port);
                     Listener.Start();
                     isListening = true;
                     ThreadUtil.Start(AcceptLoop);
@@ -54,7 +54,7 @@ namespace EPI.Comm.Net
             }
         }
         /// <summary>
-        /// 서버가 클라이언트를 Accept 중지
+        /// 서버가 클라이언트를 Accept 중지, 및 모든 연결 해제
         /// </summary>
         public void Stop()
         {
@@ -74,8 +74,8 @@ namespace EPI.Comm.Net
             }
         }
         public event CommReceiveEventHandler Received;
-        public event CommEventHandler ClientClosed;
-        public event CommEventHandler ClientAccpeted;
+        public event TcpEventHandler ClientClosed;
+        public event TcpEventHandler ClientAccpeted;
         public void Send(string message)
         {
             var bytes = Encoding.UTF8.GetBytes(message);
@@ -201,6 +201,7 @@ namespace EPI.Comm.Net
                     Listener?.Stop();
                     DisposeAllClients();
                 }
+                clients.Clear();
                 Listener = null;
                 // TODO: 비관리형 리소스(비관리형 개체)를 해제하고 종료자를 재정의합니다.
                 // TODO: 큰 필드를 null로 설정합니다.
