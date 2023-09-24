@@ -8,9 +8,6 @@ namespace EPI.Comm.Net.Events
     /// </summary>
     public class PacketEventArgs : EventArgs
     {
-        /// <summary>
-        /// 이놈은 적절한가??
-        /// </summary>
         public IPEndPoint From { get; private set; }
         public byte[] ReceivedBytes { get; private set; }
 
@@ -21,4 +18,16 @@ namespace EPI.Comm.Net.Events
         }
     }
     public delegate void PacketEventHandler(object sender, PacketEventArgs e);
+
+    public class SocketReceiveEventArgs
+    {
+        public IPEndPoint From { get; private set; }
+        public byte[] ReceivedBytes { get; private set; }
+        public SocketReceiveEventArgs(IPEndPoint from, byte[] receivedBytes)
+        {
+            From = from;
+            ReceivedBytes = receivedBytes;
+        }
+    }
+    public delegate void SocketReceiveEventHandler(object sender, SocketReceiveEventArgs e);
 }

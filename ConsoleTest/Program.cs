@@ -52,9 +52,8 @@ namespace ConsoleTest
         {
             MyClass2 a = new MyClass2();
             MyClass b = a;
-
-            List<string> c = null;
-            c.AsReadOnly();
+            a.Test();
+            b.Test();
         }
 
 

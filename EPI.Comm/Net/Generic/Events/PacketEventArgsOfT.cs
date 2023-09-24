@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using EPI.Comm.Net.Generic.Packets;
@@ -9,18 +10,22 @@ namespace EPI.Comm.Net.Generic.Events
 {
     public class PacketEventArgs<Theader, Tfooter> : EventArgs
     {
+        public IPEndPoint From { get; private set; }
         public Packet<Theader, Tfooter> Packet { get; internal set; }
-        internal PacketEventArgs(Packet<Theader, Tfooter> packet)
+        internal PacketEventArgs(IPEndPoint from,Packet<Theader, Tfooter> packet)
         {
+            From = from;
             Packet = packet;
         }
     }
     public delegate void PacketEventHandler<Theader, Tfooter>(object sender, PacketEventArgs<Theader, Tfooter> e);
     public class PacketEventArgs<Theader> : EventArgs
     {
+        public IPEndPoint From { get; private set; }
         public Packet<Theader> Packet { get; internal set; }
-        internal PacketEventArgs(Packet<Theader> packet)
+        internal PacketEventArgs(IPEndPoint from,Packet<Theader> packet)
         {
+            From = from;
             Packet = packet;
         }
     }

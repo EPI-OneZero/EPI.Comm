@@ -22,8 +22,6 @@ namespace EPI.Comm.Net.Generic
     /// <typeparam name="Theader">Marshal.SizeOf 가능 및 레이아웃 Sequential 확인 필수</typeparam>
     public class TcpNetClient<Theader> : TcpNetClient, IComm<Theader> 
         where Theader : new()
-        //
-        //
     {
         public int HeaderSize { get;private set; }
         internal IBuffer ReceiveBuffer { get; set; } = new QueueBuffer();
@@ -33,7 +31,6 @@ namespace EPI.Comm.Net.Generic
         {
             HeaderSize = ObjectUtil.SizeOf<Theader>();
             GetBodySize = getBodySize;
-            base.Received += ClientReceived;
         }
         public TcpNetClient(Func<Theader, int> getBodySize) : this(DefaultBufferSize, getBodySize)
         {
@@ -43,7 +40,6 @@ namespace EPI.Comm.Net.Generic
         {
             HeaderSize = ObjectUtil.SizeOf<Theader>();
             GetBodySize = getBodySize;
-            base.Received += ClientReceived;
         }
         public void Send(Theader header, byte[] body)
         {
@@ -52,32 +48,37 @@ namespace EPI.Comm.Net.Generic
             Buffer.BlockCopy(body, 0, fullPacketBytes, HeaderSize, body.Length);
             Send(fullPacketBytes);
         }
-        private void ClientReceived(object sender, PacketEventArgs e)
-        {
-            Packet = new Packet<Theader>(GetBodySize);
-            ReceiveBuffer.AddBytes(e.ReceivedBytes);
-            if (Packet.TryDeserializePacket(ReceiveBuffer))
-            {
-                Received?.Invoke(this, new PacketEventArgs<Theader>(Packet));
-            }
-        }
+       
         new public event PacketEventHandler<Theader> Received;
+        private protected override void SocketReceived(object sender, PacketEventArgs e)
+        {
+            lock (this)
+            {
+                if (Packet == null)
+                {
+                    Packet = new Packet<Theader>(GetBodySize);
+                }
+                ReceiveBuffer.AddBytes(e.ReceivedBytes);
+                if (Packet.TryDeserializePacket(ReceiveBuffer))
+                {
+                    Received?.Invoke(this, new PacketEventArgs<Theader>(e.From,Packet));
+                }
+            }
+           
+        }
     }
 
     /// <summary>
-    ///  
     ///  질문 : TcpNetClient<Theader, Tfooter>, TcpNetClient<Theader>
     ///  는 각각 TcpNetClient를 상속하는게 맞는가??
     ///  제네릭 서버나 제네릭 클라이언트는 논제네릭 서버와 클라이언트를 has a로 소유하는게 맞는가?
     ///  아니면 is a로 상속하는 게 맞는가
-    ///  
     /// </summary>
     /// <typeparam name="Theader">Marshal.SizeOf 가능 및 레이아웃 Sequential 확인 필수</typeparam>
     /// <typeparam name="Tfooter">Marshal.SizeOf 가능 및 레이아웃 Sequential 확인 필수</typeparam>
     public class TcpNetClient<Theader, Tfooter> : TcpNetClient, IComm<Theader,Tfooter>
         where Theader : new()
-        // 
-        // 
+     
     {
         internal int HeaderSize { get; set; }
         internal int FooterSize { get; set; }
@@ -86,19 +87,20 @@ namespace EPI.Comm.Net.Generic
         internal Func<Theader, int> GetBodySize { get; private set; }
         public TcpNetClient(int bufferSize, Func<Theader, int> getBodySize) : base(bufferSize)
         {
-            GetBodySize = getBodySize;
-            HeaderSize = ObjectUtil.SizeOf<Theader>();
-            FooterSize = ObjectUtil.SizeOf<Tfooter>();
-            base.Received += ClientReceived;
+            SetPacketProperties(getBodySize);
         }
         public TcpNetClient(Func<Theader, int> getBodySize) : this(DefaultBufferSize, getBodySize)
         {
         }
         internal TcpNetClient(TcpClient client, int bufferSize, Func<Theader, int> getBodySize) : base(client, bufferSize)
         {
+            SetPacketProperties(getBodySize);
+        }
+        private void SetPacketProperties(Func<Theader, int> getBodySize)
+        {
             HeaderSize = ObjectUtil.SizeOf<Theader>();
+            FooterSize = ObjectUtil.SizeOf<Tfooter>();
             GetBodySize = getBodySize;
-            base.Received += ClientReceived;
         }
         public void Send(Theader header, byte[] body, Tfooter footer)
         {
@@ -113,7 +115,7 @@ namespace EPI.Comm.Net.Generic
 
             Send(fullPacketBytes);
         }
-        private void ClientReceived(object sender, PacketEventArgs e)
+        private protected override void SocketReceived(object sender, PacketEventArgs e)
         {
             lock (this)
             {
@@ -127,10 +129,9 @@ namespace EPI.Comm.Net.Generic
                 {
                     var packet = Packet;
                     Packet = null;
-                    Received?.Invoke(this, new PacketEventArgs<Theader, Tfooter>(packet));
+                    Received?.Invoke(this, new PacketEventArgs<Theader, Tfooter>(e.From,packet));
                 }
             }
-           
         }
         new public event PacketEventHandler<Theader, Tfooter> Received;
     }

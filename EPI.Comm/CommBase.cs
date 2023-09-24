@@ -19,7 +19,6 @@ namespace EPI.Comm
     {
         public const int DefaultBufferSize = 8192;
     }
-
     public interface IComm
     {
         void Send(byte[] bytes);

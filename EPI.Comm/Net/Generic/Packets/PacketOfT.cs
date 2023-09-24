@@ -31,7 +31,7 @@ namespace EPI.Comm.Net.Generic.Packets
                 if (TryDeserializeHeader(buffer))
                 {
                     HeaderDeserialized = true;
-                    return TryDeserializePacket(buffer);
+                    return TryDeserializeBody(buffer, GetBodySize?.Invoke(Header) ?? 0);
                 }
                 else return false;
             }
@@ -70,7 +70,7 @@ namespace EPI.Comm.Net.Generic.Packets
     /// <typeparam name="Tfooter"></typeparam>
     public sealed class Packet<Theader, Tfooter> : Packet<Theader>
     {
-        public override int FullSize => base.FullSize + ObjectUtil.SizeOf<Tfooter>();
+        public override int FullSize => base.FullSize + FooterSize;
         public Tfooter Footer { get; private set; }
         public int FooterSize { get; private set; }
         internal Packet(Func<Theader, int> getBodySize) : base(getBodySize)

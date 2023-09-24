@@ -99,7 +99,6 @@ namespace EPI.Comm.Net
 
 
         }
-
         private void SocketClosed(object sender, EventArgs e)
         {
             DetachSocket();
@@ -121,7 +120,7 @@ namespace EPI.Comm.Net
         }
     
 
-        private void SocketReceived(object sender, PacketEventArgs e)
+        private protected virtual void SocketReceived(object sender, PacketEventArgs e)
         {
             Received?.Invoke(this, e);
         }

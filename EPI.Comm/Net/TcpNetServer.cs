@@ -1,11 +1,9 @@
 ﻿using EPI.Comm.Net.Events;
-using EPI.Comm.Net.Generic;
 using EPI.Comm.UTils;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -77,9 +75,7 @@ namespace EPI.Comm.Net
                 }
             }
         }
-        public event PacketEventHandler Received;
-        public event TcpEventHandler ClientClosed;
-        public event TcpEventHandler ClientAccpeted;
+        
         public void Send(string message)
         {
             var bytes = Encoding.UTF8.GetBytes(message);
@@ -128,8 +124,7 @@ namespace EPI.Comm.Net
                 {
                     var client = CreateClient(tcpClient);
                     AttachClient(client);
-
-                    ClientAccpeted?.Invoke(this, new TcpEventArgs(client));
+                    OnAccepted(this, new TcpEventArgs(client));
                 }
                
 
@@ -152,6 +147,10 @@ namespace EPI.Comm.Net
                 Debug.WriteLine(nameof(Accept));
             }
         }
+        private protected virtual void OnAccepted(object sender, TcpEventArgs e)
+        {
+            ClientAccpeted?.Invoke(this, e);
+        }
         private protected virtual TcpNetClient CreateClient(TcpClient client)
         {
             return new TcpNetClient(client, BufferSize);
@@ -162,7 +161,6 @@ namespace EPI.Comm.Net
             client.Closed += OnClientClosed;
             clients.Add(client);
         }
-  
         private void DetachClient(TcpNetClient client)
         {
             client.Received -= OnClientReceived;
@@ -170,7 +168,7 @@ namespace EPI.Comm.Net
             if (clients.Contains(client))
             {
                 clients.Remove(client);
-                ClientClosed?.Invoke(this, new TcpEventArgs(client));
+                OnClosed(this, new TcpEventArgs(client));
                 client.Dispose();
             }
         }
@@ -179,8 +177,12 @@ namespace EPI.Comm.Net
         {
             var client = sender as TcpNetClient;
             DetachClient(client);
-         
         }
+        private protected virtual void OnClosed(object sender, TcpEventArgs e)
+        {
+            ClientClosed?.Invoke(this, e);
+        }
+
         private void DisposeAllClients()
         {
             var clients = this.clients?.ToArray() ?? new TcpNetClient[0];
@@ -189,11 +191,13 @@ namespace EPI.Comm.Net
                 DetachClient(client);
             }
         }
-        private void OnClientReceived(object sender, PacketEventArgs e)
+        private protected virtual void OnClientReceived(object sender, PacketEventArgs e)
         {
             Received?.Invoke(this, e);
         }
-
+        public event PacketEventHandler Received;
+        public event TcpEventHandler ClientClosed;
+        public event TcpEventHandler ClientAccpeted;
         #region IDISPOSE
         protected virtual void Dispose(bool disposing)
         {
