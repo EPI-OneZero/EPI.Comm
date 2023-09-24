@@ -4,6 +4,9 @@ using System.Collections.Generic;
 
 namespace EPI.Comm.Buffers
 {
+    /// <summary>
+    /// 질문 : 
+    /// </summary>
     internal class RefreshBuffer : IBuffer
     {
         protected byte[] buffer;

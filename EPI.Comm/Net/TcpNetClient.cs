@@ -121,7 +121,7 @@ namespace EPI.Comm.Net
         }
     
 
-        private void SocketReceived(object sender, DataReceiveEventArgs e)
+        private void SocketReceived(object sender, PacketEventArgs e)
         {
             Received?.Invoke(this, e);
         }
@@ -165,7 +165,7 @@ namespace EPI.Comm.Net
         }
         public event EventHandler Closed;
         public event EventHandler Connected;
-        public event DataReceiveEventHandler Received;
+        public event PacketEventHandler Received;
         #region IDISPOSE
         private bool disposedValue;
 

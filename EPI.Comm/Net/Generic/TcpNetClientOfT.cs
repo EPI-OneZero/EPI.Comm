@@ -15,15 +15,15 @@ using System.Threading.Tasks;
 namespace EPI.Comm.Net.Generic
 {
     /// <summary>
-    /// https://learn.microsoft.com/ko-kr/dotnet/csharp/language-reference/keywords/where-generic-type-constraint
-    /// https://learn.microsoft.com/ko-kr/dotnet/api/system.runtime.interopservices.structlayoutattribute?view=netframework-4.7.2
-    /// https://www.csharpstudy.com/DevNote/Article/10
+    /// 
+    /// 
+    /// 
     /// </summary>
     /// <typeparam name="Theader">ObjectUtil.SizeOf 가능 및 레이아웃 Sequential 확인 필수</typeparam>
     public class TcpNetClient<Theader> : TcpNetClient, IComm<Theader> 
         where Theader : new()
-        // https://learn.microsoft.com/ko-kr/dotnet/csharp/language-reference/keywords/new-constraint
-        // https://learn.microsoft.com/ko-kr/dotnet/csharp/language-reference/keywords/where-generic-type-constraint
+        //
+        //
     {
         public int HeaderSize { get;private set; }
         internal IBuffer ReceiveBuffer { get; set; } = new QueueBuffer();
@@ -52,7 +52,7 @@ namespace EPI.Comm.Net.Generic
             Buffer.BlockCopy(body, 0, fullPacketBytes, HeaderSize, body.Length);
             Send(fullPacketBytes);
         }
-        private void ClientReceived(object sender, DataReceiveEventArgs e)
+        private void ClientReceived(object sender, PacketEventArgs e)
         {
             Packet = new Packet<Theader>(GetBodySize);
             ReceiveBuffer.AddBytes(e.ReceivedBytes);
@@ -65,16 +65,16 @@ namespace EPI.Comm.Net.Generic
     }
 
     /// <summary>
-    ///  https://learn.microsoft.com/ko-kr/dotnet/csharp/language-reference/keywords/where-generic-type-constraint
-    ///  https://learn.microsoft.com/ko-kr/dotnet/api/system.runtime.interopservices.structlayoutattribute?view=netframework-4.7.2
-    ///  https://www.csharpstudy.com/DevNote/Article/10
+    ///  
+    ///  
+    ///  
     /// </summary>
     /// <typeparam name="Theader">ObjectUtil.SizeOf 가능 및 레이아웃 Sequential 확인 필수</typeparam>
     /// <typeparam name="Tfooter">ObjectUtil.SizeOf 가능 및 레이아웃 Sequential 확인 필수</typeparam>
     public class TcpNetClient<Theader, Tfooter> : TcpNetClient, IComm<Theader,Tfooter>
         where Theader : new()
-        // https://learn.microsoft.com/ko-kr/dotnet/csharp/language-reference/keywords/new-constraint
-        // https://learn.microsoft.com/ko-kr/dotnet/csharp/language-reference/keywords/where-generic-type-constraint
+        // 
+        // 
     {
         internal int HeaderSize { get; set; }
         internal int FooterSize { get; set; }
@@ -110,7 +110,7 @@ namespace EPI.Comm.Net.Generic
 
             Send(fullPacketBytes);
         }
-        private void ClientReceived(object sender, DataReceiveEventArgs e)
+        private void ClientReceived(object sender, PacketEventArgs e)
         {
             lock (this)
             {

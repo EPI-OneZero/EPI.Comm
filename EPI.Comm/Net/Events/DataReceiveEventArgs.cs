@@ -3,16 +3,16 @@ using System.Net;
 
 namespace EPI.Comm.Net.Events
 {
-    public class DataReceiveEventArgs : EventArgs
+    public class PacketEventArgs : EventArgs
     {
-        public IPEndPoint From { get; private set; }
+        public object From { get; private set; }
         public byte[] ReceivedBytes { get; private set; }
 
-        public DataReceiveEventArgs(IPEndPoint from, byte[] receivedBytes)
+        public PacketEventArgs(object from, byte[] receivedBytes)
         {
             From = from;
             ReceivedBytes = receivedBytes;
         }
     }
-    public delegate void DataReceiveEventHandler(object sender, DataReceiveEventArgs e);
+    public delegate void PacketEventHandler(object sender, PacketEventArgs e);
 }

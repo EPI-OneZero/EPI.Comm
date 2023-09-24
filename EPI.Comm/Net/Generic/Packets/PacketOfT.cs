@@ -62,6 +62,12 @@ namespace EPI.Comm.Net.Generic.Packets
             }
         }
     }
+
+    /// <summary>
+    /// 질문 : Packet<Theader, Tfooter> 가 Packet<Theader>를 상속하는게 적절한가?
+    /// </summary>
+    /// <typeparam name="Theader"></typeparam>
+    /// <typeparam name="Tfooter"></typeparam>
     public sealed class Packet<Theader, Tfooter> : Packet<Theader>
     {
         public override int FullSize => base.FullSize + ObjectUtil.SizeOf<Tfooter>();

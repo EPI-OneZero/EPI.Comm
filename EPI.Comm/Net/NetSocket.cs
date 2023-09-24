@@ -104,7 +104,7 @@ namespace EPI.Comm.Net
                     {
                         recv = Receive();
                     }
-                    Received?.Invoke(this, new DataReceiveEventArgs(RemoteEndPoint, recv));
+                    Received?.Invoke(this, new PacketEventArgs(RemoteEndPoint, recv));
                 }
                 catch(CommException e) // 연결을 끊었을 때
                 {
@@ -124,7 +124,7 @@ namespace EPI.Comm.Net
             Closed?.Invoke(this, EventArgs.Empty);
 
         }
-        public event DataReceiveEventHandler Received;
+        public event PacketEventHandler Received;
         public event EventHandler Closed;
     }
 }

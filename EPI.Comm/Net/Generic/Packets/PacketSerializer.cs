@@ -5,9 +5,9 @@ using System.Runtime.InteropServices;
 namespace EPI.Comm.Net.Generic.Packets
 {
     /// <summary>
-    /// https://learn.microsoft.com/ko-kr/dotnet/api/system.runtime.interopservices.gchandle.alloc?view=netframework-4.7.2
-    /// https://learn.microsoft.com/ko-kr/dotnet/api/system.runtime.interopservices.marshal.ptrtostructure?view=netframework-4.7.2
-    /// https://learn.microsoft.com/ko-kr/dotnet/api/system.runtime.interopservices.marshal.copy?view=netframework-4.7.2
+    /// 
+    /// 
+    /// 
     /// </summary>
     internal static class PacketSerializer
     {

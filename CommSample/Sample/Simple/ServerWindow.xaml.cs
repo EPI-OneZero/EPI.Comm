@@ -59,7 +59,7 @@ namespace CommSample.Sample
             //MessageBox.Show("Server Client Closed");
         }
 
-        private void Server_BytesReceived(object sender, DataReceiveEventArgs e)
+        private void Server_BytesReceived(object sender, PacketEventArgs e)
         {
             Dispatcher.BeginInvoke(new Action(() =>
             {

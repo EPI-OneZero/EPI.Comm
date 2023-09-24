@@ -73,7 +73,7 @@ namespace EPI.Comm.Net
                 }
             }
         }
-        public event DataReceiveEventHandler Received;
+        public event PacketEventHandler Received;
         public event TcpEventHandler ClientClosed;
         public event TcpEventHandler ClientAccpeted;
         public void Send(string message)
@@ -185,7 +185,7 @@ namespace EPI.Comm.Net
                 DetachClient(client);
             }
         }
-        private void OnClientReceived(object sender, DataReceiveEventArgs e)
+        private void OnClientReceived(object sender, PacketEventArgs e)
         {
             Received?.Invoke(this, e);
         }
