@@ -5,7 +5,8 @@ using System.Collections.Generic;
 namespace EPI.Comm.Buffers
 {
     /// <summary>
-    /// 질문 : 
+    /// 질문 : AddBytes 함수는 말그대로 버퍼 저장 배열 자체를 갈아치우는 함수인데 이건 LSP위반인가?
+    /// 참고 : GetBytes는 앞에서부터 디큐처럼 동작함
     /// </summary>
     internal class RefreshBuffer : IBuffer
     {

@@ -14,6 +14,10 @@ using static EPI.Comm.CommException;
 
 namespace EPI.Comm.Net
 {
+    /// <summary>
+    /// 질문: TcpNetServer has a TcpNetClient. 
+    ///  TcpNetClient has a NetSocket인데 이 구조 적절한가?
+    /// </summary>
     public class TcpNetServer : CommBase, IComm, IDisposable
     {
         protected TcpListener Listener { get; set; }
