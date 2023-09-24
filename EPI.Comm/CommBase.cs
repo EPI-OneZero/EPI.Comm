@@ -19,7 +19,7 @@ namespace EPI.Comm
     {
         public const int DefaultBufferSize = 8192;
     }
-   
+
     public interface IComm
     {
         void Send(byte[] bytes);
@@ -33,10 +33,10 @@ namespace EPI.Comm
 
 
     }
-    public interface IComm<Theader>
+    public interface IComm<Theader> : IComm
     {
         void Send(Theader header, byte[] body);
-        event PacketEventHandler<Theader> Received;
+        new event PacketEventHandler<Theader> Received;
 
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data.SqlTypes;
 using System.Linq;
 using System.Net;
@@ -28,15 +29,32 @@ namespace ConsoleTest
     /// </summary>
     public class Program
     {
+
+        class MyClass
+        {
+            public void Test()
+            {
+                Console.WriteLine("old");
+            }
+        }
+        class MyClass2 : MyClass
+        {
+            new public void Test()
+            {
+                Console.WriteLine("new");
+            }
+        }
         /// <summary>
         /// 메인함수
         /// </summary>
         /// <param name="args"></param>
         public static void Main(string[] args)
         {
-            var bytes = new byte[3];
-            var handle = GCHandle.Alloc(bytes, GCHandleType.Pinned);
-            var result = Marshal.PtrToStructure<MyClass>(handle.AddrOfPinnedObject());
+            MyClass2 a = new MyClass2();
+            MyClass b = a;
+
+            List<string> c = null;
+            c.AsReadOnly();
         }
 
 
