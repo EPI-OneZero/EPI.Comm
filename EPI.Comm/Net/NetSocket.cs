@@ -42,7 +42,7 @@ namespace EPI.Comm.Net
             socket.LingerState = lingerOption;
             var size = Marshal.SizeOf<KeepAliveConfig>();
             var result = new byte[size];
-            socket.IOControl(IOControlCode.KeepAliveValues,KeepAliveConfig.Generate(),result);
+            socket.IOControl(IOControlCode.KeepAliveValues, KeepAliveConfig.Generate(), result);
         }
         private void InitCallback()
         {
@@ -131,7 +131,7 @@ namespace EPI.Comm.Net
         }
         public event PacketEventHandler Received;
         public event EventHandler Closed;
-      
+
     }
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     class KeepAliveConfig

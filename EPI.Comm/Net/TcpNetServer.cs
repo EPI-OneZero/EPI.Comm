@@ -20,7 +20,7 @@ namespace EPI.Comm.Net
     {
         protected TcpListener Listener { get; set; }
         public IPEndPoint LocalEndPoint => Listener?.Server?.LocalEndPoint as IPEndPoint;
-        public int Port  => ((IPEndPoint)Listener?.LocalEndpoint)?.Port ?? -1;
+        public int Port => ((IPEndPoint)Listener?.LocalEndpoint)?.Port ?? -1;
         public bool IsListening { get => isListening; }
 
         protected volatile bool isListening = false;
@@ -29,16 +29,19 @@ namespace EPI.Comm.Net
         public ClientCollection Clients { get; private set; }
 
         protected object startStopLock = new object();
+        private volatile bool acceptLoopingOn = false;
 
         public TcpNetServer(int bufferSize)
         {
             BufferSize = bufferSize;
             Clients = new ClientCollection(clients);
         }
-        public TcpNetServer() : this( DefaultBufferSize)
+        public TcpNetServer() : this(DefaultBufferSize)
         {
-            
+
         }
+
+        #region StartStop
         /// <summary>
         ///  서버가 클라이언트를 Accept 시작
         /// </summary>
@@ -60,22 +63,21 @@ namespace EPI.Comm.Net
         /// </summary>
         public void Stop()
         {
-            lock (startStopLock)
+            if (isListening)
             {
-                if (isListening)
+                lock (startStopLock)
                 {
+
                     isListening = false;
                     Listener.Stop();
                     Listener = null;
+                    WaitAcceptLoopFinish();
                     DisposeAllClients();
-               
-                    while (acceptLoopingOn)
-                    {
-                    }
                 }
             }
         }
-        
+        #endregion
+        #region Send
         public void Send(string message)
         {
             var bytes = Encoding.UTF8.GetBytes(message);
@@ -84,12 +86,13 @@ namespace EPI.Comm.Net
         public void Send(byte[] bytes)
         {
 
-            var result = Parallel.ForEach(clients, c=>
+            var result = Parallel.ForEach(clients, c =>
             {
                 c.Send(bytes);
             });
         }
-        private volatile bool acceptLoopingOn = false;
+        #endregion
+        #region Accept
         private void AcceptLoop()
         {
             acceptLoopingOn = true;
@@ -101,14 +104,13 @@ namespace EPI.Comm.Net
                 }
                 catch (CommException e)
                 {
-
                     Debug.WriteLine(e.Message);
                     if (!isListening)
                     {
                         break;
                     }
                 }
-                finally 
+                finally
                 {
                     Debug.WriteLine(nameof(AcceptLoop));
                 }
@@ -120,13 +122,12 @@ namespace EPI.Comm.Net
             try
             {
                 var tcpClient = Listener?.AcceptTcpClient();
-                if(tcpClient!=null)
+                if (tcpClient != null)
                 {
                     var client = CreateClient(tcpClient);
                     AttachClient(client);
                     OnAccepted(this, new TcpEventArgs(client));
                 }
-               
 
             }
             catch (ObjectDisposedException disposedException)
@@ -137,7 +138,7 @@ namespace EPI.Comm.Net
             {
                 throw CreateCommException(socketException);
             }
-           
+
             catch (NullReferenceException nullException)
             {
                 throw CreateCommException(nullException);
@@ -147,6 +148,17 @@ namespace EPI.Comm.Net
                 Debug.WriteLine(nameof(Accept));
             }
         }
+        private void WaitAcceptLoopFinish()
+        {
+            while (acceptLoopingOn)
+            {
+
+            }
+        }
+        #endregion
+
+
+
         private protected virtual void OnAccepted(object sender, TcpEventArgs e)
         {
             ClientAccpeted?.Invoke(this, e);

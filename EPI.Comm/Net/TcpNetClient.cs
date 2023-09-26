@@ -22,8 +22,10 @@ namespace EPI.Comm.Net
         internal NetSocket NetSocket { get; private set; }
         public IPEndPoint LocalEndPoint => NetSocket?.LocalEndPoint;
         public IPEndPoint RemoteEndPoint => NetSocket?.RemoteEndPoint;
-
+        private volatile bool isConnecting = false;
         private volatile bool isConnectedFlag = false;
+        private string ipToConnect;
+        private int portToConnect;
         private bool IsSocketConnected => (NetSocket?.IsConnected ?? false);
         public bool IsConnected
         {
@@ -31,8 +33,8 @@ namespace EPI.Comm.Net
             {
                 return isConnectedFlag && IsSocketConnected;
             }
-            set 
-            { 
+            set
+            {
                 isConnectedFlag = value;
             }
         }
@@ -74,7 +76,6 @@ namespace EPI.Comm.Net
             NetSocket.Received += SocketReceived;
             NetSocket.Closed += SocketClosed;
         }
-
         private void DetachSocket()
         {
             if (NetSocket != null)
@@ -85,69 +86,67 @@ namespace EPI.Comm.Net
             }
         }
 
+        #region Connect
         public void Connect(string ip, int port)
         {
-            lock (ConnectLock)
+            connectHelper.SetEndPoint(ip, port, true);
+            ipToConnect = ip;
+            portToConnect = port;
+            if (!isConnecting)
             {
-                try
+                lock (ConnectLock)
                 {
-                    if (!IsConnected)
+                    isConnecting = true;
+                    try
                     {
-                        connectHelper.SetEndPoint(ip, port, true);
-                        TcpClient = new TcpClient();
-                        var asyncHandle = TcpClient.BeginConnect(IPAddress.Parse(ip), port, null, null);
-                        var returned = asyncHandle.AsyncWaitHandle.WaitOne(10000);
-                        if(returned|| IsSocketConnected)
-                        {
-                            IsConnected = true;
-                            AttachSocket(TcpClient);
-                            Connected?.Invoke(this, EventArgs.Empty);
-                        }
-                        else
-                        {
-                            TcpClient?.Dispose();
-                            RunAutoConnectIfUserWant();
-                        }
-
-
+                        Connect();
                     }
-                }
-                catch (SocketException e)
-                {
-                    TcpClient?.Dispose();
-                    RunAutoConnectIfUserWant();
-                    Debug.WriteLine(e.Message);
-                }
-                finally
-                {
-                    Debug.WriteLine(nameof(Connect));
+                    catch (CommException e)
+                    {
+                        IsConnected = false;
+                        TcpClient?.Dispose();
+                        RunAutoConnectIfUserWant();
+                        Debug.WriteLine(e.Message);
+                    }
+                    finally
+                    {
+                        isConnecting = false;
+                        Debug.WriteLine(nameof(Connect));
+                    }
                 }
             }
 
+        }
+        private void Connect()
+        {
+            try
+            {
+                if (!IsConnected)
+                {
+                    TcpClient = new TcpClient();
+                    var asyncHandle = TcpClient.BeginConnect(IPAddress.Parse(ipToConnect), portToConnect, null, null);
+                    var returned = asyncHandle.AsyncWaitHandle.WaitOne(10000);
+                    if (returned || IsSocketConnected)
+                    {
+                        IsConnected = true;
+                        AttachSocket(TcpClient);
+                        Connected?.Invoke(this, EventArgs.Empty);
+                    }
+                    else
+                    {
+                        throw new CommException("Connection TimeOut");
+                    }
+                }
+            }
+            catch (SocketException e)
+            {
+
+                throw CommException.CreateCommException(e);
+            }
 
         }
-        
-        private void SocketClosed(object sender, EventArgs e)
-        {
-            DetachSocket();
-            IsConnected = false;
-            TcpClient?.Close();
-            TcpClient = null;
-            RaiseCloseEvent();
+        #endregion
 
-            RunAutoConnectIfUserWant();
-        }
-        private void StopAutoConnectIfLoopOn()
-        {
-           
-            connectHelper?.StopAutoConnectIfLoopOn();
-           
-        }
-        private void RunAutoConnectIfUserWant()
-        {
-            connectHelper?.RunAutoConnectIfUserWant();
-        }
-    
 
         private protected virtual void SocketReceived(object sender, PacketEventArgs e)
         {
@@ -159,7 +158,7 @@ namespace EPI.Comm.Net
         public void Stop()
         {
             StopAutoConnectIfLoopOn();
-           
+
             lock (ConnectLock)
             {
                 if (IsConnected)
@@ -182,6 +181,16 @@ namespace EPI.Comm.Net
         {
             Disconnected?.Invoke(this, EventArgs.Empty);
         }
+        private void SocketClosed(object sender, EventArgs e)
+        {
+            DetachSocket();
+            IsConnected = false;
+            TcpClient?.Close();
+            TcpClient = null;
+            RaiseCloseEvent();
+
+            RunAutoConnectIfUserWant();
+        }
         public void Send(byte[] bytes)
         {
             try
@@ -193,6 +202,18 @@ namespace EPI.Comm.Net
                 Debug.WriteLine(e.Message);
             }
         }
+        private void StopAutoConnectIfLoopOn()
+        {
+
+            connectHelper?.StopAutoConnectIfLoopOn();
+
+        }
+        private void RunAutoConnectIfUserWant()
+        {
+            connectHelper?.RunAutoConnectIfUserWant();
+        }
+
+
         public event EventHandler Disconnected;
         public event EventHandler Connected;
         public event PacketEventHandler Received;
@@ -238,14 +259,14 @@ namespace EPI.Comm.Net
             private volatile string userConnectIp = null;
             private volatile int userConnectPort = -1;
             public TcpNetClient Tcp { get; private set; }
-   
+
             public AutoConnectHelper(TcpNetClient tcp)
             {
                 Tcp = tcp;
             }
             public void SetEndPoint(string ip, int port, bool requestConnect)
             {
-                
+
                 userConnectIp = ip;
                 userConnectPort = port;
                 userRequestConnect = requestConnect;
@@ -281,7 +302,7 @@ namespace EPI.Comm.Net
                         }
                         isAutoConnectLoopOn = false;
                     }
-                    
+
                 });
 
             }

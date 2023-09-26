@@ -21,6 +21,7 @@ namespace EPI.Comm
         {
 
         }
+       
         internal static CommException CreateCommException([CallerMemberName] string caller = "")
         {
             return new CommException(caller);

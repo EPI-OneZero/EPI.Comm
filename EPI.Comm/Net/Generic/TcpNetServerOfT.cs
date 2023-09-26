@@ -17,8 +17,8 @@ namespace EPI.Comm.Net.Generic
     public class TcpNetServer<Theader> : TcpNetServer, IComm<Theader>
         where Theader : new()
     {
-        private List<TcpNetClient<Theader>> clients = new List<TcpNetClient<Theader>>(); 
-        new public ClientCollection<Theader> Clients { get; private set; } 
+        private List<TcpNetClient<Theader>> clients = new List<TcpNetClient<Theader>>();
+        new public ClientCollection<Theader> Clients { get; private set; }
         internal IBuffer ReceiveBuffer { get; set; } = new QueueBuffer();
         internal Func<Theader, int> GetBodySize { get; private set; }
         internal Packet<Theader> Packet { get; set; }
@@ -83,7 +83,7 @@ namespace EPI.Comm.Net.Generic
         {
 
         }
-       
+
 
         #endregion
         #region 이벤트

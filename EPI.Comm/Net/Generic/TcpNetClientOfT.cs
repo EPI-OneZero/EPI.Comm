@@ -20,10 +20,10 @@ namespace EPI.Comm.Net.Generic
     /// 
     /// </summary>
     /// <typeparam name="Theader">Marshal.SizeOf 가능 및 레이아웃 Sequential 확인 필수</typeparam>
-    public class TcpNetClient<Theader> : TcpNetClient, IComm<Theader> 
+    public class TcpNetClient<Theader> : TcpNetClient, IComm<Theader>
         where Theader : new()
     {
-        public int HeaderSize { get;private set; }
+        public int HeaderSize { get; private set; }
         internal IBuffer ReceiveBuffer { get; set; } = new QueueBuffer();
         internal Func<Theader, int> GetBodySize { get; private set; }
         internal Packet<Theader> Packet { get; set; }
@@ -48,7 +48,7 @@ namespace EPI.Comm.Net.Generic
             Buffer.BlockCopy(body, 0, fullPacketBytes, HeaderSize, body.Length);
             Send(fullPacketBytes);
         }
-       
+
         new public event PacketEventHandler<Theader> Received;
         private protected override void SocketReceived(object sender, PacketEventArgs e)
         {
@@ -61,10 +61,10 @@ namespace EPI.Comm.Net.Generic
                 ReceiveBuffer.AddBytes(e.ReceivedBytes);
                 if (Packet.TryDeserializePacket(ReceiveBuffer))
                 {
-                    Received?.Invoke(this, new PacketEventArgs<Theader>(e.From,Packet));
+                    Received?.Invoke(this, new PacketEventArgs<Theader>(e.From, Packet));
                 }
             }
-           
+
         }
     }
 
@@ -76,9 +76,9 @@ namespace EPI.Comm.Net.Generic
     /// </summary>
     /// <typeparam name="Theader">Marshal.SizeOf 가능 및 레이아웃 Sequential 확인 필수</typeparam>
     /// <typeparam name="Tfooter">Marshal.SizeOf 가능 및 레이아웃 Sequential 확인 필수</typeparam>
-    public class TcpNetClient<Theader, Tfooter> : TcpNetClient, IComm<Theader,Tfooter>
+    public class TcpNetClient<Theader, Tfooter> : TcpNetClient, IComm<Theader, Tfooter>
         where Theader : new()
-     
+
     {
         internal int HeaderSize { get; set; }
         internal int FooterSize { get; set; }
@@ -129,11 +129,11 @@ namespace EPI.Comm.Net.Generic
                 {
                     var packet = Packet;
                     Packet = null;
-                    Received?.Invoke(this, new PacketEventArgs<Theader, Tfooter>(e.From,packet));
+                    Received?.Invoke(this, new PacketEventArgs<Theader, Tfooter>(e.From, packet));
                 }
             }
         }
         new public event PacketEventHandler<Theader, Tfooter> Received;
     }
-   
+
 }
