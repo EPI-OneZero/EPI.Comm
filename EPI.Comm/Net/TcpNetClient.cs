@@ -22,7 +22,20 @@ namespace EPI.Comm.Net
         internal NetSocket NetSocket { get; private set; }
         public IPEndPoint LocalEndPoint => NetSocket?.LocalEndPoint;
         public IPEndPoint RemoteEndPoint => NetSocket?.RemoteEndPoint;
-        public bool IsConnected { get; private set; }
+
+        private volatile bool isConnectedFlag = false;
+        private bool IsSocketConnected => (NetSocket?.IsConnected ?? false);
+        public bool IsConnected
+        {
+            get
+            {
+                return isConnectedFlag && IsSocketConnected;
+            }
+            set 
+            { 
+                isConnectedFlag = value;
+            }
+        }
         public bool AutoConnect
         {
             get => connectHelper?.AutoConnect ?? false;
@@ -52,6 +65,7 @@ namespace EPI.Comm.Net
         {
             TcpClient = client;
             BufferSize = bufferSize;
+            isConnectedFlag = true;
             AttachSocket(TcpClient);
         }
         private void AttachSocket(TcpClient client)
@@ -83,7 +97,7 @@ namespace EPI.Comm.Net
                         TcpClient = new TcpClient();
                         var asyncHandle = TcpClient.BeginConnect(IPAddress.Parse(ip), port, null, null);
                         var returned = asyncHandle.AsyncWaitHandle.WaitOne(10000);
-                        if(returned)
+                        if(returned|| IsSocketConnected)
                         {
                             IsConnected = true;
                             AttachSocket(TcpClient);
