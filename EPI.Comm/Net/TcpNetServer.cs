@@ -158,13 +158,13 @@ namespace EPI.Comm.Net
         private void AttachClient(TcpNetClient client)
         {
             client.Received += OnClientReceived;
-            client.Closed += OnClientClosed;
+            client.Disconnected += OnClientClosed;
             clients.Add(client);
         }
         private void DetachClient(TcpNetClient client)
         {
             client.Received -= OnClientReceived;
-            client.Closed -= OnClientClosed;
+            client.Disconnected -= OnClientClosed;
             if (clients.Contains(client))
             {
                 clients.Remove(client);

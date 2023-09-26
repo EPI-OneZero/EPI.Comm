@@ -22,7 +22,7 @@ namespace EPI.Comm.Net
         internal NetSocket NetSocket { get; private set; }
         public IPEndPoint LocalEndPoint => NetSocket?.LocalEndPoint;
         public IPEndPoint RemoteEndPoint => NetSocket?.RemoteEndPoint;
-        public bool IsConnected => NetSocket?.IsConnected ?? false;
+        public bool IsConnected { get; private set; }
         public bool AutoConnect
         {
             get => connectHelper?.AutoConnect ?? false;
@@ -81,13 +81,25 @@ namespace EPI.Comm.Net
                     {
                         connectHelper.SetEndPoint(ip, port, true);
                         TcpClient = new TcpClient();
-                        TcpClient.Connect(ip, port);
-                        AttachSocket(TcpClient);
-                        Connected?.Invoke(this, EventArgs.Empty);
+                        var asyncHandle = TcpClient.BeginConnect(IPAddress.Parse(ip), port, null, null);
+                        var returned = asyncHandle.AsyncWaitHandle.WaitOne(5000);
+                        if(returned)
+                        {
+                            IsConnected = true;
+                            AttachSocket(TcpClient);
+                            Connected?.Invoke(this, EventArgs.Empty);
+                        }
+                        else
+                        {
+                            TcpClient.Dispose();
+                        }
+
+
                     }
                 }
                 catch (SocketException e)
                 {
+                    TcpClient?.Dispose();
                     RunAutoConnectIfUserWant();
                     Debug.WriteLine(e.Message);
                 }
@@ -99,9 +111,11 @@ namespace EPI.Comm.Net
 
 
         }
+        
         private void SocketClosed(object sender, EventArgs e)
         {
             DetachSocket();
+            IsConnected = false;
             TcpClient?.Close();
             TcpClient = null;
             RaiseCloseEvent();
@@ -136,9 +150,11 @@ namespace EPI.Comm.Net
                 if (IsConnected)
                 {
                     DetachSocket();
+                    IsConnected = false;
                     TcpClient?.Close();
                     TcpClient = null;
                     RaiseCloseEvent();
+
                 }
             }
 
@@ -149,7 +165,7 @@ namespace EPI.Comm.Net
         /// </summary>
         private void RaiseCloseEvent()
         {
-            Closed?.Invoke(this, EventArgs.Empty);
+            Disconnected?.Invoke(this, EventArgs.Empty);
         }
         public void Send(byte[] bytes)
         {
@@ -162,7 +178,7 @@ namespace EPI.Comm.Net
                 Debug.WriteLine(e.Message);
             }
         }
-        public event EventHandler Closed;
+        public event EventHandler Disconnected;
         public event EventHandler Connected;
         public event PacketEventHandler Received;
         #region IDISPOSE

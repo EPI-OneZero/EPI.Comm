@@ -44,7 +44,7 @@ namespace CommSample.Sample
 
             var ip1 = remote.Address.ToString();
             var port1 = remote.Port.ToString();
-            //MessageBox.Show($"server local : {ip0} : {port0} , remote : {ip1} : {port1}");
+            MessageBox.Show($"server local : {ip0} : {port0} , remote : {ip1} : {port1}");
         }
 
         private void ServerWindow_Closed(object sender, EventArgs e)
@@ -56,7 +56,7 @@ namespace CommSample.Sample
         private TcpNetServer server;
         private void Server_Closed(object sender, TcpEventArgs e)
         {
-            //MessageBox.Show("Server Client Closed");
+            MessageBox.Show("Server Client Closed");
         }
 
         private void Server_BytesReceived(object sender, PacketEventArgs e)
@@ -95,7 +95,7 @@ namespace CommSample.Sample
             }
             else
             {
-                //MessageBox.Show("포트번호 이상");
+                MessageBox.Show("포트번호 이상");
             }
 
         }

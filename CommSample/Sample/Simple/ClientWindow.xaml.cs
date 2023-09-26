@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -25,14 +26,14 @@ namespace CommSample.Sample
         public ClientWindow()
         {
             InitializeComponent();
+            InitClient();
 
-           
         }
         private void InitClient()
         {
             client = new TcpNetClient();
             client.Received += Client_BytesReceived;
-            client.Closed += Client_Closed;
+            client.Disconnected += Client_Closed;
             client.Connected += Client_Connected; ;
             Closed += ClientWindow_Closed;
         }
@@ -48,18 +49,18 @@ namespace CommSample.Sample
 
             var ip1 = remote.Address.ToString();
             var port1 = remote.Port.ToString();
-            //MessageBox.Show($"client local : {ip0} : {port0} , remote : {ip1} : {port1}");
+            MessageBox.Show($"client local : {ip0} : {port0} , remote : {ip1} : {port1}");
         }
 
         private void ClientWindow_Closed(object sender, EventArgs e)
         {
-            client?.Dispose();
+            client?.Stop();
         }
 
         private TcpNetClient client = new TcpNetClient();
         private void Client_Closed(object sender, EventArgs e)
         {
-            //MessageBox.Show("Client Closed");
+            MessageBox.Show("Client Closed");
         }
 
         private void Client_BytesReceived(object sender, PacketEventArgs e)
@@ -86,10 +87,14 @@ namespace CommSample.Sample
 
         private void Start(object sender, RoutedEventArgs e)
         {
-            client?.Dispose();
-            client = null;
-            InitClient();
-            client.Connect("127.0.0.1", ServerWindow.ServerPort);
+            var s = ip.Text;
+            var p = port.Text;
+            var t = new Thread(() =>
+            {
+                client.Connect(s, int.Parse(p));
+
+            });
+            t.Start();
             //if(client.IsConnected)
             //{
             //    client.Send(new byte[] { 1,2,3});
@@ -99,8 +104,11 @@ namespace CommSample.Sample
 
         private void Stop(object sender, RoutedEventArgs e)
         {
-            client?.Dispose();
-            client = null;
+            var t = new Thread(() =>
+            {
+                client?.Stop();
+            });
+            t.Start();
 
         }
 

@@ -14,6 +14,7 @@ namespace EPI.Comm.UTils
         {
             var thread = new Thread(new ThreadStart(action));
             thread.Start();
+            thread.IsBackground= true;
             return thread;
         }
     }
