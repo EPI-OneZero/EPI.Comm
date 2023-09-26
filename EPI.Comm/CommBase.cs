@@ -11,10 +11,7 @@ using EPI.Comm.Net.Generic.Events;
 
 namespace EPI.Comm
 {
-    /// <summary>
-    /// 질문 : 이거 만들고보니 필요없는 것 같은데 버려야하나?
-    /// 그리고 아래 인터페이스 정의는 적절한가?
-    /// </summary>
+    
     public abstract class CommBase
     {
         public const int DefaultBufferSize = 8192;
