@@ -82,7 +82,7 @@ namespace EPI.Comm.Net
                         connectHelper.SetEndPoint(ip, port, true);
                         TcpClient = new TcpClient();
                         var asyncHandle = TcpClient.BeginConnect(IPAddress.Parse(ip), port, null, null);
-                        var returned = asyncHandle.AsyncWaitHandle.WaitOne(5000);
+                        var returned = asyncHandle.AsyncWaitHandle.WaitOne(10000);
                         if(returned)
                         {
                             IsConnected = true;
@@ -91,7 +91,8 @@ namespace EPI.Comm.Net
                         }
                         else
                         {
-                            TcpClient.Dispose();
+                            TcpClient?.Dispose();
+                            RunAutoConnectIfUserWant();
                         }
 
 
