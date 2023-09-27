@@ -22,9 +22,9 @@ namespace EPI.Comm
 
         }
        
-        internal static CommException CreateCommException([CallerMemberName] string caller = "")
+        internal static CommException CreateCommException(string message)
         {
-            return new CommException(caller);
+            return new CommException(message);
         }
         internal static CommException CreateCommException(Exception e, [CallerMemberName] string caller = "")
         {

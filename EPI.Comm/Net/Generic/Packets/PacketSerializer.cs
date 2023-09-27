@@ -1,21 +1,17 @@
 ﻿using System;
+using System.Data.SqlTypes;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace EPI.Comm.Net.Generic.Packets
 {
-    /// <summary>
-    /// 
-    /// 
-    /// 
-    /// </summary>
     internal static class PacketSerializer
     {
         internal static bool IsEnoughSize(int sourceSize, int targetSize, int srcOffset)
         {
             return sourceSize - srcOffset >= targetSize;
         }
-        internal static T DeserializeByMarshal<T>(byte[] srcBytes, int targetSize, int srcOffset, [CallerMemberName] string caller = "")
+        internal static T DeserializeByMarshal<T>(byte[] srcBytes, int targetSize, int srcOffset)
         {
             if (IsEnoughSize(srcBytes?.Length ?? 0, targetSize, srcOffset))
             {
@@ -26,10 +22,9 @@ namespace EPI.Comm.Net.Generic.Packets
             }
             else
             {
-                throw new IndexOutOfRangeException($"{caller} : {nameof(srcBytes)}");
+                throw new IndexOutOfRangeException($"{nameof(srcBytes)}");
             }
         }
-
         internal static void SerializeByMarshal<T>(T src, byte[] dst, int dstOffset, int srcSize)
         {
             if (IsEnoughSize(srcSize, dst.Length - dstOffset, 0))
@@ -40,7 +35,7 @@ namespace EPI.Comm.Net.Generic.Packets
             }
             else
             {
-                throw new IndexOutOfRangeException(nameof(srcSize));
+                throw new IndexOutOfRangeException($"{nameof(srcSize)}");
             }
           
         }

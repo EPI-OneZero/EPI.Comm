@@ -2,7 +2,6 @@
 using EPI.Comm.UTils;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
@@ -76,6 +75,23 @@ namespace EPI.Comm.Net
                 }
             }
         }
+        private void OnClientClosed(object sender, EventArgs e)
+        {
+            var client = sender as TcpNetClient;
+            DetachClient(client);
+        }
+        private protected virtual void OnClosed(object sender, TcpEventArgs e)
+        {
+            ClientClosed?.Invoke(this, e);
+        }
+        private void DisposeAllClients()
+        {
+            var clients = this.clients?.ToArray() ?? new TcpNetClient[0];
+            foreach (var client in clients)
+            {
+                DetachClient(client);
+            }
+        }
         #endregion
         #region Send
         public void Send(string message)
@@ -92,30 +108,35 @@ namespace EPI.Comm.Net
             });
         }
         #endregion
+
         #region Accept
         private void AcceptLoop()
         {
-            acceptLoopingOn = true;
-            while (isListening)
+            if(!acceptLoopingOn)
             {
-                try
+                acceptLoopingOn = true;
+                while (isListening)
                 {
-                    Accept();
-                }
-                catch (CommException e)
-                {
-                    Debug.WriteLine(e.Message);
-                    if (!isListening)
+                    try
                     {
-                        break;
+                        Accept();
+                    }
+                    catch (CommException e)
+                    {
+                        Debug.WriteLine(e.Message);
+                        if (!isListening)
+                        {
+                            break;
+                        }
+                    }
+                    finally
+                    {
+                        Debug.WriteLine(nameof(AcceptLoop));
                     }
                 }
-                finally
-                {
-                    Debug.WriteLine(nameof(AcceptLoop));
-                }
+                acceptLoopingOn = false;
             }
-            acceptLoopingOn = false;
+          
         }
         private void Accept()
         {
@@ -155,10 +176,6 @@ namespace EPI.Comm.Net
 
             }
         }
-        #endregion
-
-
-
         private protected virtual void OnAccepted(object sender, TcpEventArgs e)
         {
             ClientAccpeted?.Invoke(this, e);
@@ -167,16 +184,19 @@ namespace EPI.Comm.Net
         {
             return new TcpNetClient(client, BufferSize);
         }
+        #endregion
+
+        #region Client Attach Detach 
         private void AttachClient(TcpNetClient client)
         {
             client.Received += OnClientReceived;
-            client.Disconnected += OnClientClosed;
+            client.Closed += OnClientClosed;
             clients.Add(client);
         }
         private void DetachClient(TcpNetClient client)
         {
             client.Received -= OnClientReceived;
-            client.Disconnected -= OnClientClosed;
+            client.Closed -= OnClientClosed;
             if (clients.Contains(client))
             {
                 clients.Remove(client);
@@ -184,25 +204,7 @@ namespace EPI.Comm.Net
                 client.Dispose();
             }
         }
-
-        private void OnClientClosed(object sender, EventArgs e)
-        {
-            var client = sender as TcpNetClient;
-            DetachClient(client);
-        }
-        private protected virtual void OnClosed(object sender, TcpEventArgs e)
-        {
-            ClientClosed?.Invoke(this, e);
-        }
-
-        private void DisposeAllClients()
-        {
-            var clients = this.clients?.ToArray() ?? new TcpNetClient[0];
-            foreach (var client in clients)
-            {
-                DetachClient(client);
-            }
-        }
+        #endregion
         private protected virtual void OnClientReceived(object sender, PacketEventArgs e)
         {
             Received?.Invoke(this, e);
@@ -246,12 +248,5 @@ namespace EPI.Comm.Net
             GC.SuppressFinalize(this);
         }
         #endregion
-    }
-    public sealed class ClientCollection : ReadOnlyCollection<TcpNetClient>
-    {
-
-        internal ClientCollection(IList<TcpNetClient> list) : base(list)
-        {
-        }
     }
 }

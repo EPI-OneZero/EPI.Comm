@@ -50,7 +50,7 @@ namespace EPI.Comm.Net.Generic
         }
 
         new public event PacketEventHandler<Theader> Received;
-        private protected override void SocketReceived(object sender, PacketEventArgs e)
+        private protected override void SocketReceived(object sender, SocketReceiveEventArgs e)
         {
             lock (this)
             {
@@ -78,7 +78,6 @@ namespace EPI.Comm.Net.Generic
     /// <typeparam name="Tfooter">Marshal.SizeOf 가능 및 레이아웃 Sequential 확인 필수</typeparam>
     public class TcpNetClient<Theader, Tfooter> : TcpNetClient, IComm<Theader, Tfooter>
         where Theader : new()
-
     {
         internal int HeaderSize { get; set; }
         internal int FooterSize { get; set; }
@@ -115,7 +114,7 @@ namespace EPI.Comm.Net.Generic
 
             Send(fullPacketBytes);
         }
-        private protected override void SocketReceived(object sender, PacketEventArgs e)
+        private protected override void SocketReceived(object sender, SocketReceiveEventArgs e)
         {
             lock (this)
             {

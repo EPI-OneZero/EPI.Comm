@@ -30,7 +30,6 @@ namespace EPI.Comm.Net.Generic
         }
         public TcpNetServer(Func<Theader, int> getBodySize) : this(DefaultBufferSize, getBodySize)
         {
-
         }
 
         #region Override
@@ -93,7 +92,6 @@ namespace EPI.Comm.Net.Generic
         #endregion
         public void Send(Theader header, byte[] body)
         {
-            throw new NotImplementedException();
         }
     }
 }

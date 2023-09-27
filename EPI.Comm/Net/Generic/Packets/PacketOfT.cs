@@ -5,8 +5,15 @@ using System.Runtime.InteropServices;
 using static EPI.Comm.Net.Generic.Packets.PacketSerializer;
 namespace EPI.Comm.Net.Generic.Packets
 {
-    public class Packet<Theader> 
+    public class Packet<Theader>
     {
+        private enum DeserializeState
+        {
+            None,
+            HeaderCompleted,
+            BodyCompleted,
+            FooterCompleted
+        }
         public byte[] FullPacket { get; private set; }
         public Theader Header { get; private set; }
         public byte[] Body { get; private set; }
@@ -19,28 +26,38 @@ namespace EPI.Comm.Net.Generic.Packets
             GetBodySize = getBodySize;
             HeaderSize = ObjectUtil.SizeOf<Theader>();
         }
+        private int CalculateBodySize()
+        {
+            return GetBodySize?.Invoke(Header) ?? 0;
+        }
+        private DeserializeState state = DeserializeState.None;
         private protected bool HeaderDeserialized { get; private set; } = false;
+        private protected bool BodyDeserialized { get; private set; } = false;
         internal virtual bool TryDeserializePacket(IBuffer buffer)
         {
-            if (HeaderDeserialized)
+            switch (state)
             {
-                return TryDeserializeBody(buffer, GetBodySize?.Invoke(Header) ?? 0);
+                case DeserializeState.None:
+                    if (TryDeserializeHeader(buffer))
+                    {
+                        return TryDeserializeBody(buffer, CalculateBodySize());
+                    }
+                    else return false;
+                case DeserializeState.HeaderCompleted:
+                    return TryDeserializeBody(buffer, CalculateBodySize());
+                case DeserializeState.BodyCompleted:
+                    return true;
+                default:
+                    throw new InvalidOperationException($"Unexpected state: {state}");
             }
-            else
-            {
-                if (TryDeserializeHeader(buffer))
-                {
-                    HeaderDeserialized = true;
-                    return TryDeserializeBody(buffer, GetBodySize?.Invoke(Header) ?? 0);
-                }
-                else return false;
-            }
+
         }
         private bool TryDeserializeHeader(IBuffer buffer)
         {
             if (IsEnoughSize(buffer.Count, HeaderSize, 0))
             {
                 Header = DeserializeByMarshal<Theader>(buffer.GetBytes(HeaderSize), HeaderSize, 0);
+                state =  DeserializeState.HeaderCompleted;
                 return true;
             }
             else
@@ -53,7 +70,7 @@ namespace EPI.Comm.Net.Generic.Packets
             if (IsEnoughSize(buffer.Count, bodySize, 0))
             {
                 Body = buffer.GetBytes(bodySize);
-
+                state = DeserializeState.BodyCompleted;
                 return true;
             }
             else
@@ -102,6 +119,4 @@ namespace EPI.Comm.Net.Generic.Packets
         }
 
     }
-
-    
 }
