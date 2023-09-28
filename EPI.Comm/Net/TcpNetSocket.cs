@@ -10,28 +10,28 @@ using static EPI.Comm.CommException;
 
 namespace EPI.Comm.Net
 {
-    internal class NetSocket : CommBase
+    internal class TcpNetSocket : CommBase
     {
         #region Field & Property
         private readonly object SendLock = new object();
         private readonly object ReceiveLock = new object();
 
         protected Socket Socket { get; set; }
-        protected byte[] ReceiveBuffer { get; set; }
+        protected byte[] ReceiveBuffer { get;private set; }
         public bool IsConnected => Socket?.Connected ?? false;
         public IPEndPoint LocalEndPoint => Socket?.LocalEndPoint as IPEndPoint;
         public IPEndPoint RemoteEndPoint => Socket?.RemoteEndPoint as IPEndPoint;
-        private static readonly LingerOption lingerOption = new LingerOption(false, 0);
+        private static readonly LingerOption lingerOption = new LingerOption(true, 0);
 
         #endregion
 
         #region CTOR
-        internal NetSocket(Socket socket, int bufferSize)
+        internal TcpNetSocket(Socket socket, int bufferSize)
         {
             Socket = socket;
             ReceiveBuffer = new byte[bufferSize];
             SetSocketOption(socket);
-            ThreadUtil.Start(OnReceive);
+            ThreadUtil.Start(ReceiveLoop);
         }
 
         #endregion
@@ -100,7 +100,7 @@ namespace EPI.Comm.Net
             }
 
         }
-        private void OnReceive()
+        private void ReceiveLoop()
         {
             while (IsConnected)
             {
@@ -121,7 +121,7 @@ namespace EPI.Comm.Net
                 }
                 finally
                 {
-                    Debug.WriteLine(nameof(OnReceive));
+                    Debug.WriteLine(nameof(ReceiveLoop));
                 }
 
             }

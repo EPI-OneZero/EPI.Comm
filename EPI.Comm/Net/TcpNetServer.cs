@@ -1,17 +1,17 @@
 ﻿using EPI.Comm.Net.Events;
 using System.Collections.Generic;
 using System.Net.Sockets;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace EPI.Comm.Net
 {
-    /// <summary>
-    /// 질문: TcpNetServer has a TcpNetClient. 
-    ///  TcpNetClient has a NetSocket인데 이 구조 적절한가?
-    /// </summary>
     public class TcpNetServer : TcpServerBase, IComm
     {
-        public List<TcpNetClient> clients { get; private set; } = new List<TcpNetClient>();
+        #region Field & Property
+        private List<TcpNetClient> clients = new List<TcpNetClient>();
         public ClientCollection Clients { get; private set; }
+        #endregion
         #region CTOR
         public TcpNetServer(int bufferSize) : base(bufferSize)
         {
@@ -22,7 +22,20 @@ namespace EPI.Comm.Net
 
         }
         #endregion
-
+        #region Send
+        public void Send(string message)
+        {
+            var bytes = Encoding.UTF8.GetBytes(message);
+            Send(bytes);
+        }
+        public void Send(byte[] bytes)
+        {
+            var result = Parallel.ForEach(clients, c =>
+            {
+                c.Send(bytes);
+            });
+        }
+        #endregion
         #region Receive
         private void OnClientReceived(object sender, PacketEventArgs e)
         {

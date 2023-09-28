@@ -11,5 +11,4 @@ namespace EPI.Comm.Net.Events
         }
     }
     public delegate void TcpEventHandler(object sender, TcpEventArgs e);
-
 }

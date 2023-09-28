@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Net.Sockets;
+using System.Runtime.InteropServices;
 
 namespace ConsoleTest
 {
@@ -40,7 +41,7 @@ namespace ConsoleTest
 
         public static void Main(string[] args)
         {
-
+            UdpClient client = new UdpClient();
         }
         public static void ReverseEndian<T>(T t)
         {

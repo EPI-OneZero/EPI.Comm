@@ -1,4 +1,5 @@
 ﻿using EPI.Comm.Net.Events;
+using System.Diagnostics;
 using System.Net.Sockets;
 
 namespace EPI.Comm.Net
@@ -19,8 +20,12 @@ namespace EPI.Comm.Net
 
         }
         #endregion
+        #region Send Receive
+        public void Send(byte[] bytes)
+        {
+            SendBytes(bytes);
+        }
 
-        #region Receive
         private protected override void SocketReceived(object sender, SocketReceiveEventArgs e)
         {
             Received?.Invoke(this, new PacketEventArgs(e.From, e.ReceivedBytes));

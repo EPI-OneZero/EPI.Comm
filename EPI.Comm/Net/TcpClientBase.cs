@@ -15,7 +15,7 @@ namespace EPI.Comm.Net
         private readonly object ConnectLock = new object();
         private readonly KeepAlive KeepAliveConfig = new KeepAlive();
         protected TcpClient TcpClient { get; set; }
-        internal NetSocket NetSocket { get; private set; }
+        internal TcpNetSocket NetSocket { get; private set; }
         public int BufferSize { get; private set; }
         public IPEndPoint LocalEndPoint => NetSocket?.LocalEndPoint;
         public IPEndPoint RemoteEndPoint => NetSocket?.RemoteEndPoint;
@@ -54,10 +54,11 @@ namespace EPI.Comm.Net
         private void AttachSocket(Socket client)
         {
             SetKeepAlive(client);
-            NetSocket = new NetSocket(client, BufferSize);
+            NetSocket = new TcpNetSocket(client, BufferSize);
             NetSocket.Received += SocketReceived;
             NetSocket.Closed += SocketClosed;
         }
+      
         private void SetKeepAlive(Socket socket)
         {
             var size = Marshal.SizeOf<KeepAlive>();
@@ -75,9 +76,8 @@ namespace EPI.Comm.Net
             }
         }
         #endregion
-
         #region Send Receive
-        public void Send(byte[] bytes)
+        internal void SendBytes(byte[] bytes)
         {
             try
             {
@@ -89,9 +89,7 @@ namespace EPI.Comm.Net
             }
         }
         private protected abstract void SocketReceived(object sender, SocketReceiveEventArgs e);
-
         #endregion
-
         #region Connect
         public void Connect(string ip, int port)
         {
@@ -168,14 +166,15 @@ namespace EPI.Comm.Net
             StopAutoConnectIfLoopOn();
             lock (ConnectLock)
             {
-                if (IsConnected)
+                bool raiseEvent = IsConnected;
+                DetachSocket();
+                TcpClient?.Dispose();
+                TcpClient = null;
+                if(raiseEvent)
                 {
-                    DetachSocket();
-                    TcpClient?.Dispose();
-                    TcpClient = null;
                     RaiseDisconnectEvent();
-
                 }
+
             }
         }
 
@@ -284,25 +283,14 @@ namespace EPI.Comm.Net
                 if (disposing)
                 {
                     Stop();
-                    // TODO: 관리형 상태(관리형 개체)를 삭제합니다.
                 }
                 TcpClient = null;
-                // TODO: 비관리형 리소스(비관리형 개체)를 해제하고 종료자를 재정의합니다.
-                // TODO: 큰 필드를 null로 설정합니다.
                 disposedValue = true;
             }
         }
 
-        // // TODO: 비관리형 리소스를 해제하는 코드가 'Dispose(bool disposing)'에 포함된 경우에만 종료자를 재정의합니다.
-        // ~Client()
-        // {
-        //     // 이 코드를 변경하지 마세요. 'Dispose(bool disposing)' 메서드에 정리 코드를 입력합니다.
-        //     Dispose(disposing: false);
-        // }
-
         public void Dispose()
         {
-            // 이 코드를 변경하지 마세요. 'Dispose(bool disposing)' 메서드에 정리 코드를 입력합니다.
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
         }

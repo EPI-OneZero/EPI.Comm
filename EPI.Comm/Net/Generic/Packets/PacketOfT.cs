@@ -90,6 +90,21 @@ namespace EPI.Comm.Net.Generic.Packets
                 return false;
             }
         }
+        internal static byte[] GeneratePacketBytes(Theader header, byte[] body, int headerSize, int headerDefinedBodySize)
+        {
+            if (headerDefinedBodySize == body.Length)
+            {
+                var fullPacketBytes = new byte[headerSize + body.Length];
+                SerializeByMarshal(header, fullPacketBytes, 0, headerSize);
+                Buffer.BlockCopy(body, 0, fullPacketBytes, headerSize, body.Length);
+                return fullPacketBytes;
+            }
+            else
+            {
+                throw new ArgumentOutOfRangeException
+                    ($"Body length isdiffers from header definition.\r\n body length :{body.Length}, header definition : {headerDefinedBodySize}");
+            }
+        }
 
     }
     /// <summary>
@@ -132,5 +147,24 @@ namespace EPI.Comm.Net.Generic.Packets
             }
         }
 
+        internal static byte[] GeneratePacketBytes(Theader header, byte[] body, Tfooter footer, int headerSize, int headerDefinedBodySize, int footerSize)
+        {
+            int bodySize = body.Length;
+
+            if (headerDefinedBodySize == body.Length)
+            {
+                var fullPacketBytes = new byte[headerSize + bodySize + footerSize];
+                SerializeByMarshal(header, fullPacketBytes, 0, headerSize);
+                Buffer.BlockCopy(body, 0, fullPacketBytes, headerSize, bodySize);
+                SerializeByMarshal(footer, fullPacketBytes, headerSize + bodySize, footerSize);
+                return fullPacketBytes;
+            }
+            else
+            {
+                throw new ArgumentOutOfRangeException
+                    ($"Body length isdiffers from header definition.\r\n body length :{body.Length}, header definition : {headerDefinedBodySize}");
+            }
+           
+        }
     }
 }

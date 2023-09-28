@@ -15,9 +15,7 @@ namespace EPI.Comm.Net.Generic
         #region Field & Property
         private List<TcpNetClient<Theader>> clients = new List<TcpNetClient<Theader>>();
         public ClientCollection<Theader> Clients { get; private set; }
-        internal IBuffer ReceiveBuffer { get; set; } = new QueueBuffer();
         internal Func<Theader, int> GetBodySize { get; private set; }
-        internal Packet<Theader> Packet { get; set; }
         #endregion
 
         #region CTOR
@@ -111,9 +109,7 @@ namespace EPI.Comm.Net.Generic
         #region Field & Property
         private List<TcpNetClient<Theader, Tfooter>> clients = new List<TcpNetClient<Theader, Tfooter>>();
         public ClientCollection<Theader, Tfooter> Clients { get; private set; }
-        internal IBuffer ReceiveBuffer { get; set; } = new QueueBuffer();
         internal Func<Theader, int> GetBodySize { get; private set; }
-        internal Packet<Theader, Tfooter> Packet { get; set; }
         #endregion
 
         #region CTOR
@@ -190,12 +186,5 @@ namespace EPI.Comm.Net.Generic
 
         public event TcpEventHandler<Theader, Tfooter> ClientDisconnected;
         #endregion
-
-        #region Event
-
-
-        #endregion
-
-
     }
 }

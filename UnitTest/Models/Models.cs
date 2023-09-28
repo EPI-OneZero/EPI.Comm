@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 
-namespace UnitTest
+namespace UnitTest.Models
 {
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class Header : IEquatable<Header>

@@ -6,31 +6,32 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading;
+using UnitTest.Models;
 
-namespace UnitTest
+namespace UnitTest.Tcp
 {
+
     [TestClass]
-    public class PacketHeaderFooterTest
+    public class PacketHeaderTest
     {
-        public TcpNetServer<Header, Footer> Server { get; set; }
-        public TcpNetClient<Header, Footer> Client { get; set; }
-        public List<PacketWithHeaderFooter> Data { get; set; }
+        public TcpNetServer<Header> Server { get; set; }
+        public TcpNetClient<Header> Client { get; set; }
+        public List<PacketWithHeader> Data { get; set; }
 
-
-        public PacketHeaderFooterTest()
+        public PacketHeaderTest()
         {
         }
         [TestInitialize]
         public void Init()
         {
             const int Port = 4101;
-            Server = new TcpNetServer<Header, Footer>(Header.GetBodySize);
-            Client = new TcpNetClient<Header, Footer>(Header.GetBodySize);
+            Server = new TcpNetServer<Header>(Header.GetBodySize);
+            Client = new TcpNetClient<Header>(Header.GetBodySize);
             int packetCount = 10;
-            Data = new List<PacketWithHeaderFooter>(packetCount);
+            Data = new List<PacketWithHeader>(packetCount);
             for (int i = 0; i < packetCount; i++)
             {
-                var packet = new PacketWithHeaderFooter();
+                var packet = new PacketWithHeader();
                 packet.SetRandom();
                 Data.Add(packet);
             }
@@ -54,17 +55,17 @@ namespace UnitTest
         {
             IOTest(Server, Client, Data);
         }
-        private void IOTest(IComm<Header, Footer> sender, IComm<Header, Footer> receiver, List<PacketWithHeaderFooter> packets)
+        private void IOTest(IComm<Header> sender, IComm<Header> receiver, List<PacketWithHeader> packets)
         {
             int count = 0;
             int fullCount = packets.Count;
-            PacketWithHeaderFooter recv = null;
+            PacketWithHeader recv = null;
             receiver.Received += OnReceived;
             try
             {
                 for (int i = 0; i < fullCount; i++)
                 {
-                    sender.Send(packets[i].Header, packets[i].Body, packets[i].Footer);
+                    sender.Send(packets[i].Header, packets[i].Body);
                     while (count <= i)
                     {
                         Thread.Sleep(1);
@@ -78,18 +79,20 @@ namespace UnitTest
             }
             catch (Exception)
             {
+
                 throw;
             }
             finally
             {
                 receiver.Received -= OnReceived;
             }
-            void OnReceived(object s, PacketEventArgs<Header, Footer> e)
+            void OnReceived(object s, PacketEventArgs<Header> e)
             {
-                recv = new PacketWithHeaderFooter() { Header = e.Packet.Header, Body = e.Packet.Body, Footer = e.Packet.Footer };
+                recv = new PacketWithHeader() { Header = e.Packet.Header, Body = e.Packet.Body };
                 count++;
             }
         }
+
     }
 
 

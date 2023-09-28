@@ -37,19 +37,9 @@ namespace EPI.Comm.Net.Generic
         }
         public void Send(Theader header, byte[] body)
         {
-            var headerDefinedBodySize = GetBodySize?.Invoke(header);
-            if (headerDefinedBodySize == body.Length)
-            {
-                var fullPacketBytes = new byte[HeaderSize + body.Length];
-                PacketSerializer.SerializeByMarshal(header, fullPacketBytes, 0, HeaderSize);
-                Buffer.BlockCopy(body, 0, fullPacketBytes, HeaderSize, body.Length);
-                Send(fullPacketBytes);
-            }
-            else
-            {
-                throw new ArgumentOutOfRangeException
-                    ($"Body length isdiffers from header definition.\r\n body length :{body.Length}, header definition : {headerDefinedBodySize}");
-            }
+            var headerDefinedBodySize = GetBodySize?.Invoke(header) ?? 0;
+            var fullPacketBytes = Packet<Theader>.GeneratePacketBytes(header,body,HeaderSize,headerDefinedBodySize);
+            SendBytes(fullPacketBytes);
         }
 
         public event PacketEventHandler<Theader> Received;
@@ -106,16 +96,10 @@ namespace EPI.Comm.Net.Generic
         }
         public void Send(Theader header, byte[] body, Tfooter footer)
         {
-            int bodySize = body.Length;
-            var fullPacketBytes = new byte[HeaderSize + bodySize + FooterSize];
+            var headerDefinedBodySize = GetBodySize?.Invoke(header) ?? 0;
+            var fullPacketBytes = Packet<Theader, Tfooter>.GeneratePacketBytes(header, body, footer, HeaderSize, headerDefinedBodySize, FooterSize);
 
-            PacketSerializer.SerializeByMarshal(header, fullPacketBytes, 0, HeaderSize);
-
-            Buffer.BlockCopy(body, 0, fullPacketBytes, HeaderSize, bodySize);
-
-            PacketSerializer.SerializeByMarshal(footer, fullPacketBytes, HeaderSize + bodySize, FooterSize);
-
-            Send(fullPacketBytes);
+            SendBytes(fullPacketBytes);
         }
         private protected override void SocketReceived(object sender, SocketReceiveEventArgs e)
         {

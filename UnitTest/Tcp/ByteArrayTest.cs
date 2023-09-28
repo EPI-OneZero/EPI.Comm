@@ -7,7 +7,7 @@ using System.Linq;
 using System.Net;
 using System.Threading;
 
-namespace UnitTest
+namespace UnitTest.Tcp
 {
 
     [TestClass]
