@@ -66,7 +66,7 @@ namespace EPI.Comm.Buffers
             var count = bytes.Length;
             if (Capacity < count + queueDataCount)
             {
-                int newCapacity = (int)(count * 2);
+                int newCapacity = (int)((count + queueDataCount) * 2);
                 if (newCapacity < buffer.Length + 4)
                 {
                     newCapacity = buffer.Length + 4;

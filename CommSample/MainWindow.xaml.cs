@@ -1,4 +1,5 @@
 ﻿using CommSample.Sample;
+using CommSample.Sample.Packet1;
 using System;
 using System.Diagnostics;
 using System.Windows;
@@ -24,6 +25,7 @@ namespace CommSample
 
         private ServerWindow serverWindow = null;
         private ClientWindow clientWindow = null;
+        private ClientHeader clientHeaderWindow = null;
         private void OpenServerWindow(object sender, RoutedEventArgs e)
         {
             serverWindow = CreateWindow(serverWindow, () => serverWindow = null);
@@ -47,6 +49,11 @@ namespace CommSample
                 return result;
             }
 
+        }
+
+        private void OpenClientHeaderWindow(object sender, RoutedEventArgs e)
+        {
+            clientHeaderWindow = CreateWindow(clientHeaderWindow, () => clientHeaderWindow = null);
         }
     }
 }
