@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using EPI.Comm.Net.Generic.Packets;
+using System;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
-using EPI.Comm.Net.Generic.Packets;
 
 namespace EPI.Comm.Net.Generic.Events
 {
@@ -12,7 +8,7 @@ namespace EPI.Comm.Net.Generic.Events
     {
         public IPEndPoint From { get; private set; }
         public Packet<Theader, Tfooter> Packet { get; internal set; }
-        internal PacketEventArgs(IPEndPoint from,Packet<Theader, Tfooter> packet)
+        internal PacketEventArgs(IPEndPoint from, Packet<Theader, Tfooter> packet)
         {
             From = from;
             Packet = packet;
@@ -23,7 +19,7 @@ namespace EPI.Comm.Net.Generic.Events
     {
         public IPEndPoint From { get; private set; }
         public Packet<Theader> Packet { get; internal set; }
-        internal PacketEventArgs(IPEndPoint from,Packet<Theader> packet)
+        internal PacketEventArgs(IPEndPoint from, Packet<Theader> packet)
         {
             From = from;
             Packet = packet;
@@ -32,7 +28,7 @@ namespace EPI.Comm.Net.Generic.Events
 
     public delegate void PacketEventHandler<Theader>(object sender, PacketEventArgs<Theader> e);
 
-    public class TcpEventArgs<Theader> : EventArgs where Theader : new ()
+    public class TcpEventArgs<Theader> : EventArgs where Theader : new()
     {
         public TcpNetClient<Theader> TcpNetClient { get; private set; }
         public TcpEventArgs(TcpNetClient<Theader> client)
@@ -54,5 +50,5 @@ namespace EPI.Comm.Net.Generic.Events
         where Theader : new() where Tfooter : new();
 
 
-  
+
 }

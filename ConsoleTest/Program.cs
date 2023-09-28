@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Data.SqlTypes;
-using System.Linq;
-using System.Net;
-using System.Net.Sockets;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 
 namespace ConsoleTest
 {
@@ -29,31 +21,30 @@ namespace ConsoleTest
     /// </summary>
     public class Program
     {
-
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
         class MyClass
         {
-            public void Test()
-            {
-                Console.WriteLine("old");
-            }
+            public int A;
+            public int B;
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)]
+            public ushort[] Shorts;
         }
-        class MyClass2 : MyClass
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
+        class MyClass2
         {
-            new public void Test()
-            {
-                Console.WriteLine("new");
-            }
+            public int A;
+            public int B;
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)]
+            public char[] Chars;
         }
-        /// <summary>
-        /// 메인함수
-        /// </summary>
-        /// <param name="args"></param>
+
         public static void Main(string[] args)
         {
-            MyClass2 a = new MyClass2();
-            MyClass b = a;
-            a.Test();
-            b.Test();
+
+        }
+        public static void ReverseEndian<T>(T t)
+        {
+
         }
 
 

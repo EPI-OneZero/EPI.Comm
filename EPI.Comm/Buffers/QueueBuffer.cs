@@ -63,7 +63,7 @@ namespace EPI.Comm.Buffers
 
             return array;
         }
-      
+
         public void AddBytes(byte[] bytes)
         {
             var count = bytes.Length;

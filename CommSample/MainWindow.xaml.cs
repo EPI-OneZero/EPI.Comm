@@ -1,19 +1,7 @@
 ﻿using CommSample.Sample;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace CommSample
 {
@@ -26,7 +14,7 @@ namespace CommSample
         {
             InitializeComponent();
             Application.Current.Exit += Current_Exit;
-            
+
         }
 
         private void Current_Exit(object sender, ExitEventArgs e)
@@ -44,9 +32,9 @@ namespace CommSample
         {
             clientWindow = CreateWindow(clientWindow, () => clientWindow = null);
         }
-        private T CreateWindow<T>(T source, Action closeCallback) where  T : Window, new()
+        private T CreateWindow<T>(T source, Action closeCallback) where T : Window, new()
         {
-            if(source != null)
+            if (source != null)
             {
                 source.Focus();
                 return source;
@@ -54,11 +42,11 @@ namespace CommSample
             else
             {
                 var result = new T();
-                result.Closed+= (s,e)=> closeCallback?.Invoke();
+                result.Closed += (s, e) => closeCallback?.Invoke();
                 result.Show();
                 return result;
             }
-          
+
         }
     }
 }

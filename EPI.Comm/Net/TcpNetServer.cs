@@ -1,8 +1,5 @@
 ﻿using EPI.Comm.Net.Events;
-using EPI.Comm.Net.Generic;
-using EPI.Comm.Net.Generic.Events;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Sockets;
 
 namespace EPI.Comm.Net
@@ -30,7 +27,7 @@ namespace EPI.Comm.Net
         private void OnClientReceived(object sender, PacketEventArgs e)
         {
             Received?.Invoke(this, e);
-           
+
         }
         public event PacketEventHandler Received;
         #endregion
@@ -77,6 +74,7 @@ namespace EPI.Comm.Net
         {
             clients.Remove(client);
             client.Received -= OnClientReceived;
+            ClientDisconnected?.Invoke(this, new TcpEventArgs(client));
         }
         public event TcpEventHandler ClientDisconnected;
         #endregion

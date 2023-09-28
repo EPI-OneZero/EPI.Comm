@@ -1,11 +1,11 @@
-﻿using System;
+﻿using EPI.Comm.Net.Events;
+using EPI.Comm.UTils;
+using System;
 using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Threading;
-using EPI.Comm.Net.Events;
-using EPI.Comm.UTils;
 
 namespace EPI.Comm.Net
 {
@@ -34,6 +34,7 @@ namespace EPI.Comm.Net
         public bool IsConnected => (NetSocket?.IsConnected ?? false);
         private AutoConnectHelper connectHelper;
         #endregion
+
         #region CTOR
         protected TcpClientBase(int bufferSize)
         {
@@ -48,6 +49,7 @@ namespace EPI.Comm.Net
             AttachSocket(TcpClient.Client);
         }
         #endregion
+
         #region Socket Attach Detach
         private void AttachSocket(Socket client)
         {
@@ -74,7 +76,6 @@ namespace EPI.Comm.Net
         }
         #endregion
 
-
         #region Send Receive
         public void Send(byte[] bytes)
         {
@@ -87,7 +88,6 @@ namespace EPI.Comm.Net
                 Debug.WriteLine(e.Message);
             }
         }
-
         private protected abstract void SocketReceived(object sender, SocketReceiveEventArgs e);
 
         #endregion
@@ -150,7 +150,7 @@ namespace EPI.Comm.Net
                 Debug.WriteLine($"{nameof(IsConnected)} : {IsConnected}");
             }
         }
-       
+
         private void SetRemoteEndPoint(string ip, int port)
         {
             connectHelper.SetEndPoint(ip, port, true);
@@ -163,9 +163,6 @@ namespace EPI.Comm.Net
         #endregion
 
         #region Stop
-        /// <summary>
-        /// 연결 해제
-        /// </summary>
         public void Stop()
         {
             StopAutoConnectIfLoopOn();
@@ -174,16 +171,14 @@ namespace EPI.Comm.Net
                 if (IsConnected)
                 {
                     DetachSocket();
-                    TcpClient?.Close();
+                    TcpClient?.Dispose();
                     TcpClient = null;
                     RaiseDisconnectEvent();
 
                 }
             }
         }
-        /// <summary>
-        ///연결을 끊었을 때
-        /// </summary>
+
         private void RaiseDisconnectEvent()
         {
             Disconnected?.Invoke(this, EventArgs.Empty);
@@ -191,7 +186,7 @@ namespace EPI.Comm.Net
         private void SocketClosed(object sender, EventArgs e)
         {
             DetachSocket();
-            TcpClient?.Close();
+            TcpClient?.Dispose();
             TcpClient = null;
             RaiseDisconnectEvent();
 

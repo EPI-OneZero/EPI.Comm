@@ -4,13 +4,7 @@ using EPI.Comm.Net.Generic.Events;
 using EPI.Comm.Net.Generic.Packets;
 using EPI.Comm.Utils;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
 using System.Net.Sockets;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace EPI.Comm.Net.Generic
 {
@@ -43,10 +37,19 @@ namespace EPI.Comm.Net.Generic
         }
         public void Send(Theader header, byte[] body)
         {
-            var fullPacketBytes = new byte[HeaderSize + body.Length];
-            PacketSerializer.SerializeByMarshal(header, fullPacketBytes, 0, HeaderSize);
-            Buffer.BlockCopy(body, 0, fullPacketBytes, HeaderSize, body.Length);
-            Send(fullPacketBytes);
+            var headerDefinedBodySize = GetBodySize?.Invoke(header);
+            if (headerDefinedBodySize == body.Length)
+            {
+                var fullPacketBytes = new byte[HeaderSize + body.Length];
+                PacketSerializer.SerializeByMarshal(header, fullPacketBytes, 0, HeaderSize);
+                Buffer.BlockCopy(body, 0, fullPacketBytes, HeaderSize, body.Length);
+                Send(fullPacketBytes);
+            }
+            else
+            {
+                throw new ArgumentOutOfRangeException
+                    ($"Body length isdiffers from header definition.\r\n body length :{body.Length}, header definition : {headerDefinedBodySize}");
+            }
         }
 
         public event PacketEventHandler<Theader> Received;

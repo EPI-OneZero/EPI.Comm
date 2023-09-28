@@ -2,18 +2,8 @@
 using EPI.Comm.Net.Events;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace CommSample.Sample
 {
@@ -91,7 +81,7 @@ namespace CommSample.Sample
                     server.StartListen(p);
                     ServerPort = p;
                 }
-             
+
             }
             else
             {
@@ -102,7 +92,7 @@ namespace CommSample.Sample
 
         private void Stop(object sender, RoutedEventArgs e)
         {
-   
+
             server.Stop();
 
         }

@@ -1,8 +1,7 @@
 ﻿using EPI.Comm.Buffers;
 using EPI.Comm.Utils;
 using System;
-using System.Runtime.InteropServices;
-using static EPI.Comm.Net.Generic.Packets.PacketSerializer;
+using static EPI.Comm.Utils.PacketSerializer;
 namespace EPI.Comm.Net.Generic.Packets
 {
     public class Packet<Theader>
@@ -25,7 +24,7 @@ namespace EPI.Comm.Net.Generic.Packets
         {
             GetBodySize = getBodySize;
             HeaderSize = ObjectUtil.SizeOf<Theader>();
-            queue= new QueueBuffer();
+            queue = new QueueBuffer();
         }
         private int CalculateBodySize()
         {
@@ -48,7 +47,7 @@ namespace EPI.Comm.Net.Generic.Packets
             switch (state)
             {
                 case DeserializeState.None:
-                    if (TryDeserializeHeader(buffer)) 
+                    if (TryDeserializeHeader(buffer))
                     {
                         return TryDeserializeBody(buffer, CalculateBodySize());
                     }
@@ -63,12 +62,12 @@ namespace EPI.Comm.Net.Generic.Packets
         }
         private bool TryDeserializeHeader(IBuffer buffer)
         {
-            if (IsEnoughSize(buffer.Count, HeaderSize, 0))
+            if (IsEnoughSizeToDeserialize(buffer.Count, HeaderSize, 0))
             {
                 var bytes = buffer.GetBytes(HeaderSize);
                 queue.AddBytes(bytes);
                 Header = DeserializeByMarshal<Theader>(bytes, HeaderSize, 0);
-                state =  DeserializeState.HeaderCompleted;
+                state = DeserializeState.HeaderCompleted;
                 return true;
             }
             else
@@ -78,9 +77,9 @@ namespace EPI.Comm.Net.Generic.Packets
         }
         private bool TryDeserializeBody(IBuffer buffer, int bodySize)
         {
-            if (IsEnoughSize(buffer.Count, bodySize, 0))
+            if (IsEnoughSizeToDeserialize(buffer.Count, bodySize, 0))
             {
-                var bytes = buffer.GetBytes(HeaderSize);
+                var bytes = buffer.GetBytes(bodySize);
                 queue.AddBytes(bytes);
                 Body = bytes;
                 state = DeserializeState.BodyCompleted;
@@ -120,7 +119,7 @@ namespace EPI.Comm.Net.Generic.Packets
         }
         private bool TryDeserializeFooter(IBuffer buffer)
         {
-            if (IsEnoughSize(buffer.Count, FooterSize, 0))
+            if (IsEnoughSizeToDeserialize(buffer.Count, FooterSize, 0))
             {
                 var bytes = buffer.GetBytes(FooterSize);
                 queue.AddBytes(bytes);

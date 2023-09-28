@@ -8,7 +8,7 @@ namespace EPI.Comm.Net.Events
         public IPEndPoint From { get; private set; }
         public byte[] ReceivedBytes { get; private set; }
 
-        public PacketEventArgs(IPEndPoint from,byte[] receivedBytes)
+        public PacketEventArgs(IPEndPoint from, byte[] receivedBytes)
         {
             From = from;
             ReceivedBytes = receivedBytes;

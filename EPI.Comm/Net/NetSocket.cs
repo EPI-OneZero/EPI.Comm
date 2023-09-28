@@ -1,15 +1,11 @@
 ﻿using EPI.Comm.Net.Events;
-using EPI.Comm.Net.Generic.Packets;
+using EPI.Comm.Utils;
 using EPI.Comm.UTils;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using static EPI.Comm.CommException;
 
 namespace EPI.Comm.Net
@@ -19,7 +15,7 @@ namespace EPI.Comm.Net
         #region Field & Property
         private readonly object SendLock = new object();
         private readonly object ReceiveLock = new object();
-  
+
         protected Socket Socket { get; set; }
         protected byte[] ReceiveBuffer { get; set; }
         public bool IsConnected => Socket?.Connected ?? false;
@@ -39,7 +35,7 @@ namespace EPI.Comm.Net
         }
 
         #endregion
-        
+
         #region Method
         private void SetSocketOption(Socket socket)
         {
@@ -47,9 +43,9 @@ namespace EPI.Comm.Net
             socket.SendBufferSize = ReceiveBuffer.Length;
             socket.NoDelay = true;
             socket.LingerState = lingerOption;
-        
+
         }
-      
+
         public void Send(byte[] bytes)
         {
             try
@@ -86,7 +82,7 @@ namespace EPI.Comm.Net
                 }
                 return result;
             }
-            catch(NullReferenceException e)
+            catch (NullReferenceException e)
             {
                 throw CreateCommException(e);
             }

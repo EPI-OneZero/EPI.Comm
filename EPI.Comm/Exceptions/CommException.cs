@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace EPI.Comm
 {
@@ -21,7 +17,7 @@ namespace EPI.Comm
         {
 
         }
-       
+
         internal static CommException CreateCommException(string message)
         {
             return new CommException(message);

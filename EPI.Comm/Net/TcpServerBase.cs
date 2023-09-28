@@ -22,16 +22,19 @@ namespace EPI.Comm.Net
         protected int BufferSize { get; private set; }
 
         private List<TcpClientBase> clients = new List<TcpClientBase>();
-    
+
 
         protected object startStopLock = new object();
         private volatile bool acceptLoopingOn = false;
         #endregion
+
+        #region CTOR
         protected TcpServerBase(int bufferSize)
         {
             BufferSize = bufferSize;
-  
+
         }
+        #endregion
 
         #region Client Attach Detach 
         private void AttachClient(TcpClientBase client)
@@ -51,7 +54,7 @@ namespace EPI.Comm.Net
         }
         #endregion
 
-        #region Send Receive
+        #region Send
         public void Send(string message)
         {
             var bytes = Encoding.UTF8.GetBytes(message);
@@ -64,8 +67,8 @@ namespace EPI.Comm.Net
                 c.Send(bytes);
             });
         }
-     
-       
+
+
         #endregion
 
         #region StartStop
@@ -117,7 +120,7 @@ namespace EPI.Comm.Net
                 DetachClient(client);
             }
         }
-      
+
         #endregion
 
         #region Accept
@@ -188,10 +191,10 @@ namespace EPI.Comm.Net
             }
         }
         private protected abstract void OnAccepted(TcpClientBase client);
-        
+
 
         private protected abstract TcpClientBase CreateClient(TcpClient client);
-      
+
         #endregion
 
         #region IDISPOSE

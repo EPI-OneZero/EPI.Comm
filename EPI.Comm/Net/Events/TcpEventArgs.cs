@@ -1,5 +1,4 @@
-﻿using EPI.Comm.Net.Generic;
-using System;
+﻿using System;
 
 namespace EPI.Comm.Net.Events
 {
@@ -12,5 +11,5 @@ namespace EPI.Comm.Net.Events
         }
     }
     public delegate void TcpEventHandler(object sender, TcpEventArgs e);
-   
+
 }
