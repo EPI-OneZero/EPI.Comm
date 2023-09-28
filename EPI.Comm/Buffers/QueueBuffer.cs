@@ -4,10 +4,7 @@ using System.Collections.Generic;
 
 namespace EPI.Comm.Buffers
 {
-    /// <summary>
-    /// 질문 : addbytes는 인큐 , getbytes는 디큐로 동작하는데 -> getbytes가 디큐로 동작하는 건 이상한 것 처럼보임. 해결방법 있을지??
-    /// 그냥 이렇게 해도 되는것인가?? 이것도 LSP위반인가?
-    /// </summary>
+    
     internal class QueueBuffer : IBuffer
     {
         #region Field & Property

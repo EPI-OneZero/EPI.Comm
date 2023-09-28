@@ -62,10 +62,10 @@ namespace EPI.Comm.Net.Generic
     }
 
     /// <summary>
-    ///  질문 : TcpNetClient<Theader, Tfooter>, TcpNetClient<Theader>
-    ///  는 각각 TcpNetClient를 상속하는게 맞는가??
-    ///  제네릭 서버나 제네릭 클라이언트는 논제네릭 서버와 클라이언트를 has a로 소유하는게 맞는가?
-    ///  아니면 is a로 상속하는 게 맞는가
+    /// 
+    /// 
+    /// 
+    /// 
     /// </summary>
     /// <typeparam name="Theader">Marshal.SizeOf 가능 및 StructLayout Sequential 확인 필수</typeparam>
     /// <typeparam name="Tfooter">Marshal.SizeOf 가능 및 StructLayout Sequential 확인 필수</typeparam>
