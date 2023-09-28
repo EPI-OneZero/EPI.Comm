@@ -33,7 +33,7 @@ namespace CommSample.Sample
         {
             client = new TcpNetClient();
             client.Received += Client_BytesReceived;
-            client.Closed += Client_Closed;
+            client.Disconnected += Client_Closed;
             client.Connected += Client_Connected; ;
             Closed += ClientWindow_Closed;
         }

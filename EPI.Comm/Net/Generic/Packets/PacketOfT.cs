@@ -7,12 +7,12 @@ namespace EPI.Comm.Net.Generic.Packets
 {
     public class Packet<Theader>
     {
+        private protected QueueBuffer queue;
         private enum DeserializeState
         {
             None,
             HeaderCompleted,
             BodyCompleted,
-            FooterCompleted
         }
         public byte[] FullPacket { get; private set; }
         public Theader Header { get; private set; }
@@ -25,6 +25,7 @@ namespace EPI.Comm.Net.Generic.Packets
         {
             GetBodySize = getBodySize;
             HeaderSize = ObjectUtil.SizeOf<Theader>();
+            queue= new QueueBuffer();
         }
         private int CalculateBodySize()
         {
@@ -33,12 +34,21 @@ namespace EPI.Comm.Net.Generic.Packets
         private DeserializeState state = DeserializeState.None;
         private protected bool HeaderDeserialized { get; private set; } = false;
         private protected bool BodyDeserialized { get; private set; } = false;
-        internal virtual bool TryDeserializePacket(IBuffer buffer)
+        internal bool TryDeserialize(IBuffer buffer)
+        {
+            var success = TryDeserializePacket(buffer);
+            if (success)
+            {
+                FullPacket = queue.GetBytes(queue.Count);
+            }
+            return success;
+        }
+        private protected virtual bool TryDeserializePacket(IBuffer buffer)
         {
             switch (state)
             {
                 case DeserializeState.None:
-                    if (TryDeserializeHeader(buffer))
+                    if (TryDeserializeHeader(buffer)) 
                     {
                         return TryDeserializeBody(buffer, CalculateBodySize());
                     }
@@ -50,13 +60,14 @@ namespace EPI.Comm.Net.Generic.Packets
                 default:
                     throw new InvalidOperationException($"Unexpected state: {state}");
             }
-
         }
         private bool TryDeserializeHeader(IBuffer buffer)
         {
             if (IsEnoughSize(buffer.Count, HeaderSize, 0))
             {
-                Header = DeserializeByMarshal<Theader>(buffer.GetBytes(HeaderSize), HeaderSize, 0);
+                var bytes = buffer.GetBytes(HeaderSize);
+                queue.AddBytes(bytes);
+                Header = DeserializeByMarshal<Theader>(bytes, HeaderSize, 0);
                 state =  DeserializeState.HeaderCompleted;
                 return true;
             }
@@ -69,7 +80,9 @@ namespace EPI.Comm.Net.Generic.Packets
         {
             if (IsEnoughSize(buffer.Count, bodySize, 0))
             {
-                Body = buffer.GetBytes(bodySize);
+                var bytes = buffer.GetBytes(HeaderSize);
+                queue.AddBytes(bytes);
+                Body = bytes;
                 state = DeserializeState.BodyCompleted;
                 return true;
             }
@@ -78,10 +91,10 @@ namespace EPI.Comm.Net.Generic.Packets
                 return false;
             }
         }
-    }
 
+    }
     /// <summary>
-    /// 질문 : Packet<Theader, Tfooter> 가 Packet<Theader>를 상속하는게 적절한가?
+    /// 
     /// </summary>
     /// <typeparam name="Theader"></typeparam>
     /// <typeparam name="Tfooter"></typeparam>
@@ -94,7 +107,7 @@ namespace EPI.Comm.Net.Generic.Packets
         {
             FooterSize = ObjectUtil.SizeOf<Tfooter>();
         }
-        internal override bool TryDeserializePacket(IBuffer buffer)
+        private protected override bool TryDeserializePacket(IBuffer buffer)
         {
             if (base.TryDeserializePacket(buffer))
             {
@@ -107,9 +120,11 @@ namespace EPI.Comm.Net.Generic.Packets
         }
         private bool TryDeserializeFooter(IBuffer buffer)
         {
-            if (IsEnoughSize(buffer.Count, HeaderSize, 0))
+            if (IsEnoughSize(buffer.Count, FooterSize, 0))
             {
-                Footer = DeserializeByMarshal<Tfooter>(buffer.GetBytes(HeaderSize), HeaderSize, 0);
+                var bytes = buffer.GetBytes(FooterSize);
+                queue.AddBytes(bytes);
+                Footer = DeserializeByMarshal<Tfooter>(bytes, FooterSize, 0);
                 return true;
             }
             else

@@ -10,14 +10,16 @@ namespace EPI.Comm.Buffers
     /// </summary>
     internal class QueueBuffer : IBuffer
     {
+        #region Field & Property
         protected byte[] buffer;
         public int Capacity => buffer.Length;
         protected int head;
         protected int tail;
         protected int queueDataCount;
-        public int Count => queueDataCount;
+        #endregion
 
-        public QueueBuffer() : this(8192)
+        #region CTOR
+        public QueueBuffer() : this(CommBase.DefaultBufferSize)
         {
 
         }
@@ -28,6 +30,10 @@ namespace EPI.Comm.Buffers
             tail = 0;
             queueDataCount = 0;
         }
+        #endregion
+
+        #region IBuffer
+        public int Count => queueDataCount;
         public byte[] GetBytes(int count)
         {
             var array = new byte[count];
@@ -111,7 +117,8 @@ namespace EPI.Comm.Buffers
             head = 0;
             tail = ((queueDataCount != capacity) ? queueDataCount : 0);
         }
-        
+        #endregion
+
         #region IEnumerable
         public IEnumerator<byte> GetEnumerator()
         {

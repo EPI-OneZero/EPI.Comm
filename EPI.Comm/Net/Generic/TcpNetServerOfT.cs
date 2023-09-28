@@ -10,18 +10,23 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Collections;
 using System.Net;
+using System.Threading.Tasks;
 
 namespace EPI.Comm.Net.Generic
 {
 
-    public class TcpNetServer<Theader> : TcpNetServer, IComm<Theader>
+    public class TcpNetServer<Theader> : TcpServerBase, IComm<Theader>
         where Theader : new()
     {
+        #region Field & Property
         private List<TcpNetClient<Theader>> clients = new List<TcpNetClient<Theader>>();
-        new public ClientCollection<Theader> Clients { get; private set; }
+        public ClientCollection<Theader> Clients { get; private set; }
         internal IBuffer ReceiveBuffer { get; set; } = new QueueBuffer();
         internal Func<Theader, int> GetBodySize { get; private set; }
         internal Packet<Theader> Packet { get; set; }
+        #endregion
+
+        #region CTOR
         public TcpNetServer(int bufferSize, Func<Theader, int> getBodySize) : base(bufferSize)
         {
             Clients = new ClientCollection<Theader>(clients);
@@ -31,17 +36,32 @@ namespace EPI.Comm.Net.Generic
         public TcpNetServer(Func<Theader, int> getBodySize) : this(DefaultBufferSize, getBodySize)
         {
         }
+        #endregion
 
-        #region Override
-        private protected override TcpNetClient CreateClient(TcpClient client)
+        #region Send Receive
+        public void Send(Theader header, byte[] body)
+        {
+            var result = Parallel.ForEach(clients, c =>
+            {
+                c.Send(header, body);
+            });
+        }
+        private void OnClientReceived(object sender, PacketEventArgs<Theader> e)
+        {
+            Received?.Invoke(this, e);
+        }
+        public event PacketEventHandler<Theader> Received;
+        #endregion
+
+        #region Accept
+        private protected override TcpClientBase CreateClient(TcpClient client)
         {
             var result = new TcpNetClient<Theader>(client, BufferSize, GetBodySize);
             return result;
         }
-
-        private protected override void OnAccepted(object sender, TcpEventArgs e)
+        private protected override void OnAccepted(TcpClientBase client)
         {
-            var newClient = e.TcpNetClient as TcpNetClient<Theader>;
+            var newClient = client as TcpNetClient<Theader>;
             if (IsValidClientType(newClient) && !clients.Contains(newClient))
             {
                 AttachClient(newClient);
@@ -51,47 +71,43 @@ namespace EPI.Comm.Net.Generic
         private void AttachClient(TcpNetClient<Theader> client)
         {
             clients.Add(client);
-            client.Received += ClientReceived;
+            client.Received += OnClientReceived;
 
         }
+        public event TcpEventHandler<Theader> ClientAccpeted;
+     
+        #endregion
 
-        private void ClientReceived(object sender, PacketEventArgs<Theader> e)
+        #region Close
+     
+       
+        private protected override void OnDisconnected(TcpClientBase client)
         {
-        }
-
-        private void DetachClient(TcpNetClient<Theader> client)
-        {
-            clients.Remove(client);
-            client.Received -= ClientReceived;
-        }
-        private protected override void OnClosed(object sender, TcpEventArgs e)
-        {
-            var oldClient = e.TcpNetClient as TcpNetClient<Theader>;
+            var oldClient = client as TcpNetClient<Theader>;
             if (IsValidClientType(oldClient) && clients.Contains(oldClient))
             {
                 DetachClient(oldClient);
-                ClientClosed?.Invoke(this, new TcpEventArgs<Theader>(oldClient));
+                ClientDisconnected?.Invoke(this, new TcpEventArgs<Theader>(oldClient));
             }
         }
-        private bool IsValidClientType(TcpNetClient client)
+        private void DetachClient(TcpNetClient<Theader> client)
+        {
+            clients.Remove(client);
+            client.Received -= OnClientReceived;
+        }
+        private bool IsValidClientType(TcpClientBase client)
         {
             return client is TcpNetClient<Theader>;
         }
 
-        private protected override void OnClientReceived(object sender, PacketEventArgs e)
-        {
+        public event TcpEventHandler<Theader> ClientDisconnected;
+        #endregion
 
-        }
+        #region Event
 
 
         #endregion
-        #region 이벤트
-        new public event PacketEventHandler<Theader> Received;
-        new public event TcpEventHandler<Theader> ClientAccpeted;
-        new public event TcpEventHandler<Theader> ClientClosed;
-        #endregion
-        public void Send(Theader header, byte[] body)
-        {
-        }
+
+
     }
 }

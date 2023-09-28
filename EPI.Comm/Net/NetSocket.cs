@@ -19,7 +19,7 @@ namespace EPI.Comm.Net
         #region Field & Property
         private readonly object SendLock = new object();
         private readonly object ReceiveLock = new object();
-        private readonly KeepAliveConfig KeepAliveConfig = new KeepAliveConfig();
+  
         protected Socket Socket { get; set; }
         protected byte[] ReceiveBuffer { get; set; }
         public bool IsConnected => Socket?.Connected ?? false;
@@ -28,6 +28,8 @@ namespace EPI.Comm.Net
         private static readonly LingerOption lingerOption = new LingerOption(false, 0);
 
         #endregion
+
+        #region CTOR
         internal NetSocket(Socket socket, int bufferSize)
         {
             Socket = socket;
@@ -35,6 +37,9 @@ namespace EPI.Comm.Net
             SetSocketOption(socket);
             ThreadUtil.Start(OnReceive);
         }
+
+        #endregion
+        
         #region Method
         private void SetSocketOption(Socket socket)
         {
@@ -42,10 +47,9 @@ namespace EPI.Comm.Net
             socket.SendBufferSize = ReceiveBuffer.Length;
             socket.NoDelay = true;
             socket.LingerState = lingerOption;
-            var size = Marshal.SizeOf<KeepAliveConfig>();
-            var result = new byte[size];
-            socket.IOControl(IOControlCode.KeepAliveValues, KeepAliveConfig.Generate(), result);
+        
         }
+      
         public void Send(byte[] bytes)
         {
             try
@@ -81,6 +85,10 @@ namespace EPI.Comm.Net
                     throw CreateCommException($"연결 끊김 수신 바이트 수 :{count}");
                 }
                 return result;
+            }
+            catch(NullReferenceException e)
+            {
+                throw CreateCommException(e);
             }
             catch (SocketException e)
             {
@@ -127,13 +135,15 @@ namespace EPI.Comm.Net
             Closed?.Invoke(this, EventArgs.Empty);
         }
         #endregion
+
         #region Event
         public event SocketReceiveEventHandler Received;
         public event EventHandler Closed;
         #endregion
     }
+    #region KeepAlive
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    class KeepAliveConfig
+    internal class KeepAlive
     {
         public uint OnOff = 1;
         public uint IntervalMilliseconds = 3 * 1000;
@@ -141,11 +151,11 @@ namespace EPI.Comm.Net
 
         public byte[] Generate()
         {
-            var size = Marshal.SizeOf<KeepAliveConfig>();
+            var size = Marshal.SizeOf<KeepAlive>();
             var result = new byte[size];
-            GCHandle.Alloc(result, GCHandleType.Pinned);
             PacketSerializer.SerializeByMarshal(this, result, 0, size);
             return result;
         }
     }
+    #endregion
 }

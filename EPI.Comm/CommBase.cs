@@ -22,17 +22,17 @@ namespace EPI.Comm
         event PacketEventHandler Received;
     }
 
-    public interface IComm<Theader, Tfooter> : IComm
+    public interface IComm<Theader, Tfooter>
     {
         void Send(Theader header, byte[] body, Tfooter footer);
-        new event PacketEventHandler<Theader, Tfooter> Received;
+        event PacketEventHandler<Theader, Tfooter> Received;
 
 
     }
-    public interface IComm<Theader> : IComm
+    public interface IComm<Theader>
     {
         void Send(Theader header, byte[] body);
-        new event PacketEventHandler<Theader> Received;
+        event PacketEventHandler<Theader> Received;
 
     }
 }

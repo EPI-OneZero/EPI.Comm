@@ -28,7 +28,7 @@ namespace CommSample.Sample
             Closed += ServerWindow_Closed;
             server = new TcpNetServer(int.Parse(port.Text));
             server.Received += Server_BytesReceived;
-            server.ClientClosed += Server_Closed;
+            server.ClientDisconnected += Server_Closed;
             server.ClientAccpeted += Server_Accpeted;
 
         }

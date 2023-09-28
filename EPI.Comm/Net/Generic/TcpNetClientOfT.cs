@@ -19,8 +19,8 @@ namespace EPI.Comm.Net.Generic
     /// 
     /// 
     /// </summary>
-    /// <typeparam name="Theader">Marshal.SizeOf 가능 및 레이아웃 Sequential 확인 필수</typeparam>
-    public class TcpNetClient<Theader> : TcpNetClient, IComm<Theader>
+    /// <typeparam name="Theader">Marshal.SizeOf 가능 및 StructLayout Sequential 확인 필수</typeparam>
+    public class TcpNetClient<Theader> : TcpClientBase, IComm<Theader>
         where Theader : new()
     {
         public int HeaderSize { get; private set; }
@@ -49,7 +49,7 @@ namespace EPI.Comm.Net.Generic
             Send(fullPacketBytes);
         }
 
-        new public event PacketEventHandler<Theader> Received;
+        public event PacketEventHandler<Theader> Received;
         private protected override void SocketReceived(object sender, SocketReceiveEventArgs e)
         {
             lock (this)
@@ -59,7 +59,7 @@ namespace EPI.Comm.Net.Generic
                     Packet = new Packet<Theader>(GetBodySize);
                 }
                 ReceiveBuffer.AddBytes(e.ReceivedBytes);
-                if (Packet.TryDeserializePacket(ReceiveBuffer))
+                if (Packet.TryDeserialize(ReceiveBuffer))
                 {
                     Received?.Invoke(this, new PacketEventArgs<Theader>(e.From, Packet));
                 }
@@ -74,9 +74,9 @@ namespace EPI.Comm.Net.Generic
     ///  제네릭 서버나 제네릭 클라이언트는 논제네릭 서버와 클라이언트를 has a로 소유하는게 맞는가?
     ///  아니면 is a로 상속하는 게 맞는가
     /// </summary>
-    /// <typeparam name="Theader">Marshal.SizeOf 가능 및 레이아웃 Sequential 확인 필수</typeparam>
-    /// <typeparam name="Tfooter">Marshal.SizeOf 가능 및 레이아웃 Sequential 확인 필수</typeparam>
-    public class TcpNetClient<Theader, Tfooter> : TcpNetClient, IComm<Theader, Tfooter>
+    /// <typeparam name="Theader">Marshal.SizeOf 가능 및 StructLayout Sequential 확인 필수</typeparam>
+    /// <typeparam name="Tfooter">Marshal.SizeOf 가능 및 StructLayout Sequential 확인 필수</typeparam>
+    public class TcpNetClient<Theader, Tfooter> : TcpClientBase, IComm<Theader, Tfooter>
         where Theader : new()
     {
         internal int HeaderSize { get; set; }
@@ -124,7 +124,7 @@ namespace EPI.Comm.Net.Generic
                 }
                 ReceiveBuffer.AddBytes(e.ReceivedBytes);
 
-                if (Packet.TryDeserializePacket(ReceiveBuffer))
+                if (Packet.TryDeserialize(ReceiveBuffer))
                 {
                     var packet = Packet;
                     Packet = null;
@@ -132,7 +132,8 @@ namespace EPI.Comm.Net.Generic
                 }
             }
         }
-        new public event PacketEventHandler<Theader, Tfooter> Received;
+
+        public event PacketEventHandler<Theader, Tfooter> Received;
     }
 
 }

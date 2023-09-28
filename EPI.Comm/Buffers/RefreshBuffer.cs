@@ -11,12 +11,17 @@ namespace EPI.Comm.Buffers
     internal class RefreshBuffer : IBuffer
     {
         protected byte[] buffer;
+        protected int offset = 0;
 
+        public RefreshBuffer()
+        {
+        }
+        #region IBuffer
         public int Count
         {
             get
             {
-                if(buffer == null)
+                if (buffer == null)
                 {
                     return 0;
                 }
@@ -26,12 +31,6 @@ namespace EPI.Comm.Buffers
                 }
             }
         }
-        protected int offset = 0;
-
-        public RefreshBuffer()
-        {
-        }
-
         public void AddBytes(byte[] bytes)
         {
             offset = 0;
@@ -54,6 +53,8 @@ namespace EPI.Comm.Buffers
             }
 
         }
+        #endregion
+
         #region IEnumerable
         public IEnumerator<byte> GetEnumerator()
         {

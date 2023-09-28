@@ -1,13 +1,9 @@
 ﻿using EPI.Comm.Net.Events;
-using EPI.Comm.UTils;
-using System;
+using EPI.Comm.Net.Generic;
+using EPI.Comm.Net.Generic.Events;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Net;
+using System.Linq;
 using System.Net.Sockets;
-using System.Text;
-using System.Threading.Tasks;
-using static EPI.Comm.CommException;
 
 namespace EPI.Comm.Net
 {
@@ -15,238 +11,74 @@ namespace EPI.Comm.Net
     /// 질문: TcpNetServer has a TcpNetClient. 
     ///  TcpNetClient has a NetSocket인데 이 구조 적절한가?
     /// </summary>
-    public class TcpNetServer : CommBase, IComm, IDisposable
+    public class TcpNetServer : TcpServerBase, IComm
     {
-        protected TcpListener Listener { get; set; }
-        public IPEndPoint LocalEndPoint => Listener?.Server?.LocalEndPoint as IPEndPoint;
-        public int Port => ((IPEndPoint)Listener?.LocalEndpoint)?.Port ?? -1;
-        public bool IsListening { get => isListening; }
-
-        protected volatile bool isListening = false;
-        protected int BufferSize { get; set; }
-        private List<TcpNetClient> clients = new List<TcpNetClient>();
+        public List<TcpNetClient> clients { get; private set; } = new List<TcpNetClient>();
         public ClientCollection Clients { get; private set; }
-
-        protected object startStopLock = new object();
-        private volatile bool acceptLoopingOn = false;
-
-        public TcpNetServer(int bufferSize)
+        #region CTOR
+        public TcpNetServer(int bufferSize) : base(bufferSize)
         {
-            BufferSize = bufferSize;
             Clients = new ClientCollection(clients);
         }
         public TcpNetServer() : this(DefaultBufferSize)
         {
 
         }
-
-        #region StartStop
-        /// <summary>
-        ///  서버가 클라이언트를 Accept 시작
-        /// </summary>
-        public void StartListen(int port)
-        {
-            lock (startStopLock)
-            {
-                if (!isListening)
-                {
-                    Listener = new TcpListener(IPAddress.Any, port);
-                    Listener.Start();
-                    isListening = true;
-                    ThreadUtil.Start(AcceptLoop);
-                }
-            }
-        }
-        /// <summary>
-        /// 서버가 클라이언트를 Accept 중지, 및 모든 연결 해제
-        /// </summary>
-        public void Stop()
-        {
-            if (isListening)
-            {
-                lock (startStopLock)
-                {
-
-                    isListening = false;
-                    Listener.Stop();
-                    Listener = null;
-                    WaitAcceptLoopFinish();
-                    DisposeAllClients();
-                }
-            }
-        }
-        private void OnClientClosed(object sender, EventArgs e)
-        {
-            var client = sender as TcpNetClient;
-            DetachClient(client);
-        }
-        private protected virtual void OnClosed(object sender, TcpEventArgs e)
-        {
-            ClientClosed?.Invoke(this, e);
-        }
-        private void DisposeAllClients()
-        {
-            var clients = this.clients?.ToArray() ?? new TcpNetClient[0];
-            foreach (var client in clients)
-            {
-                DetachClient(client);
-            }
-        }
         #endregion
-        #region Send
-        public void Send(string message)
-        {
-            var bytes = Encoding.UTF8.GetBytes(message);
-            Send(bytes);
-        }
-        public void Send(byte[] bytes)
-        {
 
-            var result = Parallel.ForEach(clients, c =>
-            {
-                c.Send(bytes);
-            });
+        #region Receive
+        private void OnClientReceived(object sender, PacketEventArgs e)
+        {
+            Received?.Invoke(this, e);
+           
         }
+        public event PacketEventHandler Received;
         #endregion
 
         #region Accept
-        private void AcceptLoop()
-        {
-            if(!acceptLoopingOn)
-            {
-                acceptLoopingOn = true;
-                while (isListening)
-                {
-                    try
-                    {
-                        Accept();
-                    }
-                    catch (CommException e)
-                    {
-                        Debug.WriteLine(e.Message);
-                        if (!isListening)
-                        {
-                            break;
-                        }
-                    }
-                    finally
-                    {
-                        Debug.WriteLine(nameof(AcceptLoop));
-                    }
-                }
-                acceptLoopingOn = false;
-            }
-          
-        }
-        private void Accept()
-        {
-            try
-            {
-                var tcpClient = Listener?.AcceptTcpClient();
-                if (tcpClient != null)
-                {
-                    var client = CreateClient(tcpClient);
-                    AttachClient(client);
-                    OnAccepted(this, new TcpEventArgs(client));
-                }
-
-            }
-            catch (ObjectDisposedException disposedException)
-            {
-                throw CreateCommException(disposedException);
-            }
-            catch (SocketException socketException)
-            {
-                throw CreateCommException(socketException);
-            }
-
-            catch (NullReferenceException nullException)
-            {
-                throw CreateCommException(nullException);
-            }
-            finally
-            {
-                Debug.WriteLine(nameof(Accept));
-            }
-        }
-        private void WaitAcceptLoopFinish()
-        {
-            while (acceptLoopingOn)
-            {
-
-            }
-        }
-        private protected virtual void OnAccepted(object sender, TcpEventArgs e)
-        {
-            ClientAccpeted?.Invoke(this, e);
-        }
-        private protected virtual TcpNetClient CreateClient(TcpClient client)
+        private protected override TcpClientBase CreateClient(TcpClient client)
         {
             return new TcpNetClient(client, BufferSize);
         }
-        #endregion
 
-        #region Client Attach Detach 
+        private protected override void OnAccepted(TcpClientBase client)
+        {
+            var newClient = client as TcpNetClient;
+            if (IsValidClientType(newClient) && !clients.Contains(newClient))
+            {
+                AttachClient(newClient);
+                ClientAccpeted?.Invoke(this, new TcpEventArgs(newClient));
+            }
+        }
         private void AttachClient(TcpNetClient client)
         {
-            client.Received += OnClientReceived;
-            client.Closed += OnClientClosed;
             clients.Add(client);
+            client.Received += OnClientReceived;
+
+        }
+        public event TcpEventHandler ClientAccpeted;
+        #endregion
+
+        #region Close
+        private protected override void OnDisconnected(TcpClientBase client)
+        {
+            var oldClient = client as TcpNetClient;
+            if (IsValidClientType(oldClient) && clients.Contains(oldClient))
+            {
+                DetachClient(oldClient);
+                ClientDisconnected?.Invoke(this, new TcpEventArgs(oldClient));
+            }
+        }
+        private bool IsValidClientType(TcpClientBase client)
+        {
+            return client is TcpNetClient;
         }
         private void DetachClient(TcpNetClient client)
         {
+            clients.Remove(client);
             client.Received -= OnClientReceived;
-            client.Closed -= OnClientClosed;
-            if (clients.Contains(client))
-            {
-                clients.Remove(client);
-                OnClosed(this, new TcpEventArgs(client));
-                client.Dispose();
-            }
         }
-        #endregion
-        private protected virtual void OnClientReceived(object sender, PacketEventArgs e)
-        {
-            Received?.Invoke(this, e);
-        }
-        public event PacketEventHandler Received;
-        public event TcpEventHandler ClientClosed;
-        public event TcpEventHandler ClientAccpeted;
-        #region IDISPOSE
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!disposedValue)
-            {
-                if (disposing)
-                {
-                    // TODO: 관리형 상태(관리형 개체)를 삭제합니다.
-                    Listener?.Stop();
-                    DisposeAllClients();
-                }
-                clients.Clear();
-                Listener = null;
-                // TODO: 비관리형 리소스(비관리형 개체)를 해제하고 종료자를 재정의합니다.
-                // TODO: 큰 필드를 null로 설정합니다.
-                disposedValue = true;
-            }
-        }
-
-        // // TODO: 비관리형 리소스를 해제하는 코드가 'Dispose(bool disposing)'에 포함된 경우에만 종료자를 재정의합니다.
-        // ~Server()
-        // {
-        //     // 이 코드를 변경하지 마세요. 'Dispose(bool disposing)' 메서드에 정리 코드를 입력합니다.
-        //     Dispose(disposing: false);
-        // }
-
-
-        private bool disposedValue;
-
-        public void Dispose()
-        {
-            // 이 코드를 변경하지 마세요. 'Dispose(bool disposing)' 메서드에 정리 코드를 입력합니다.
-            Dispose(disposing: true);
-            GC.SuppressFinalize(this);
-        }
+        public event TcpEventHandler ClientDisconnected;
         #endregion
     }
 }
