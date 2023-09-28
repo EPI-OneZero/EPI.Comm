@@ -51,7 +51,7 @@ namespace EPI.Comm.Net
             return new TcpNetClient(client, BufferSize);
         }
 
-        private protected override void OnAccepted(TcpClientBase client)
+        private protected override void OnClientAccepted(TcpClientBase client)
         {
             var newClient = client as TcpNetClient;
             if (IsValidClientType(newClient) && !clients.Contains(newClient))
@@ -70,7 +70,7 @@ namespace EPI.Comm.Net
         #endregion
 
         #region Close
-        private protected override void OnDisconnected(TcpClientBase client)
+        private protected override void OnClientDisconnected(TcpClientBase client)
         {
             var oldClient = client as TcpNetClient;
             if (IsValidClientType(oldClient) && clients.Contains(oldClient))

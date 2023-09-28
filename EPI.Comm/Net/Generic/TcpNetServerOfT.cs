@@ -51,7 +51,7 @@ namespace EPI.Comm.Net.Generic
             var result = new TcpNetClient<Theader>(client, BufferSize, GetBodySize);
             return result;
         }
-        private protected override void OnAccepted(TcpClientBase client)
+        private protected override void OnClientAccepted(TcpClientBase client)
         {
             var newClient = client as TcpNetClient<Theader>;
             if (IsValidClientType(newClient) && !clients.Contains(newClient))
@@ -73,7 +73,7 @@ namespace EPI.Comm.Net.Generic
         #region Close
 
 
-        private protected override void OnDisconnected(TcpClientBase client)
+        private protected override void OnClientDisconnected(TcpClientBase client)
         {
             var oldClient = client as TcpNetClient<Theader>;
             if (IsValidClientType(oldClient) && clients.Contains(oldClient))
@@ -145,7 +145,7 @@ namespace EPI.Comm.Net.Generic
             var result = new TcpNetClient<Theader, Tfooter>(client, BufferSize, GetBodySize);
             return result;
         }
-        private protected override void OnAccepted(TcpClientBase client)
+        private protected override void OnClientAccepted(TcpClientBase client)
         {
             var newClient = client as TcpNetClient<Theader, Tfooter>;
             if (IsValidClientType(newClient) && !clients.Contains(newClient))
@@ -165,7 +165,7 @@ namespace EPI.Comm.Net.Generic
         #endregion
 
         #region Close
-        private protected override void OnDisconnected(TcpClientBase client)
+        private protected override void OnClientDisconnected(TcpClientBase client)
         {
             var oldClient = client as TcpNetClient<Theader, Tfooter>;
             if (IsValidClientType(oldClient) && clients.Contains(oldClient))
