@@ -51,7 +51,7 @@ namespace EPI.Comm.Net.Generic
             var result = new TcpNetClient<Theader>(client, BufferSize, GetBodySize);
             return result;
         }
-        private protected override void OnClientAccepted(TcpClientBase client)
+        private protected override void OnClientConnected(TcpClientBase client)
         {
             var newClient = client as TcpNetClient<Theader>;
             if (IsValidClientType(newClient) && !clients.Contains(newClient))
@@ -145,7 +145,7 @@ namespace EPI.Comm.Net.Generic
             var result = new TcpNetClient<Theader, Tfooter>(client, BufferSize, GetBodySize);
             return result;
         }
-        private protected override void OnClientAccepted(TcpClientBase client)
+        private protected override void OnClientConnected(TcpClientBase client)
         {
             var newClient = client as TcpNetClient<Theader, Tfooter>;
             if (IsValidClientType(newClient) && !clients.Contains(newClient))

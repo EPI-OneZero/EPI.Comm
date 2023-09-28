@@ -51,7 +51,7 @@ namespace EPI.Comm.Net
             return new TcpNetClient(client, BufferSize);
         }
 
-        private protected override void OnClientAccepted(TcpClientBase client)
+        private protected override void OnClientConnected(TcpClientBase client)
         {
             var newClient = client as TcpNetClient;
             if (IsValidClientType(newClient) && !clients.Contains(newClient))

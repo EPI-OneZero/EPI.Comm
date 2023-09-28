@@ -148,7 +148,7 @@ namespace EPI.Comm.Net
                 {
                     var client = CreateClient(tcpClient);
                     AttachClient(client);
-                    OnClientAccepted(client);
+                    OnClientConnected(client);
                 }
 
             }
@@ -177,7 +177,7 @@ namespace EPI.Comm.Net
 
             }
         }
-        private protected abstract void OnClientAccepted(TcpClientBase client);
+        private protected abstract void OnClientConnected(TcpClientBase client);
         private protected abstract TcpClientBase CreateClient(TcpClient client);
 
         #endregion
