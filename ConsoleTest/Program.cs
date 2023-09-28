@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -6,11 +8,12 @@ using System.Runtime.InteropServices;
 namespace ConsoleTest
 {
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public struct MyClass
+    public class MyClass
     {
         public byte A;
         public byte B;
         public byte C;
+        Queue<string> x;
         public MyClass(byte a, byte b, byte c)
         {
             A = a;

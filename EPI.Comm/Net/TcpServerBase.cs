@@ -124,7 +124,7 @@ namespace EPI.Comm.Net
                     }
                     catch (CommException e)
                     {
-                        Debug.WriteLine(e.Message);
+                        //Debug.WriteLine(e.Message);
                         if (!isListening)
                         {
                             break;
@@ -132,7 +132,7 @@ namespace EPI.Comm.Net
                     }
                     finally
                     {
-                        Debug.WriteLine(nameof(AcceptLoop));
+                        //Debug.WriteLine(nameof(AcceptLoop));
                     }
                 }
                 acceptLoopingOn = false;
@@ -167,7 +167,7 @@ namespace EPI.Comm.Net
             }
             finally
             {
-                Debug.WriteLine(nameof(Accept));
+                //Debug.WriteLine(nameof(Accept));
             }
         }
         private void WaitAcceptLoopFinish()

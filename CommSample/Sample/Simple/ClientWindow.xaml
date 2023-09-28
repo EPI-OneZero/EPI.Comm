@@ -21,7 +21,7 @@
     
         <StackPanel Grid.Column="2" Margin="5">
             <TextBox x:Name="ip" Text="127.0.0.1" Height="20"/>
-            <TextBox x:Name="port" Text="5000" Height="20"/>
+            <TextBox x:Name="port" Text="4101" Height="20"/>
             <Button Width="100" Height="50" Content="Start" Click="Start"/>
             <Button Width="100" Height="50" Content="Stop" Click="Stop"/>
             <Button Width="100" Height="50" Content="Clear" Click="Clear"/>

@@ -2,9 +2,11 @@
 using EPI.Comm.Net.Generic;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -46,34 +48,45 @@ namespace CommSample.Sample.Packet1
         }
         private void Client_Received(object sender, EPI.Comm.Net.Generic.Events.PacketEventArgs<MyHeader> e)
         {
-            var src = e.Packet.Header.src;
-            var dst = e.Packet.Header.dst;
-            var code = e.Packet.Header.code;
-            var size = e.Packet.Header.size;
-            var data = e.Packet.Body;
+            //var src = e.Packet.Header.src;
+            //var dst = e.Packet.Header.dst;
+            //var code = e.Packet.Header.code;
+            //var size = e.Packet.Header.size;
+            //Debug.WriteLine(src);
+            //Debug.WriteLine(dst);
+            //Debug.WriteLine(code);
+            //Debug.WriteLine(size);
+            //for (int i = 0; i < data.Length; i++)
+            //{
+            //    Debug.WriteLine(data[i]);
+            //}
+            if(count == 0)
+            {
+                time = DateTime.Now;
+            }
             count++;
+            Debug.WriteLine(count);
+            //Debug.WriteLine(data.Length);
             if (count < 10000)
             {
-                Button_Click1(null, null);
+               Button_Click1(null, null);
             }
             else
             {
                 var dt = DateTime.Now - time;
                 var ms = dt.TotalSeconds;
-                MessageBox.Show(((long)ms).ToString());
+                MessageBox.Show(ms.ToString());
+                count = 0;
             }
 
         }
         private volatile int count = 0;
         private DateTime time;
 
-       
+           
         private void Button_Click1(object sender, RoutedEventArgs e)
         {
-            if (count == 0)
-            {
-                time = DateTime.Now;
-            }
+
 
             //MyHeader header = new MyHeader()
             //{
@@ -82,22 +95,23 @@ namespace CommSample.Sample.Packet1
             //    code = 3,
             //    size = 32,
             //};
-            //byte[] data = new byte[] 
+            //byte[] data = new byte[]
             //{
-            //    1, 2, 3, 4,
-            //    1, 2, 3, 4,
-            //    1, 2, 3, 4,
-            //    1, 2, 3, 4,
+            //1, 2, 3, 4,
+            //1, 2, 3, 4,
+            //1, 2, 3, 4,
+            //1, 2, 3, 4,
 
-            //    1, 2, 3, 4,
-            //    1, 2, 3, 4,
-            //    1, 2, 3, 4,
-            //    1, 2, 3, 4,
+            //1, 2, 3, 4,
+            //1, 2, 3, 4,
+            //1, 2, 3, 4,
+            //1, 2, 3, 4,
 
-            //};
+            //  };
             //client.Send(header, data);
+            // Console.WriteLine("ii: " + i);
             client.SendBytes(new byte[]
-           {
+            {
                 1,0,0,0,
                 2,0,0,0,
                 3,0,0,0,
@@ -112,7 +126,10 @@ namespace CommSample.Sample.Packet1
                 1,2,3,4,
                 1,2,3,4,
                 1,2,3,4,
-           });
+            });
+
+
+
         }
     }
 }

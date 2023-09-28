@@ -17,10 +17,13 @@ namespace EPI.Comm.Net.Generic
     public class TcpNetClient<Theader> : TcpClientBase, IComm<Theader>
         where Theader : new()
     {
+        #region Field & Property
         public int HeaderSize { get; private set; }
         internal IBuffer ReceiveBuffer { get; set; } = new QueueBuffer();
         internal Func<Theader, int> GetBodySize { get; private set; }
         internal Packet<Theader> Packet { get; set; }
+        #endregion
+        #region CTOR
         public TcpNetClient(int bufferSize, Func<Theader, int> getBodySize) : base(bufferSize)
         {
             HeaderSize = ObjectUtil.SizeOf<Theader>();
@@ -28,10 +31,28 @@ namespace EPI.Comm.Net.Generic
         }
         public TcpNetClient(Func<Theader, int> getBodySize) : this(DefaultBufferSize, getBodySize)
         {
+            SetPacketProperties(getBodySize);
         }
 
         internal TcpNetClient(TcpClient client, int bufferSize, Func<Theader, int> getBodySize) : base(client, bufferSize)
         {
+            SetPacketProperties(getBodySize);
+        }
+        #endregion
+        #region Method & Event
+        private protected override void OnSocketDisconnected()
+        {
+            ReceiveBuffer.Clear();
+            base.OnSocketDisconnected();
+        }
+        private protected override void OnSocketConnected()
+        {
+            ReceiveBuffer.Clear();
+            base.OnSocketConnected();
+        }
+        private void SetPacketProperties(Func<Theader, int> getBodySize)
+        {
+            Packet = new Packet<Theader>(GetBodySize);
             HeaderSize = ObjectUtil.SizeOf<Theader>();
             GetBodySize = getBodySize;
         }
@@ -41,42 +62,42 @@ namespace EPI.Comm.Net.Generic
             var fullPacketBytes = Packet<Theader>.GeneratePacketBytes(header,body,HeaderSize,headerDefinedBodySize);
             SendBytes(fullPacketBytes);
         }
-
-        public event PacketEventHandler<Theader> Received;
         private protected override void SocketReceived(object sender, SocketReceiveEventArgs e)
         {
             lock (this)
             {
-                if (Packet == null)
-                {
-                    Packet = new Packet<Theader>(GetBodySize);
-                }
                 ReceiveBuffer.AddBytes(e.ReceivedBytes);
-                if (Packet.TryDeserialize(ReceiveBuffer))
+                while (Packet.TryDeserialize(ReceiveBuffer))
                 {
-                    Received?.Invoke(this, new PacketEventArgs<Theader>(e.From, Packet));
+
+                    var packet = Packet;
+
+                    Received?.Invoke(this, new PacketEventArgs<Theader>(e.From, packet));
+                    Packet = new Packet<Theader>(GetBodySize);
                 }
             }
 
         }
+
+        public event PacketEventHandler<Theader> Received;
+        #endregion
     }
 
     /// <summary>
-    /// 
-    /// 
-    /// 
-    /// 
     /// </summary>
     /// <typeparam name="Theader">Marshal.SizeOf 가능 및 StructLayout Sequential 확인 필수</typeparam>
     /// <typeparam name="Tfooter">Marshal.SizeOf 가능 및 StructLayout Sequential 확인 필수</typeparam>
     public class TcpNetClient<Theader, Tfooter> : TcpClientBase, IComm<Theader, Tfooter>
         where Theader : new()
     {
+        #region Field & Property
         internal int HeaderSize { get; set; }
         internal int FooterSize { get; set; }
         internal IBuffer ReceiveBuffer { get; set; } = new QueueBuffer();
         private Packet<Theader, Tfooter> Packet { get; set; }
         internal Func<Theader, int> GetBodySize { get; private set; }
+        #endregion
+        #region CTOR
         public TcpNetClient(int bufferSize, Func<Theader, int> getBodySize) : base(bufferSize)
         {
             SetPacketProperties(getBodySize);
@@ -88,11 +109,24 @@ namespace EPI.Comm.Net.Generic
         {
             SetPacketProperties(getBodySize);
         }
+        #endregion
+        #region Method & Event
         private void SetPacketProperties(Func<Theader, int> getBodySize)
         {
+            Packet = new Packet<Theader, Tfooter>(GetBodySize);
             HeaderSize = ObjectUtil.SizeOf<Theader>();
             FooterSize = ObjectUtil.SizeOf<Tfooter>();
             GetBodySize = getBodySize;
+        }
+        private protected override void OnSocketDisconnected()
+        {
+            ReceiveBuffer.Clear();
+            base.OnSocketDisconnected();
+        }
+        private protected override void OnSocketConnected()
+        {
+            ReceiveBuffer.Clear();
+            base.OnSocketConnected();
         }
         public void Send(Theader header, byte[] body, Tfooter footer)
         {
@@ -105,22 +139,20 @@ namespace EPI.Comm.Net.Generic
         {
             lock (this)
             {
-                if (Packet == null)
-                {
-                    Packet = new Packet<Theader, Tfooter>(GetBodySize);
-                }
                 ReceiveBuffer.AddBytes(e.ReceivedBytes);
-
-                if (Packet.TryDeserialize(ReceiveBuffer))
+                while (Packet.TryDeserialize(ReceiveBuffer))
                 {
+
                     var packet = Packet;
-                    Packet = null;
+                  
                     Received?.Invoke(this, new PacketEventArgs<Theader, Tfooter>(e.From, packet));
+                    Packet = new Packet<Theader, Tfooter>(GetBodySize);
                 }
             }
         }
 
         public event PacketEventHandler<Theader, Tfooter> Received;
+        #endregion
     }
 
 }

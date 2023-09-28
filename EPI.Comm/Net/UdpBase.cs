@@ -94,7 +94,7 @@ namespace EPI.Comm.Net
                 }
                 catch (CommException e)
                 {
-                    Debug.WriteLine(e.Message);
+                    //Debug.WriteLine(e.Message);
                     break;
                 }
             }

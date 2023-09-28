@@ -2,6 +2,7 @@
 using EPI.Comm.Net.Events;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 using System.Threading;
 using System.Windows;
@@ -53,27 +54,29 @@ namespace CommSample.Sample
         {
             MessageBox.Show("Client Closed");
         }
-
+        private volatile int count = 0;
         private void Client_BytesReceived(object sender, PacketEventArgs e)
         {
-            Dispatcher.BeginInvoke(new Action(() =>
-            {
-                var build = new StringBuilder();
-                build.AppendLine($"받은 바이트 수 :  {e.ReceivedBytes.Length}");
-                for (int i = 0; i < e.ReceivedBytes.Length; i++)
-                {
-                    if (i % 8 == 0)
-                    {
-                        build.AppendLine();
-                    }
-                    var b = e.ReceivedBytes[i];
-                    build.Append(b + " ");
+            count++;
+            Debug.WriteLine(count);
+            //Dispatcher.BeginInvoke(new Action(() =>
+            //{
+            //    var build = new StringBuilder();
+            //    build.AppendLine($"받은 바이트 수 :  {e.ReceivedBytes.Length}");
+            //    for (int i = 0; i < e.ReceivedBytes.Length; i++)
+            //    {
+            //        if (i % 8 == 0)
+            //        {
+            //            build.AppendLine();
+            //        }
+            //        var b = e.ReceivedBytes[i];
+            //        build.Append(b + " ");
 
-                }
-                build.AppendLine();
-                recv.Text += build.ToString();
+            //    }
+            //    build.AppendLine();
+            //    recv.Text += build.ToString();
 
-            }));
+            //}));
         }
 
         private void Start(object sender, RoutedEventArgs e)

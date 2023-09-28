@@ -31,7 +31,7 @@ namespace EPI.Comm.Net
         private volatile bool isConnecting = false;
         private string ipToConnect;
         private int portToConnect;
-        public bool IsConnected => (NetSocket?.IsConnected ?? false);
+        public bool IsConnected => (TcpClient?.Client?.Connected ?? false);
         private AutoConnectHelper connectHelper;
         #endregion
 
@@ -85,7 +85,7 @@ namespace EPI.Comm.Net
             }
             catch (CommException e)
             {
-                Debug.WriteLine(e.Message);
+                //Debug.WriteLine(e.Message);
             }
         }
         private protected abstract void SocketReceived(object sender, SocketReceiveEventArgs e);
@@ -107,16 +107,17 @@ namespace EPI.Comm.Net
                             Connect(TcpClient);
                         }
                     }
-                    catch (CommException e)
+                    catch (CommException e)   
                     {
                         TcpClient?.Dispose();
+                        TcpClient = null;
                         RunAutoConnectIfUserWant();
-                        Debug.WriteLine(e.Message);
+                        //Debug.WriteLine(e.Message);
                     }
                     finally
                     {
                         isConnecting = false;
-                        Debug.WriteLine(nameof(Connect));
+                        //Debug.WriteLine(nameof(Connect));
                     }
                 }
             }
@@ -128,10 +129,10 @@ namespace EPI.Comm.Net
             {
                 var asyncHandle = client.BeginConnect(IPAddress.Parse(ipToConnect), portToConnect, null, null);
                 var returned = asyncHandle.AsyncWaitHandle.WaitOne(10000);
-                if (IsConnected || returned)
+                if (IsConnected && returned)
                 {
                     AttachSocket(client.Client);
-                    Connected?.Invoke(this, EventArgs.Empty);
+                    OnSocketConnected();
                 }
                 else
                 {
@@ -145,7 +146,7 @@ namespace EPI.Comm.Net
             }
             finally
             {
-                Debug.WriteLine($"{nameof(IsConnected)} : {IsConnected}");
+                //Debug.WriteLine($"{nameof(IsConnected)} : {IsConnected}");
             }
         }
 
@@ -155,7 +156,10 @@ namespace EPI.Comm.Net
             ipToConnect = ip;
             portToConnect = port;
         }
-
+        private protected virtual void OnSocketConnected()
+        {
+            Connected?.Invoke(this, EventArgs.Empty);
+        }
         public event EventHandler Connected;
 
         #endregion
@@ -172,13 +176,13 @@ namespace EPI.Comm.Net
                 TcpClient = null;
                 if(raiseEvent)
                 {
-                    RaiseDisconnectEvent();
+                    OnSocketDisconnected();
                 }
 
             }
         }
 
-        private void RaiseDisconnectEvent()
+        private protected virtual void OnSocketDisconnected()
         {
             Disconnected?.Invoke(this, EventArgs.Empty);
         }
@@ -187,7 +191,7 @@ namespace EPI.Comm.Net
             DetachSocket();
             TcpClient?.Dispose();
             TcpClient = null;
-            RaiseDisconnectEvent();
+            OnSocketDisconnected();
 
             RunAutoConnectIfUserWant();
         }

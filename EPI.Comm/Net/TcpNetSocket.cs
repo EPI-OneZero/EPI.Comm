@@ -52,7 +52,7 @@ namespace EPI.Comm.Net
             {
                 lock (SendLock)
                 {
-                    Socket.Send(bytes);
+                   var res= Socket.Send(bytes);
                 }
             }
             catch (SocketException e)
@@ -63,12 +63,17 @@ namespace EPI.Comm.Net
             {
                 throw CreateCommException(e);
             }
+            catch(NullReferenceException e)
+            {
+                throw CreateCommException(e);
+            }
             finally
             {
-                Debug.WriteLine(nameof(Receive));
+                //Debug.WriteLine(nameof(Receive));
             }
 
         }
+        private volatile int ccc = 0;
         private byte[] Receive()
         {
             try
@@ -81,6 +86,7 @@ namespace EPI.Comm.Net
                     throw CreateCommException($"연결 끊김 수신 바이트 수 :{count}");
                 }
                 return result;
+
             }
             catch (NullReferenceException e)
             {
@@ -96,7 +102,7 @@ namespace EPI.Comm.Net
             }
             finally
             {
-                Debug.WriteLine(nameof(Receive));
+                //Debug.WriteLine(nameof(Receive));
             }
 
         }
@@ -121,7 +127,7 @@ namespace EPI.Comm.Net
                 }
                 finally
                 {
-                    Debug.WriteLine(nameof(ReceiveLoop));
+                    //Debug.WriteLine(nameof(ReceiveLoop));
                 }
 
             }
