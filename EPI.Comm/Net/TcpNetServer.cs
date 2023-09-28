@@ -87,7 +87,6 @@ namespace EPI.Comm.Net
         {
             clients.Remove(client);
             client.Received -= OnClientReceived;
-            ClientDisconnected?.Invoke(this, new TcpEventArgs(client));
         }
         public event TcpEventHandler ClientDisconnected;
         #endregion

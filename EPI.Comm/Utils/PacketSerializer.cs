@@ -31,9 +31,10 @@ namespace EPI.Comm.Utils
         {
             if (IsEnoughSizeToSerialize(srcSize, dst.Length - dstOffset, 0))
             {
-                var handle = GCHandle.Alloc(src, GCHandleType.Pinned);
-
-                Marshal.Copy(handle.AddrOfPinnedObject(), dst, dstOffset, srcSize);
+                var handle = GCHandle.Alloc(dst, GCHandleType.Pinned);
+                var ptr = IntPtr.Add(handle.AddrOfPinnedObject(), dstOffset);
+                Marshal.StructureToPtr(src, ptr, false);
+                handle.Free();
             }
             else
             {

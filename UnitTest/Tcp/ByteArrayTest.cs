@@ -86,6 +86,7 @@ namespace UnitTest.Tcp
             finally
             {
                 receiver.Received -= OnReceived;
+               
             }
             void OnReceived(object s, EPI.Comm.Net.Events.PacketEventArgs e)
             {
