@@ -64,7 +64,7 @@ namespace EPI.Comm.Utils
             }
             else if(FieldType.IsArray)
             {
-
+                var types = FieldType.GenericTypeArguments;
             }
         }
         private void SetSize()

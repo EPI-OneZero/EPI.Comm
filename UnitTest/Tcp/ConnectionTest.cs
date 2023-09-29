@@ -41,10 +41,10 @@ namespace UnitTest.Tcp
             for (int i = 0; i < 5; i++)
             {
                 server.Stop();
-                Thread.Sleep(100);
+                Thread.Sleep(20);
                 Assert.IsFalse(client.IsConnected);
                 server.StartListen(port);
-                Thread.Sleep(2000);
+                Thread.Sleep(750);
                 Assert.IsTrue(client.IsConnected);
             }
             server.Dispose();
