@@ -22,7 +22,7 @@ namespace UnitTest.Tcp
         [TestInitialize]
         public void Init()
         {
-            const int Port = 4101;
+            const int Port = 5555;
             Server = new TcpNetServer();
             Client = new TcpNetClient();
             Data = new List<byte[]>();

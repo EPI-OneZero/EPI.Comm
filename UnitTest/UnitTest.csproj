@@ -61,13 +61,13 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Udp\" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\EPI.Comm\EPI.Comm.csproj">
       <Project>{79c7c12f-0fdc-4390-88ec-45ef900cc770}</Project>
       <Name>EPI.Comm</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Udp\" />
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

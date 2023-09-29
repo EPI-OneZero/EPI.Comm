@@ -31,8 +31,6 @@ namespace EPI.Comm.Net.Generic.Packets
             return GetBodySize?.Invoke(Header) ?? 0;
         }
         private DeserializeState state = DeserializeState.None;
-        private protected bool HeaderDeserialized { get; private set; } = false;
-        private protected bool BodyDeserialized { get; private set; } = false;
         internal bool TryDeserialize(IBuffer buffer)
         {
             var success = TryDeserializePacket(buffer);

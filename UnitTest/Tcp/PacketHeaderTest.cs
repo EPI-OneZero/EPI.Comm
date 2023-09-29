@@ -24,7 +24,7 @@ namespace UnitTest.Tcp
         [TestInitialize]
         public void Init()
         {
-            const int Port = 4101;
+            const int Port = 5555;
             Server = new TcpNetServer<Header>(Header.GetBodySize);
             Client = new TcpNetClient<Header>(Header.GetBodySize);
             int packetCount = 10;
@@ -60,6 +60,7 @@ namespace UnitTest.Tcp
             int count = 0;
             int fullCount = packets.Count;
             PacketWithHeader recv = null;
+           
             receiver.Received += OnReceived;
             try
             {

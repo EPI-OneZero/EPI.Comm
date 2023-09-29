@@ -24,7 +24,7 @@ namespace UnitTest.Tcp
         [TestInitialize]
         public void Init()
         {
-            const int Port = 4101;
+            const int Port = 5555;
             Server = new TcpNetServer<Header, Footer>(Header.GetBodySize);
             Client = new TcpNetClient<Header, Footer>(Header.GetBodySize);
             int packetCount = 10;
@@ -70,7 +70,20 @@ namespace UnitTest.Tcp
                     {
                         Thread.Sleep(1);
                     }
-                    Assert.AreEqual(packets[i], recv);
+                    try
+                    {
+                        Assert.AreEqual(packets[i], recv);
+                    }
+                    catch (Exception)
+                    {
+                        Console.WriteLine(packets[i].Header.BodySize);
+                        Console.WriteLine(packets[i].Footer.Etx);
+                        Console.WriteLine(packets[i].Body.Length);
+                        Console.WriteLine(recv.Header.BodySize);
+                        Console.WriteLine(recv.Footer.Etx);
+                        Console.WriteLine(recv.Body.Length);
+                        throw;
+                    }
                 }
                 Console.WriteLine(count);
                 Console.WriteLine(fullCount);

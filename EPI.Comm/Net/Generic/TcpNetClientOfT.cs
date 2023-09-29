@@ -52,9 +52,10 @@ namespace EPI.Comm.Net.Generic
         }
         private void SetPacketProperties(Func<Theader, int> getBodySize)
         {
+            GetBodySize = getBodySize;
             Packet = new Packet<Theader>(GetBodySize);
             HeaderSize = ObjectUtil.SizeOf<Theader>();
-            GetBodySize = getBodySize;
+            
         }
         public void Send(Theader header, byte[] body)
         {
@@ -113,10 +114,11 @@ namespace EPI.Comm.Net.Generic
         #region Method & Event
         private void SetPacketProperties(Func<Theader, int> getBodySize)
         {
+            GetBodySize = getBodySize;
             Packet = new Packet<Theader, Tfooter>(GetBodySize);
             HeaderSize = ObjectUtil.SizeOf<Theader>();
             FooterSize = ObjectUtil.SizeOf<Tfooter>();
-            GetBodySize = getBodySize;
+           
         }
         private protected override void OnSocketDisconnected()
         {
