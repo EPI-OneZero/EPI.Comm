@@ -9,7 +9,7 @@ namespace EPI.Comm.Utils
         {
             return sourceSize >= targetSize;
         }
-        internal static T DeserializeByMarshal<T>(byte[] srcBytes, int targetSize)
+        internal static T DeserializeByMarshal<T>(byte[] srcBytes)
         {
             var handle = GCHandle.Alloc(srcBytes, GCHandleType.Pinned);
             var result = Marshal.PtrToStructure<T>(handle.AddrOfPinnedObject());

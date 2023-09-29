@@ -5,6 +5,7 @@ using EPI.Comm.Net.Generic.Packets;
 using EPI.Comm.Utils;
 using System;
 using System.Net.Sockets;
+using System.Runtime.InteropServices;
 using static EPI.Comm.CommConfig;
 
 namespace EPI.Comm.Net.Generic
@@ -22,7 +23,7 @@ namespace EPI.Comm.Net.Generic
         #region CTOR
         public TcpNetClient(int bufferSize, Func<Theader, int> getBodySize) : base(bufferSize)
         {
-            HeaderSize = TypeUtil.SizeOf<Theader>();
+            HeaderSize = Marshal.SizeOf<Theader>();
             GetBodySize = getBodySize;
         }
         public TcpNetClient(Func<Theader, int> getBodySize) : this(DefaultBufferSize, getBodySize)
@@ -50,7 +51,7 @@ namespace EPI.Comm.Net.Generic
         {
             GetBodySize = getBodySize;
             Packet = new Packet<Theader>(GetBodySize);
-            HeaderSize = TypeUtil.SizeOf<Theader>();
+            HeaderSize = Marshal.SizeOf<Theader>();
 
         }
         public void Send(Theader header, byte[] body)
@@ -60,7 +61,7 @@ namespace EPI.Comm.Net.Generic
             var fullPacketBytes = packet.SerializePacket();
             SendBytes(fullPacketBytes);
         }
-        private protected override void SocketReceived(object sender, SocketReceiveEventArgs e)
+        private protected override void SocketReceived(object sender, PacketEventArgs e)
         {
             lock (this)
             {
@@ -111,8 +112,8 @@ namespace EPI.Comm.Net.Generic
         {
             GetBodySize = getBodySize;
             Packet = new Packet<Theader, Tfooter>(GetBodySize);
-            HeaderSize = TypeUtil.SizeOf<Theader>();
-            FooterSize = TypeUtil.SizeOf<Tfooter>();
+            HeaderSize = Marshal.SizeOf<Theader>();
+            FooterSize = Marshal.SizeOf<Tfooter>();
 
         }
         private protected override void OnSocketDisconnected()
@@ -133,7 +134,7 @@ namespace EPI.Comm.Net.Generic
 
             SendBytes(fullPacketBytes);
         }
-        private protected override void SocketReceived(object sender, SocketReceiveEventArgs e)
+        private protected override void SocketReceived(object sender, PacketEventArgs e)
         {
             lock (this)
             {

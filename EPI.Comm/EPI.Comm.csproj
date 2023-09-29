@@ -17,5 +17,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
+    <AnalysisLevel>none</AnalysisLevel>
   </PropertyGroup>
 </Project>

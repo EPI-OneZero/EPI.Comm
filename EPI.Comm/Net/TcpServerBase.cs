@@ -1,5 +1,5 @@
 ﻿using EPI.Comm.Log;
-using EPI.Comm.UTils;
+using EPI.Comm.Utils;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -62,7 +62,7 @@ namespace EPI.Comm.Net
                     Listener.Start();
                     Port = port;
                     isListening = true;
-                    ThreadUtil.Start(AcceptLoop);
+                    DelegateUtil.Start(AcceptLoop);
                 }
             }
 
@@ -140,7 +140,7 @@ namespace EPI.Comm.Net
         {
             try
             {
-                var tcpClient = Listener?.AcceptTcpClient();
+                var tcpClient = Listener.AcceptTcpClient();
                 return tcpClient;
             }
             catch (ObjectDisposedException disposedException)

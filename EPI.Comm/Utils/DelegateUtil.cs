@@ -1,9 +1,8 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 
-namespace EPI.Comm.UTils
+namespace EPI.Comm.Utils
 {
-    internal static class ThreadUtil
+    internal static class DelegateUtil
     {
 
         public static Thread Start(ThreadStart start)

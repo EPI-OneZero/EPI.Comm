@@ -38,19 +38,18 @@ namespace EPI.Comm.Buffers
             {
                 throw new IndexOutOfRangeException("count");
             }
-
+            int headerToLength = buffer.Length - head;
             if (count > 0)
             {
-                if (count <= buffer.Length - head)
+                if (count <= headerToLength)
                 {
                     Buffer.BlockCopy(buffer, head, array, 0, count);
 
                 }
                 else
                 {
-                    var size2 = buffer.Length - head;
-                    Buffer.BlockCopy(buffer, head, array, 0, size2);
-                    Buffer.BlockCopy(buffer, 0, array, size2, count - size2);
+                    Buffer.BlockCopy(buffer, head, array, 0, headerToLength);
+                    Buffer.BlockCopy(buffer, 0, array, headerToLength, count - headerToLength);
 
                 }
                 head = (head + count) % buffer.Length;

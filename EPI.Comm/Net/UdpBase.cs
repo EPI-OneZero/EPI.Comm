@@ -1,6 +1,6 @@
 ﻿using EPI.Comm.Log;
 using EPI.Comm.Net.Events;
-using EPI.Comm.UTils;
+using EPI.Comm.Utils;
 using System;
 using System.Net;
 using System.Net.Sockets;
@@ -33,12 +33,16 @@ namespace EPI.Comm.Net
                 {
                     UdpClient = new UdpClient(new IPEndPoint(IPAddress.Any, recvPort));
                     RemoteEndPoint = new IPEndPoint(IPAddress.Parse(sendIp), sendPort);
-                    UdpClient.Client.ReceiveBufferSize = BufferSize;
-                    UdpClient.Client.SendBufferSize = BufferSize;
-                    ThreadUtil.Start(ReceiveLoop);
+                    SetSocketOption();
+                    DelegateUtil.Start(ReceiveLoop);
                     isStarted = true;
                 }
             }
+        }
+        private void SetSocketOption()
+        {
+            UdpClient.Client.ReceiveBufferSize = BufferSize;
+            UdpClient.Client.SendBufferSize = BufferSize;
         }
         public void Stop()
         {
@@ -89,7 +93,7 @@ namespace EPI.Comm.Net
             {
                 var from = new IPEndPoint(IPAddress.Any, 0);
                 var recv = UdpClient.Receive(ref from);
-                OnReceived(new SocketReceiveEventArgs(new IPEndPoint(from.Address, from.Port), recv));
+                OnReceived(new PacketEventArgs(new IPEndPoint(from.Address, from.Port), recv));
             }
             catch (ObjectDisposedException e)
             {
@@ -120,7 +124,7 @@ namespace EPI.Comm.Net
             }
 
         }
-        private protected abstract void OnReceived(SocketReceiveEventArgs e);
+        private protected abstract void OnReceived(PacketEventArgs e);
         #region IDISPOSE
         private bool disposedValue;
         protected virtual void Dispose(bool disposing)

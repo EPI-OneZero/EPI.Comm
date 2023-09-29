@@ -1,7 +1,6 @@
 ﻿using EPI.Comm.Net.Events;
 using System.Collections.Generic;
 using System.Net.Sockets;
-using System.Text;
 using System.Threading.Tasks;
 using static EPI.Comm.CommConfig;
 namespace EPI.Comm.Net
@@ -9,7 +8,7 @@ namespace EPI.Comm.Net
     public class TcpNetServer : TcpServerBase, IComm
     {
         #region Field & Property
-        private List<TcpNetClient> clients = new List<TcpNetClient>();
+        private readonly List<TcpNetClient> clients = new List<TcpNetClient>();
         public ClientCollection Clients { get; private set; }
         #endregion
         #region CTOR
@@ -48,8 +47,7 @@ namespace EPI.Comm.Net
 
         private protected override void OnClientConnected(TcpClientBase client)
         {
-            var newClient = client as TcpNetClient;
-            if (IsValidClientType(newClient) && !clients.Contains(newClient))
+            if (client is TcpNetClient newClient && !clients.Contains(newClient))
             {
                 AttachClient(newClient);
                 ClientConnected?.Invoke(this, new TcpEventArgs(newClient));
@@ -67,16 +65,11 @@ namespace EPI.Comm.Net
         #region Close
         private protected override void OnClientDisconnected(TcpClientBase client)
         {
-            var oldClient = client as TcpNetClient;
-            if (IsValidClientType(oldClient) && clients.Contains(oldClient))
+            if (client is TcpNetClient oldClient && clients.Contains(oldClient))
             {
                 DetachClient(oldClient);
                 ClientDisconnected?.Invoke(this, new TcpEventArgs(oldClient));
             }
-        }
-        private bool IsValidClientType(TcpClientBase client)
-        {
-            return client is TcpNetClient;
         }
         private void DetachClient(TcpNetClient client)
         {

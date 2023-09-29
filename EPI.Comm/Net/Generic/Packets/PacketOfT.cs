@@ -1,6 +1,7 @@
 ﻿using EPI.Comm.Buffers;
 using EPI.Comm.Utils;
 using System;
+using System.Runtime.InteropServices;
 using static EPI.Comm.Utils.PacketSerializer;
 namespace EPI.Comm.Net.Generic.Packets
 {
@@ -22,6 +23,7 @@ namespace EPI.Comm.Net.Generic.Packets
         public virtual int FullSize => HeaderSize + BodySize;
         public Func<Theader, int> GetBodySize { get; set; }
         #endregion
+
         #region CTOR
         internal Packet(Func<Theader, int> getBodySize) : this(default(Theader), null, getBodySize)
         {
@@ -30,12 +32,13 @@ namespace EPI.Comm.Net.Generic.Packets
         internal Packet(Theader header, byte[] body, Func<Theader, int> getBodySize)
         {
             GetBodySize = getBodySize;
-            HeaderSize = TypeUtil.SizeOf<Theader>();
+            HeaderSize = Marshal.SizeOf<Theader>();
             queue = new QueueBuffer();
             Header = header;
             Body = body;
         }
         #endregion
+
         #region Method
         protected int CalculateBodySize()
         {
@@ -58,11 +61,11 @@ namespace EPI.Comm.Net.Generic.Packets
                 case DeserializeState.None:
                     if (TryDeserializeHeader(buffer))
                     {
-                        return TryDeserializeBody(buffer, CalculateBodySize());
+                        return TryDeserializeBody(buffer);
                     }
                     else return false;
                 case DeserializeState.HeaderCompleted:
-                    return TryDeserializeBody(buffer, CalculateBodySize());
+                    return TryDeserializeBody(buffer);
                 case DeserializeState.BodyCompleted:
                     return true;
                 default:
@@ -75,7 +78,7 @@ namespace EPI.Comm.Net.Generic.Packets
             {
                 var bytes = buffer.GetBytes(HeaderSize);
                 queue.AddBytes(bytes);
-                Header = DeserializeByMarshal<Theader>(bytes, HeaderSize);
+                Header = DeserializeByMarshal<Theader>(bytes);
                 state = DeserializeState.HeaderCompleted;
                 return true;
             }
@@ -84,8 +87,9 @@ namespace EPI.Comm.Net.Generic.Packets
                 return false;
             }
         }
-        private bool TryDeserializeBody(IBuffer buffer, int bodySize)
+        private bool TryDeserializeBody(IBuffer buffer)
         {
+            var bodySize = CalculateBodySize();
             if (IsEnoughSizeToDeserialize(buffer.Count, bodySize))
             {
                 var bytes = buffer.GetBytes(bodySize);
@@ -126,6 +130,7 @@ namespace EPI.Comm.Net.Generic.Packets
         public Tfooter Footer { get; private set; }
         public int FooterSize { get; private set; }
         #endregion
+
         #region CTOR
 
         internal Packet(Func<Theader, int> getBodySize) : this(default(Theader), null, default(Tfooter), getBodySize)
@@ -135,7 +140,7 @@ namespace EPI.Comm.Net.Generic.Packets
         internal Packet(Theader header, byte[] body, Tfooter footer, Func<Theader, int> getBodySize) : base(header, body, getBodySize)
         {
             Footer = footer;
-            FooterSize = TypeUtil.SizeOf<Tfooter>();
+            FooterSize = Marshal.SizeOf<Tfooter>();
         }
         #endregion
 
@@ -157,7 +162,7 @@ namespace EPI.Comm.Net.Generic.Packets
             {
                 var bytes = buffer.GetBytes(FooterSize);
                 queue.AddBytes(bytes);
-                Footer = DeserializeByMarshal<Tfooter>(bytes, FooterSize);
+                Footer = DeserializeByMarshal<Tfooter>(bytes);
                 return true;
             }
             else

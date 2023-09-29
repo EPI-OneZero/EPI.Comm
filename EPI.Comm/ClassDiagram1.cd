@@ -7,13 +7,6 @@
       <FileName>Net\Events\PacketEventArgs.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="EPI.Comm.Net.Events.SocketReceiveEventArgs" Collapsed="true">
-    <Position X="41.5" Y="5" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAA=</HashCode>
-      <FileName>Net\Events\PacketEventArgs.cs</FileName>
-    </TypeIdentifier>
-  </Class>
   <Class Name="EPI.Comm.Net.Events.TcpEventArgs" Collapsed="true">
     <Position X="34" Y="8.75" Width="1.5" />
     <TypeIdentifier>
@@ -51,13 +44,6 @@
   </Class>
   <Class Name="EPI.Comm.Net.Generic.Packets.Packet&lt;Theader&gt;" Collapsed="true">
     <Position X="27" Y="10.25" Width="1.5" />
-    <NestedTypes>
-      <Enum Name="EPI.Comm.Net.Generic.Packets.Packet&lt;Theader&gt;.DeserializeState" Collapsed="true">
-        <TypeIdentifier>
-          <NewMemberFileName>Net\Generic\Packets\PacketOfT.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Enum>
-    </NestedTypes>
     <TypeIdentifier>
       <HashCode>BAABAAAAAAAAIAAJAABBAAAAAAAAIAIEAQACCAABAAA=</HashCode>
       <FileName>Net\Generic\Packets\PacketOfT.cs</FileName>
@@ -106,7 +92,7 @@
   <Class Name="EPI.Comm.Net.Generic.TcpNetServer&lt;Theader&gt;">
     <Position X="20.25" Y="6" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAABAEAABAAAIGAAAAAgAABAAAIABQAAIAAoAAA=</HashCode>
+      <HashCode>AAAAAAABAEAABAAAAGAAAAAgAABAAAIABQAAIAAoAAA=</HashCode>
       <FileName>Net\Generic\TcpNetServerOfT.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
@@ -128,13 +114,6 @@
   </Class>
   <Class Name="EPI.Comm.Net.TcpClientBase" Collapsed="true">
     <Position X="27" Y="4.5" Width="1.5" />
-    <NestedTypes>
-      <Class Name="EPI.Comm.Net.TcpClientBase.AutoConnectHelper" Collapsed="true">
-        <TypeIdentifier>
-          <NewMemberFileName>Net\TcpClientBase.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Class>
-    </NestedTypes>
     <TypeIdentifier>
       <HashCode>IAAAAAAAICEASABQCAkAApAQDAAAAIAQIAEAAkAAYIA=</HashCode>
       <FileName>Net\TcpClientBase.cs</FileName>
@@ -152,7 +131,7 @@
   <Class Name="EPI.Comm.Net.TcpNetServer">
     <Position X="18" Y="6" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAABAEAABAAAIGAAAAAgAABAAAIABAAAIAAoAAA=</HashCode>
+      <HashCode>AAAAAAABAEAABAAAAGAAAAAgAABAAAIABAAAIAAoAAA=</HashCode>
       <FileName>Net\TcpNetServer.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
@@ -182,7 +161,7 @@
   <Class Name="EPI.Comm.Net.UdpBase" Collapsed="true">
     <Position X="22.5" Y="4.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAQAAAAICAAAAAACEAAAEAQAABCAEAQIAEAAyAAAQA=</HashCode>
+      <HashCode>AAAQAAAAICAAAAAACEAAAEAQAABCAEAQIAEAAyCAAQA=</HashCode>
       <FileName>Net\UdpBase.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
@@ -194,28 +173,6 @@
       <FileName>Buffers\QueueBuffer.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" Collapsed="true" />
-  </Class>
-  <Class Name="EPI.Comm.Buffers.RefreshBuffer" Collapsed="true" BaseTypeListCollapsed="true">
-    <Position X="38" Y="1" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AACAAAAAAAAAABAAAAAAAAQAAAAAAAAEQABAAABAAAA=</HashCode>
-      <FileName>Buffers\RefreshBuffer.cs</FileName>
-    </TypeIdentifier>
-    <Lollipop Position="0.2" Collapsed="true" />
-  </Class>
-  <Class Name="EPI.Comm.Utils.MarshalTypeInfo" Collapsed="true">
-    <Position X="41.5" Y="8.75" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAgAAAAAAIQAAAAAAAAAAAAABAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Utils\ObjectInfo.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="EPI.Comm.Utils.MarshalFieldInfo" Collapsed="true">
-    <Position X="43.5" Y="8.75" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AACAAAAAAAAAIAAAAAAAAAUAAAAAAAAAAYAAAAAAwAA=</HashCode>
-      <FileName>Utils\ObjectInfo.cs</FileName>
-    </TypeIdentifier>
   </Class>
   <Class Name="EPI.Comm.Utils.ObjectUtil" Collapsed="true">
     <Position X="41.5" Y="7.5" Width="1.5" />
@@ -234,15 +191,15 @@
   <Class Name="EPI.Comm.Utils.TypeUtil" Collapsed="true">
     <Position X="43.5" Y="7.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAgAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAEA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Utils\TypeUtil.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="EPI.Comm.UTils.ThreadUtil" Collapsed="true">
+  <Class Name="EPI.Comm.Utils.DelegateUtil" Collapsed="true">
     <Position X="43.5" Y="6.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Utils\ThreadUtil.cs</FileName>
+      <FileName>Utils\DelegateUtil.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="EPI.Comm.CommException" Collapsed="true">
@@ -257,6 +214,28 @@
     <TypeIdentifier>
       <HashCode>AAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>CommBase.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EPI.Comm.Buffers.RefreshBuffer" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="38" Y="1" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACAAAAAAAAAABAAAAAAAAQAAAAAAAAEQABAAABAAAA=</HashCode>
+      <FileName>Buffers\RefreshBuffer.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="EPI.Comm.Utils.MarshalTypeInfo" Collapsed="true">
+    <Position X="41.5" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAgAAgAAAgQgAAAAAAAAAAAAAAAAAAQAAAAAAAAA=</HashCode>
+      <FileName>Utils\MarshalTypeInfo.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EPI.Comm.Utils.MarshalFieldInfo" Collapsed="true">
+    <Position X="43.5" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAIBAAAAAgAgEAAAIAAQAEAAAAAAAAAAAAAAAgAA=</HashCode>
+      <FileName>Utils\MarshalTypeInfo.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Interface Name="EPI.Comm.Buffers.IBuffer" Collapsed="true">
@@ -291,13 +270,6 @@
     <Position X="34" Y="5.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAgAAA=</HashCode>
-      <FileName>Net\Events\PacketEventArgs.cs</FileName>
-    </TypeIdentifier>
-  </Delegate>
-  <Delegate Name="EPI.Comm.Net.Events.SocketReceiveEventHandler" Collapsed="true">
-    <Position X="41.5" Y="6.25" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAABAAAAAQAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Net\Events\PacketEventArgs.cs</FileName>
     </TypeIdentifier>
   </Delegate>

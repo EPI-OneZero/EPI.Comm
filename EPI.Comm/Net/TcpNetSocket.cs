@@ -1,7 +1,6 @@
 ﻿using EPI.Comm.Log;
 using EPI.Comm.Net.Events;
 using EPI.Comm.Utils;
-using EPI.Comm.UTils;
 using System;
 using System.Net;
 using System.Net.Sockets;
@@ -9,17 +8,17 @@ using System.Runtime.InteropServices;
 using static EPI.Comm.CommException;
 namespace EPI.Comm.Net
 {
-    internal class TcpNetSocket
+    internal sealed class TcpNetSocket
     {
         #region Field & Property
         private readonly object SendLock = new object();
         private readonly object ReceiveLock = new object();
         private readonly KeepAlive KeepAliveConfig = new KeepAlive();
-        protected Socket Socket { get; set; }
-        protected byte[] ReceiveBuffer { get; private set; }
-        public bool IsConnected => Socket?.Connected ?? false;
-        public IPEndPoint LocalEndPoint => Socket?.LocalEndPoint as IPEndPoint;
-        public IPEndPoint RemoteEndPoint => Socket?.RemoteEndPoint as IPEndPoint;
+        internal Socket Socket { get; private set; }
+        internal byte[] ReceiveBuffer { get; private set; }
+        public bool IsConnected => Socket != null && Socket.Connected;
+        public IPEndPoint LocalEndPoint { get; private set; }
+        public IPEndPoint RemoteEndPoint { get; private set; }
         private static readonly LingerOption lingerOption = new LingerOption(true, 0);
 
         #endregion
@@ -28,9 +27,11 @@ namespace EPI.Comm.Net
         internal TcpNetSocket(Socket socket, int bufferSize)
         {
             Socket = socket;
+            LocalEndPoint = socket.LocalEndPoint as IPEndPoint;
+            RemoteEndPoint = socket.RemoteEndPoint as IPEndPoint;
             ReceiveBuffer = new byte[bufferSize];
             SetSocketOption(socket);
-            ThreadUtil.Start(ReceiveLoop);
+            DelegateUtil.Start(ReceiveLoop);
         }
 
         #endregion
@@ -46,34 +47,14 @@ namespace EPI.Comm.Net
         }
         private void SetKeepAlive(Socket socket)
         {
-            var size = Marshal.SizeOf<KeepAlive>();
 
             socket.IOControl(IOControlCode.KeepAliveValues, KeepAliveConfig.Generate(), null);
         }
         public void Send(byte[] bytes)
         {
-            try
+            lock (SendLock)
             {
-                lock (SendLock)
-                {
-                    var res = Socket.Send(bytes);
-                }
-            }
-            catch (SocketException e)
-            {
-                throw CreateCommException(e);
-            }
-            catch (ObjectDisposedException e)
-            {
-                throw CreateCommException(e);
-            }
-            catch (NullReferenceException e)
-            {
-                throw CreateCommException(e);
-            }
-            finally
-            {
-                Logger.Default.WriteLineCaller();
+                var res = Socket?.Send(bytes);
             }
 
         }
@@ -82,16 +63,16 @@ namespace EPI.Comm.Net
             try
             {
                 int count = Socket.Receive(ReceiveBuffer);
-                byte[] result = new byte[count];
-                Buffer.BlockCopy(ReceiveBuffer, 0, result, 0, count);
                 if (count <= 0)
                 {
-                    throw CreateCommException($"연결 끊김 수신 바이트 수 :{count}");
+                    throw CreateCommException($"연결 끊김 수신 바이트 수 : {count}");
                 }
+                byte[] result = new byte[count];
+                Buffer.BlockCopy(ReceiveBuffer, 0, result, 0, count);
                 return result;
 
             }
-            catch (NullReferenceException e)
+            catch(NullReferenceException e)
             {
                 throw CreateCommException(e);
             }
@@ -120,7 +101,7 @@ namespace EPI.Comm.Net
                     {
                         recv = Receive();
                     }
-                    Received?.Invoke(this, new SocketReceiveEventArgs(RemoteEndPoint, recv));
+                    Received?.Invoke(this, new PacketEventArgs(RemoteEndPoint, recv));
                 }
                 catch (CommException e) // 연결을 끊었을 때
                 {
@@ -142,13 +123,13 @@ namespace EPI.Comm.Net
         #endregion
 
         #region Event
-        public event SocketReceiveEventHandler Received;
+        public event PacketEventHandler Received;
         public event EventHandler Closed;
         #endregion
     }
     #region KeepAlive
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    internal class KeepAlive
+    internal sealed class KeepAlive
     {
         public uint OnOff = 1;
         public uint IntervalMilliseconds = 3 * 1000;

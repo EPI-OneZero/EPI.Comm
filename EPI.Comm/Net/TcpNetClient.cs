@@ -25,9 +25,9 @@ namespace EPI.Comm.Net
             SendBytes(bytes);
         }
 
-        private protected override void SocketReceived(object sender, SocketReceiveEventArgs e)
+        private protected override void SocketReceived(object sender, PacketEventArgs e)
         {
-            Received?.Invoke(this, new PacketEventArgs(e.From, e.ReceivedBytes));
+            Received?.Invoke(this, e);
         }
         public event PacketEventHandler Received;
         #endregion

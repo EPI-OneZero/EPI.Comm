@@ -11,7 +11,7 @@ namespace EPI.Comm.Net.Generic
         where Theader : new()
     {
         #region Field & Property
-        private List<TcpNetClient<Theader>> clients = new List<TcpNetClient<Theader>>();
+        private readonly List<TcpNetClient<Theader>> clients = new List<TcpNetClient<Theader>>();
         public ClientCollection<Theader> Clients { get; private set; }
         internal Func<Theader, int> GetBodySize { get; private set; }
         #endregion
@@ -51,8 +51,7 @@ namespace EPI.Comm.Net.Generic
         }
         private protected override void OnClientConnected(TcpClientBase client)
         {
-            var newClient = client as TcpNetClient<Theader>;
-            if (IsValidClientType(newClient) && !clients.Contains(newClient))
+            if (client is TcpNetClient<Theader> newClient && !clients.Contains(newClient))
             {
                 AttachClient(newClient);
                 ClientConnected?.Invoke(this, new TcpEventArgs<Theader>(newClient));
@@ -71,8 +70,7 @@ namespace EPI.Comm.Net.Generic
         #region Close
         private protected override void OnClientDisconnected(TcpClientBase client)
         {
-            var oldClient = client as TcpNetClient<Theader>;
-            if (IsValidClientType(oldClient) && clients.Contains(oldClient))
+            if (client is TcpNetClient<Theader> oldClient && clients.Contains(oldClient))
             {
                 DetachClient(oldClient);
                 ClientDisconnected?.Invoke(this, new TcpEventArgs<Theader>(oldClient));
@@ -83,11 +81,7 @@ namespace EPI.Comm.Net.Generic
             clients.Remove(client);
             client.Received -= OnClientReceived;
         }
-        private bool IsValidClientType(TcpClientBase client)
-        {
-            return client is TcpNetClient<Theader>;
-        }
-
+        
         public event TcpEventHandler<Theader> ClientDisconnected;
         #endregion
     }
@@ -96,7 +90,7 @@ namespace EPI.Comm.Net.Generic
        where Theader : new() where Tfooter : new()
     {
         #region Field & Property
-        private List<TcpNetClient<Theader, Tfooter>> clients = new List<TcpNetClient<Theader, Tfooter>>();
+        private readonly List<TcpNetClient<Theader, Tfooter>> clients = new List<TcpNetClient<Theader, Tfooter>>();
         public ClientCollection<Theader, Tfooter> Clients { get; private set; }
         internal Func<Theader, int> GetBodySize { get; private set; }
         #endregion
@@ -106,7 +100,6 @@ namespace EPI.Comm.Net.Generic
         {
             Clients = new ClientCollection<Theader, Tfooter>(clients);
             GetBodySize = getBodySize;
-
         }
         public TcpNetServer(Func<Theader, int> getBodySize) : this(DefaultBufferSize, getBodySize)
         {
@@ -136,8 +129,7 @@ namespace EPI.Comm.Net.Generic
         }
         private protected override void OnClientConnected(TcpClientBase client)
         {
-            var newClient = client as TcpNetClient<Theader, Tfooter>;
-            if (IsValidClientType(newClient) && !clients.Contains(newClient))
+            if (client is TcpNetClient<Theader, Tfooter> newClient && !clients.Contains(newClient))
             {
                 AttachClient(newClient);
                 ClientConnected?.Invoke(this, new TcpEventArgs<Theader, Tfooter>(newClient));
@@ -168,7 +160,7 @@ namespace EPI.Comm.Net.Generic
             clients.Remove(client);
             client.Received -= OnClientReceived;
         }
-        private bool IsValidClientType(TcpClientBase client)
+        private static bool IsValidClientType(TcpClientBase client)
         {
             return client is TcpNetClient<Theader, Tfooter>;
         }

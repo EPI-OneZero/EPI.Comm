@@ -37,17 +37,10 @@ namespace EPI.Comm.Buffers
         public byte[] GetBytes(int count)
         {
 
-            if (buffer == null || buffer.Length < count + offset)
-            {
-                throw new IndexOutOfRangeException("count");
-            }
-            else
-            {
-                var result = new byte[count];
-                Buffer.BlockCopy(buffer, offset, result, 0, count);
-                offset += count;
-                return result;
-            }
+            var result = new byte[count];
+            Buffer.BlockCopy(buffer, offset, result, 0, count);
+            offset += count;
+            return result;
 
         }
         #endregion
