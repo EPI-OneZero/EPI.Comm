@@ -5,35 +5,27 @@ namespace EPI.Comm.Utils
 {
     internal static class PacketSerializer
     {
-        internal static bool IsEnoughSizeToDeserialize(int sourceSize, int targetSize, int srcOffset)
+        internal static bool IsEnoughSizeToDeserialize(int sourceSize, int targetSize)
         {
-            return sourceSize - srcOffset >= targetSize;
+            return sourceSize >= targetSize;
         }
-        internal static T DeserializeByMarshal<T>(byte[] srcBytes, int targetSize, int srcOffset)
+        internal static T DeserializeByMarshal<T>(byte[] srcBytes, int targetSize)
         {
-            if (IsEnoughSizeToDeserialize(srcBytes?.Length ?? 0, targetSize, srcOffset))
-            {
-                var handle = GCHandle.Alloc(srcBytes, GCHandleType.Pinned);
-                var result = Marshal.PtrToStructure<T>(handle.AddrOfPinnedObject() + srcOffset);
-                handle.Free();
-                return result;
-            }
-            else
-            {
-                throw new IndexOutOfRangeException($"{nameof(srcBytes)}");
-            }
+            var handle = GCHandle.Alloc(srcBytes, GCHandleType.Pinned);
+            var result = Marshal.PtrToStructure<T>(handle.AddrOfPinnedObject());
+            handle.Free();
+            return result;
         }
-        internal static bool IsEnoughSizeToSerialize(int sourceSize, int targetSize, int srcOffset)
+        internal static bool IsEnoughSizeToSerialize(int sourceSize, int targetSize, int dstOffset)
         {
-            return sourceSize - srcOffset <= targetSize;
+            return sourceSize <= targetSize - dstOffset;
         }
         internal static void SerializeByMarshal<T>(T src, byte[] dst, int dstOffset, int srcSize)
         {
-            if (IsEnoughSizeToSerialize(srcSize, dst.Length - dstOffset, 0))
+            if (IsEnoughSizeToSerialize(srcSize, dst.Length, dstOffset))
             {
                 var handle = GCHandle.Alloc(dst, GCHandleType.Pinned);
-                var ptr = IntPtr.Add(handle.AddrOfPinnedObject(), dstOffset);
-                Marshal.StructureToPtr(src, ptr, false);
+                Marshal.StructureToPtr(src, handle.AddrOfPinnedObject() + dstOffset, false);
                 handle.Free();
             }
             else

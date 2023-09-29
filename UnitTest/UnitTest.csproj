@@ -63,6 +63,12 @@
   <ItemGroup>
     <Folder Include="Udp\" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\EPI.Comm\EPI.Comm.csproj">
+      <Project>{E765ABE9-2B15-4CB4-9553-57CE2479D6BA}</Project>
+      <Name>EPI.Comm</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

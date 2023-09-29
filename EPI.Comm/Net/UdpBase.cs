@@ -10,26 +10,25 @@ namespace EPI.Comm.Net
 {
     public abstract class UdpBase : CommBase, IDisposable
     {
-        private readonly object startStopLock = new object();
+        private readonly object StartStopLock = new object();
+        private readonly object SendLock = new object();
         public UdpClient UdpClient { get; private set; }
-        private protected IPEndPoint RemoteEndPoint { get; private set; }
+        public IPEndPoint LocalEndPoint => UdpClient?.Client?.LocalEndPoint as IPEndPoint;
+        public IPEndPoint RemoteEndPoint { get; private set; }
         public int BufferSize { get; private set; }
-        protected byte[] ReceiveBuffer { get; private set; }
         private volatile bool isStarted;
 
         public bool IsStarted => isStarted;
         protected UdpBase(int bufferSize)
         {
             BufferSize = bufferSize;
-            ReceiveBuffer = new byte[BufferSize];
         }
         protected UdpBase() : this(DefaultBufferSize)
         {
-
         }
         public void Start(int recvPort, string sendIp, int sendPort)
         {
-            lock (startStopLock)
+            lock (StartStopLock)
             {
                 if(!isStarted)
                 {
@@ -44,7 +43,7 @@ namespace EPI.Comm.Net
         }
         public void Stop()
         {
-            lock (startStopLock)
+            lock (StartStopLock)
             {
                 UdpClient?.Dispose();
                 UdpClient = null;
@@ -54,13 +53,36 @@ namespace EPI.Comm.Net
         }
         public void JoinMulticastGroup(string ip)
         {
-            UdpClient.JoinMulticastGroup(IPAddress.Parse(ip));
-            UdpClient.MulticastLoopback = false;
+            UdpClient?.JoinMulticastGroup(IPAddress.Parse(ip));
+        }
+        public void DropMulticastGroup(string ip)
+        {
+            UdpClient?.DropMulticastGroup(IPAddress.Parse(ip));
         }
 
         public void Send(byte[] bytes)
         {
-            UdpClient?.Send(bytes,bytes.Length,RemoteEndPoint);
+            try
+            {
+                lock (SendLock)
+                {
+                    UdpClient?.Send(bytes, bytes.Length, RemoteEndPoint);
+                }
+            }
+         
+            catch (SocketException )
+            {
+            }
+            catch (ObjectDisposedException)
+            {
+            }
+            catch (NullReferenceException)
+            {
+            }
+            finally
+            {
+                Debug.WriteLine(nameof(Receive));
+            }
         }
         private void Receive()
         {
@@ -93,7 +115,7 @@ namespace EPI.Comm.Net
                 }
                 catch (CommException e)
                 {
-                    //Debug.WriteLine(e.Message);
+                    Debug.WriteLine(e.Message);
                     break;
                 }
             }

@@ -51,5 +51,11 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\EPI.Comm\EPI.Comm.csproj">
+      <Project>{e765abe9-2b15-4cb4-9553-57ce2479d6ba}</Project>
+      <Name>EPI.Comm</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -66,9 +66,9 @@ namespace EPI.Comm.Buffers
 
         public void Clear()
         {
-            throw new NotImplementedException();
+            buffer = new byte[0];
+            offset = 0;
         }
         #endregion
     }
-
 }

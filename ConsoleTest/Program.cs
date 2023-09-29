@@ -1,6 +1,4 @@
-﻿using EPI.Comm.Net;
-using EPI.Comm.Utils;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Net;
@@ -8,6 +6,8 @@ using System.Net.Sockets;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using EPI.Comm.Net;
+using EPI.Comm.Utils;
 
 namespace ConsoleTest
 {
@@ -35,39 +35,16 @@ namespace ConsoleTest
         {
             int x = 1;
 
-            var fields = TypeUtil.GetFields(typeof(DateTime));
+            var fields = TypeUtil.GetFields(typeof(int[]));
             foreach (var field in fields) 
             {
                 PrintInfo(field);
-                Console.WriteLine(field.GetValue(DateTime.MinValue));
-                Console.WriteLine(field.GetValue(DateTime.MaxValue));
             }
         }
         private static void PrintInfo(FieldInfo field)
         {
             Console.WriteLine(field.Name);
             Console.WriteLine(field.FieldType.Name);
-        }
-    }
-    class DServer : TcpServerBase
-    {
-        public DServer(int bufferSize) : base(bufferSize)
-        {
-        }
-
-        internal override TcpClientBase CreateClient(TcpClient client)
-        {
-            throw new NotImplementedException();
-        }
-
-        internal override void OnClientConnected(TcpClientBase client)
-        {
-            throw new NotImplementedException();
-        }
-
-        internal override void OnClientDisconnected(TcpClientBase client)
-        {
-            throw new NotImplementedException();
         }
     }
 }

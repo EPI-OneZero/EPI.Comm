@@ -78,7 +78,7 @@ namespace EPI.Comm.Net
             }
             catch (CommException e)
             {
-                //Debug.WriteLine(e.Message);
+                Debug.WriteLine(e.Message);
             }
         }
         private protected abstract void SocketReceived(object sender, SocketReceiveEventArgs e);
@@ -105,12 +105,12 @@ namespace EPI.Comm.Net
                         TcpClient?.Dispose();
                         TcpClient = null;
                         RunAutoConnectIfUserWant();
-                        //Debug.WriteLine(e.Message);
+                        Debug.WriteLine(e.Message);
                     }
                     finally
                     {
                         isConnecting = false;
-                        //Debug.WriteLine(nameof(Connect));
+                        Debug.WriteLine(nameof(Connect));
                     }
                 }
             }
@@ -139,7 +139,7 @@ namespace EPI.Comm.Net
             }
             finally
             {
-                //Debug.WriteLine($"{nameof(IsConnected)} : {IsConnected}");
+                Debug.WriteLine($"{nameof(IsConnected)} : {IsConnected}");
             }
         }
 

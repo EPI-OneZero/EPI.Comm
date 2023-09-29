@@ -74,7 +74,7 @@ namespace EPI.Comm.Net
             }
             finally
             {
-                //Debug.WriteLine(nameof(Receive));
+                Debug.WriteLine(nameof(Receive));
             }
 
         }
@@ -106,7 +106,7 @@ namespace EPI.Comm.Net
             }
             finally
             {
-                //Debug.WriteLine(nameof(Receive));
+                Debug.WriteLine(nameof(Receive));
             }
 
         }
@@ -131,7 +131,7 @@ namespace EPI.Comm.Net
                 }
                 finally
                 {
-                    //Debug.WriteLine(nameof(ReceiveLoop));
+                    Debug.WriteLine(nameof(ReceiveLoop));
                 }
 
             }

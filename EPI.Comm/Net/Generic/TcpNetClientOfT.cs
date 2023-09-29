@@ -8,7 +8,7 @@ using System.Net.Sockets;
 
 namespace EPI.Comm.Net.Generic
 {
-   
+
     public class TcpNetClient<Theader> : TcpClientBase, IComm<Theader>
         where Theader : new()
     {
@@ -50,12 +50,13 @@ namespace EPI.Comm.Net.Generic
             GetBodySize = getBodySize;
             Packet = new Packet<Theader>(GetBodySize);
             HeaderSize = TypeUtil.SizeOf<Theader>();
-            
+
         }
         public void Send(Theader header, byte[] body)
         {
             var headerDefinedBodySize = GetBodySize?.Invoke(header) ?? 0;
-            var fullPacketBytes = Packet<Theader>.GeneratePacketBytes(header,body,HeaderSize,headerDefinedBodySize);
+            var packet = new Packet<Theader>(header, body, GetBodySize);
+            var fullPacketBytes = packet.SerializePacket();
             SendBytes(fullPacketBytes);
         }
         private protected override void SocketReceived(object sender, SocketReceiveEventArgs e)
@@ -79,10 +80,6 @@ namespace EPI.Comm.Net.Generic
         #endregion
     }
 
-    /// <summary>
-    /// </summary>
-    /// <typeparam name="Theader">Marshal.SizeOf 가능 및 StructLayout Sequential 확인 필수</typeparam>
-    /// <typeparam name="Tfooter">Marshal.SizeOf 가능 및 StructLayout Sequential 확인 필수</typeparam>
     public class TcpNetClient<Theader, Tfooter> : TcpClientBase, IComm<Theader, Tfooter>
         where Theader : new()
     {
@@ -115,7 +112,7 @@ namespace EPI.Comm.Net.Generic
             Packet = new Packet<Theader, Tfooter>(GetBodySize);
             HeaderSize = TypeUtil.SizeOf<Theader>();
             FooterSize = TypeUtil.SizeOf<Tfooter>();
-           
+
         }
         private protected override void OnSocketDisconnected()
         {
@@ -130,7 +127,8 @@ namespace EPI.Comm.Net.Generic
         public void Send(Theader header, byte[] body, Tfooter footer)
         {
             var headerDefinedBodySize = GetBodySize?.Invoke(header) ?? 0;
-            var fullPacketBytes = Packet<Theader, Tfooter>.GeneratePacketBytes(header, body, footer, HeaderSize, headerDefinedBodySize, FooterSize);
+            var packet = new Packet<Theader, Tfooter>(header,body,footer,GetBodySize);
+            var fullPacketBytes = packet.SerializePacket();
 
             SendBytes(fullPacketBytes);
         }
@@ -143,7 +141,7 @@ namespace EPI.Comm.Net.Generic
                 {
 
                     var packet = Packet;
-                  
+
                     Received?.Invoke(this, new PacketEventArgs<Theader, Tfooter>(e.From, packet));
                     Packet = new Packet<Theader, Tfooter>(GetBodySize);
                 }

@@ -83,53 +83,29 @@ namespace CommSample.Sample.Packet1
         private volatile int count = 0;
         private DateTime time;
 
-           
         private void Button_Click1(object sender, RoutedEventArgs e)
         {
-
-
-            //MyHeader header = new MyHeader()
-            //{
-            //    src = 1,
-            //    dst = 2,
-            //    code = 3,
-            //    size = 32,
-            //};
-            //byte[] data = new byte[]
-            //{
-            //1, 2, 3, 4,
-            //1, 2, 3, 4,
-            //1, 2, 3, 4,
-            //1, 2, 3, 4,
-
-            //1, 2, 3, 4,
-            //1, 2, 3, 4,
-            //1, 2, 3, 4,
-            //1, 2, 3, 4,
-
-            //  };
-            //client.Send(header, data);
-            // Console.WriteLine("ii: " + i);
-            client.SendBytes(new byte[]
+            MyHeader header = new MyHeader()
             {
-                1,0,0,0,
-                2,0,0,0,
-                3,0,0,0,
-                32,0,0,0,
+                src = 1,
+                dst = 2,
+                code = 3,
+                size = 32,
+            };
+            byte[] data = new byte[]
+            {
+                1, 2, 3, 4,
+                1, 2, 3, 4,
+                1, 2, 3, 4,
+                1, 2, 3, 4,
 
-                1,2,3,4,
-                1,2,3,4,
-                1,2,3,4,
-                1,2,3,4,
+                1, 2, 3, 4,
+                1, 2, 3, 4,
+                1, 2, 3, 4,
+                1, 2, 3, 4,
 
-                1,2,3,4,
-                1,2,3,4,
-                1,2,3,4,
-                1,2,3,4,
-            });
-
-
-
+            };
+            client.Send(header, data);
         }
     }
 }

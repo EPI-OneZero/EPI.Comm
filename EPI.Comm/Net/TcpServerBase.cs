@@ -57,9 +57,6 @@ namespace EPI.Comm.Net
       
 
         #region StartStop
-        /// <summary>
-        ///  서버가 클라이언트를 Accept 시작
-        /// </summary>
         public void StartListen(int port)
         {
             lock (startStopLock)
@@ -75,9 +72,6 @@ namespace EPI.Comm.Net
            
             
         }
-        /// <summary>
-        /// 서버가 클라이언트를 Accept 중지, 및 모든 연결 해제
-        /// </summary>
         public void Stop()
         {
             lock (startStopLock)
@@ -124,7 +118,7 @@ namespace EPI.Comm.Net
                     }
                     catch (CommException e)
                     {
-                        //Debug.WriteLine(e.Message);
+                        Debug.WriteLine(e.Message);
                         if (!isListening)
                         {
                             break;
@@ -132,7 +126,7 @@ namespace EPI.Comm.Net
                     }
                     finally
                     {
-                        //Debug.WriteLine(nameof(AcceptLoop));
+                        Debug.WriteLine(nameof(AcceptLoop));
                     }
                 }
                 acceptLoopingOn = false;
@@ -167,7 +161,7 @@ namespace EPI.Comm.Net
             }
             finally
             {
-                //Debug.WriteLine(nameof(Accept));
+                Debug.WriteLine(nameof(Accept));
             }
         }
         private void WaitAcceptLoopFinish()

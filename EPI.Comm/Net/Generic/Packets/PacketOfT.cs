@@ -6,6 +6,7 @@ namespace EPI.Comm.Net.Generic.Packets
 {
     public class Packet<Theader>
     {
+        #region Field & Property
         private protected QueueBuffer queue;
         private enum DeserializeState
         {
@@ -20,13 +21,23 @@ namespace EPI.Comm.Net.Generic.Packets
         public int BodySize => Body?.Length ?? 0;
         public virtual int FullSize => HeaderSize + BodySize;
         public Func<Theader, int> GetBodySize { get; set; }
-        internal Packet(Func<Theader, int> getBodySize)
+        #endregion
+        #region CTOR
+        internal Packet(Func<Theader, int> getBodySize) : this(default(Theader), null, getBodySize)
+        {
+
+        }
+        internal Packet(Theader header, byte[] body, Func<Theader, int> getBodySize)
         {
             GetBodySize = getBodySize;
             HeaderSize = TypeUtil.SizeOf<Theader>();
             queue = new QueueBuffer();
+            Header = header;
+            Body = body;
         }
-        private int CalculateBodySize()
+        #endregion
+        #region Method
+        protected int CalculateBodySize()
         {
             return GetBodySize?.Invoke(Header) ?? 0;
         }
@@ -60,11 +71,11 @@ namespace EPI.Comm.Net.Generic.Packets
         }
         private bool TryDeserializeHeader(IBuffer buffer)
         {
-            if (IsEnoughSizeToDeserialize(buffer.Count, HeaderSize, 0))
+            if (IsEnoughSizeToDeserialize(buffer.Count, HeaderSize))
             {
                 var bytes = buffer.GetBytes(HeaderSize);
                 queue.AddBytes(bytes);
-                Header = DeserializeByMarshal<Theader>(bytes, HeaderSize, 0);
+                Header = DeserializeByMarshal<Theader>(bytes, HeaderSize);
                 state = DeserializeState.HeaderCompleted;
                 return true;
             }
@@ -75,7 +86,7 @@ namespace EPI.Comm.Net.Generic.Packets
         }
         private bool TryDeserializeBody(IBuffer buffer, int bodySize)
         {
-            if (IsEnoughSizeToDeserialize(buffer.Count, bodySize, 0))
+            if (IsEnoughSizeToDeserialize(buffer.Count, bodySize))
             {
                 var bytes = buffer.GetBytes(bodySize);
                 queue.AddBytes(bytes);
@@ -88,37 +99,47 @@ namespace EPI.Comm.Net.Generic.Packets
                 return false;
             }
         }
-        internal static byte[] GeneratePacketBytes(Theader header, byte[] body, int headerSize, int headerDefinedBodySize)
+        internal virtual byte[] SerializePacket()
         {
-            if (headerDefinedBodySize == body.Length)
+            int bodySize = Body.Length;
+            var headerDefinedBodySize = CalculateBodySize();
+            if (headerDefinedBodySize == bodySize)
             {
-                var fullPacketBytes = new byte[headerSize + body.Length];
-                SerializeByMarshal(header, fullPacketBytes, 0, headerSize);
-                Buffer.BlockCopy(body, 0, fullPacketBytes, headerSize, body.Length);
+                var fullPacketBytes = new byte[FullSize];
+                SerializeByMarshal(Header, fullPacketBytes, 0, HeaderSize);
+                Buffer.BlockCopy(Body, 0, fullPacketBytes, HeaderSize, bodySize);
                 return fullPacketBytes;
             }
             else
             {
                 throw new ArgumentOutOfRangeException
-                    ($"Body length isdiffers from header definition.\r\n body length :{body.Length}, header definition : {headerDefinedBodySize}");
+                    ($"Body length is differs from header definition.\r\n body length :{BodySize}, header definition : {headerDefinedBodySize}");
             }
-        }
 
+        }
+        #endregion
     }
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <typeparam name="Theader"></typeparam>
-    /// <typeparam name="Tfooter"></typeparam>
     public sealed class Packet<Theader, Tfooter> : Packet<Theader>
     {
+        #region Field & Property
         public override int FullSize => base.FullSize + FooterSize;
         public Tfooter Footer { get; private set; }
         public int FooterSize { get; private set; }
-        internal Packet(Func<Theader, int> getBodySize) : base(getBodySize)
+        #endregion
+        #region CTOR
+
+        internal Packet(Func<Theader, int> getBodySize) : this(default(Theader), null, default(Tfooter), getBodySize)
         {
+
+        }
+        internal Packet(Theader header, byte[] body, Tfooter footer, Func<Theader, int> getBodySize) : base(header, body, getBodySize)
+        {
+            Footer = footer;
             FooterSize = TypeUtil.SizeOf<Tfooter>();
         }
+        #endregion
+
+        #region Method
         private protected override bool TryDeserializePacket(IBuffer buffer)
         {
             if (base.TryDeserializePacket(buffer))
@@ -132,11 +153,11 @@ namespace EPI.Comm.Net.Generic.Packets
         }
         private bool TryDeserializeFooter(IBuffer buffer)
         {
-            if (IsEnoughSizeToDeserialize(buffer.Count, FooterSize, 0))
+            if (IsEnoughSizeToDeserialize(buffer.Count, FooterSize))
             {
                 var bytes = buffer.GetBytes(FooterSize);
                 queue.AddBytes(bytes);
-                Footer = DeserializeByMarshal<Tfooter>(bytes, FooterSize, 0);
+                Footer = DeserializeByMarshal<Tfooter>(bytes, FooterSize);
                 return true;
             }
             else
@@ -144,24 +165,12 @@ namespace EPI.Comm.Net.Generic.Packets
                 return false;
             }
         }
-        internal static byte[] GeneratePacketBytes(Theader header, byte[] body, Tfooter footer, int headerSize, int headerDefinedBodySize, int footerSize)
+        internal override byte[] SerializePacket()
         {
-            int bodySize = body.Length;
-
-            if (headerDefinedBodySize == body.Length)
-            {
-                var fullPacketBytes = new byte[headerSize + bodySize + footerSize];
-                SerializeByMarshal(header, fullPacketBytes, 0, headerSize);
-                Buffer.BlockCopy(body, 0, fullPacketBytes, headerSize, bodySize);
-                SerializeByMarshal(footer, fullPacketBytes, headerSize + bodySize, footerSize);
-                return fullPacketBytes;
-            }
-            else
-            {
-                throw new ArgumentOutOfRangeException
-                    ($"Body length is differs from header definition.\r\n body length :{body.Length}, header definition : {headerDefinedBodySize}");
-            }
-           
+            var fullPacketBytes = base.SerializePacket();
+            SerializeByMarshal(Footer, fullPacketBytes, HeaderSize + BodySize, FooterSize);
+            return fullPacketBytes;
         }
+        #endregion
     }
 }
