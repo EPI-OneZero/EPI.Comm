@@ -139,7 +139,7 @@ namespace EPI.Comm.Net
         {
             var size = Marshal.SizeOf<KeepAlive>();
             var result = new byte[size];
-            PacketSerializer.SerializeByMarshal(this, result, 0, size);
+            MarshalSerializer.Serialize(this, result, 0, size);
             return result;
         }
     }

@@ -3,13 +3,13 @@ using System.Runtime.InteropServices;
 
 namespace EPI.Comm.Utils
 {
-    internal static class PacketSerializer
+    internal static class MarshalSerializer
     {
         internal static bool IsEnoughSizeToDeserialize(int sourceSize, int targetSize)
         {
             return sourceSize >= targetSize;
         }
-        internal static T DeserializeByMarshal<T>(byte[] srcBytes)
+        internal static T Deserialize<T>(byte[] srcBytes)
         {
             var handle = GCHandle.Alloc(srcBytes, GCHandleType.Pinned);
             var result = Marshal.PtrToStructure<T>(handle.AddrOfPinnedObject());
@@ -20,12 +20,13 @@ namespace EPI.Comm.Utils
         {
             return sourceSize <= targetSize - dstOffset;
         }
-        internal static void SerializeByMarshal<T>(T src, byte[] dst, int dstOffset, int srcSize)
+        internal static void Serialize<T>(T src, byte[] dst, int dstOffset, int srcSize)
         {
             if (IsEnoughSizeToSerialize(srcSize, dst.Length, dstOffset))
             {
                 var handle = GCHandle.Alloc(dst, GCHandleType.Pinned);
                 Marshal.StructureToPtr(src, handle.AddrOfPinnedObject() + dstOffset, false);
+                Marshal.DestroyStructure(handle.AddrOfPinnedObject() + dstOffset, typeof(T));
                 handle.Free();
             }
             else

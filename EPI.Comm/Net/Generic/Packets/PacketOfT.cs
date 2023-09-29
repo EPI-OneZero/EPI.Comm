@@ -2,7 +2,7 @@
 using EPI.Comm.Utils;
 using System;
 using System.Runtime.InteropServices;
-using static EPI.Comm.Utils.PacketSerializer;
+using static EPI.Comm.Utils.MarshalSerializer;
 namespace EPI.Comm.Net.Generic.Packets
 {
     public class Packet<Theader>
@@ -78,7 +78,7 @@ namespace EPI.Comm.Net.Generic.Packets
             {
                 var bytes = buffer.GetBytes(HeaderSize);
                 queue.AddBytes(bytes);
-                Header = DeserializeByMarshal<Theader>(bytes);
+                Header = Deserialize<Theader>(bytes);
                 state = DeserializeState.HeaderCompleted;
                 return true;
             }
@@ -110,7 +110,7 @@ namespace EPI.Comm.Net.Generic.Packets
             if (headerDefinedBodySize == bodySize)
             {
                 var fullPacketBytes = new byte[FullSize];
-                SerializeByMarshal(Header, fullPacketBytes, 0, HeaderSize);
+                Serialize(Header, fullPacketBytes, 0, HeaderSize);
                 Buffer.BlockCopy(Body, 0, fullPacketBytes, HeaderSize, bodySize);
                 return fullPacketBytes;
             }
@@ -162,7 +162,7 @@ namespace EPI.Comm.Net.Generic.Packets
             {
                 var bytes = buffer.GetBytes(FooterSize);
                 queue.AddBytes(bytes);
-                Footer = DeserializeByMarshal<Tfooter>(bytes);
+                Footer = Deserialize<Tfooter>(bytes);
                 return true;
             }
             else
@@ -173,7 +173,7 @@ namespace EPI.Comm.Net.Generic.Packets
         internal override byte[] SerializePacket()
         {
             var fullPacketBytes = base.SerializePacket();
-            SerializeByMarshal(Footer, fullPacketBytes, HeaderSize + BodySize, FooterSize);
+            Serialize(Footer, fullPacketBytes, HeaderSize + BodySize, FooterSize);
             return fullPacketBytes;
         }
         #endregion
