@@ -23,7 +23,7 @@ namespace EPI.Comm.Net.Generic.Packets
         internal Packet(Func<Theader, int> getBodySize)
         {
             GetBodySize = getBodySize;
-            HeaderSize = ObjectUtil.SizeOf<Theader>();
+            HeaderSize = TypeUtil.SizeOf<Theader>();
             queue = new QueueBuffer();
         }
         private int CalculateBodySize()
@@ -117,7 +117,7 @@ namespace EPI.Comm.Net.Generic.Packets
         public int FooterSize { get; private set; }
         internal Packet(Func<Theader, int> getBodySize) : base(getBodySize)
         {
-            FooterSize = ObjectUtil.SizeOf<Tfooter>();
+            FooterSize = TypeUtil.SizeOf<Tfooter>();
         }
         private protected override bool TryDeserializePacket(IBuffer buffer)
         {
@@ -144,7 +144,6 @@ namespace EPI.Comm.Net.Generic.Packets
                 return false;
             }
         }
-
         internal static byte[] GeneratePacketBytes(Theader header, byte[] body, Tfooter footer, int headerSize, int headerDefinedBodySize, int footerSize)
         {
             int bodySize = body.Length;
@@ -160,7 +159,7 @@ namespace EPI.Comm.Net.Generic.Packets
             else
             {
                 throw new ArgumentOutOfRangeException
-                    ($"Body length isdiffers from header definition.\r\n body length :{body.Length}, header definition : {headerDefinedBodySize}");
+                    ($"Body length is differs from header definition.\r\n body length :{body.Length}, header definition : {headerDefinedBodySize}");
             }
            
         }

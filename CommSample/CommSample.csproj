@@ -117,12 +117,6 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\EPI.Comm\EPI.Comm.csproj">
-      <Project>{79C7C12F-0FDC-4390-88EC-45EF900CC770}</Project>
-      <Name>EPI.Comm</Name>
-    </ProjectReference>
-  </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

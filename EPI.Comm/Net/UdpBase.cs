@@ -13,7 +13,6 @@ namespace EPI.Comm.Net
         private readonly object startStopLock = new object();
         public UdpClient UdpClient { get; private set; }
         private protected IPEndPoint RemoteEndPoint { get; private set; }
-
         public int BufferSize { get; private set; }
         protected byte[] ReceiveBuffer { get; private set; }
         private volatile bool isStarted;

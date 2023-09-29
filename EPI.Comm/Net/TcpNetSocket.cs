@@ -15,7 +15,7 @@ namespace EPI.Comm.Net
         #region Field & Property
         private readonly object SendLock = new object();
         private readonly object ReceiveLock = new object();
-
+        private readonly KeepAlive KeepAliveConfig = new KeepAlive();
         protected Socket Socket { get; set; }
         protected byte[] ReceiveBuffer { get;private set; }
         public bool IsConnected => Socket?.Connected ?? false;
@@ -43,9 +43,14 @@ namespace EPI.Comm.Net
             socket.SendBufferSize = ReceiveBuffer.Length;
             socket.NoDelay = true;
             socket.LingerState = lingerOption;
-
+            SetKeepAlive(socket);
         }
+        private void SetKeepAlive(Socket socket)
+        {
+            var size = Marshal.SizeOf<KeepAlive>();
 
+            socket.IOControl(IOControlCode.KeepAliveValues, KeepAliveConfig.Generate(), null);
+        }
         public void Send(byte[] bytes)
         {
             try

@@ -8,12 +8,7 @@ using System.Net.Sockets;
 
 namespace EPI.Comm.Net.Generic
 {
-    /// <summary>
-    /// 
-    /// 
-    /// 
-    /// </summary>
-    /// <typeparam name="Theader">Marshal.SizeOf 가능 및 StructLayout Sequential 확인 필수</typeparam>
+   
     public class TcpNetClient<Theader> : TcpClientBase, IComm<Theader>
         where Theader : new()
     {
@@ -26,7 +21,7 @@ namespace EPI.Comm.Net.Generic
         #region CTOR
         public TcpNetClient(int bufferSize, Func<Theader, int> getBodySize) : base(bufferSize)
         {
-            HeaderSize = ObjectUtil.SizeOf<Theader>();
+            HeaderSize = TypeUtil.SizeOf<Theader>();
             GetBodySize = getBodySize;
         }
         public TcpNetClient(Func<Theader, int> getBodySize) : this(DefaultBufferSize, getBodySize)
@@ -54,7 +49,7 @@ namespace EPI.Comm.Net.Generic
         {
             GetBodySize = getBodySize;
             Packet = new Packet<Theader>(GetBodySize);
-            HeaderSize = ObjectUtil.SizeOf<Theader>();
+            HeaderSize = TypeUtil.SizeOf<Theader>();
             
         }
         public void Send(Theader header, byte[] body)
@@ -98,6 +93,7 @@ namespace EPI.Comm.Net.Generic
         private Packet<Theader, Tfooter> Packet { get; set; }
         internal Func<Theader, int> GetBodySize { get; private set; }
         #endregion
+
         #region CTOR
         public TcpNetClient(int bufferSize, Func<Theader, int> getBodySize) : base(bufferSize)
         {
@@ -111,13 +107,14 @@ namespace EPI.Comm.Net.Generic
             SetPacketProperties(getBodySize);
         }
         #endregion
+
         #region Method & Event
         private void SetPacketProperties(Func<Theader, int> getBodySize)
         {
             GetBodySize = getBodySize;
             Packet = new Packet<Theader, Tfooter>(GetBodySize);
-            HeaderSize = ObjectUtil.SizeOf<Theader>();
-            FooterSize = ObjectUtil.SizeOf<Tfooter>();
+            HeaderSize = TypeUtil.SizeOf<Theader>();
+            FooterSize = TypeUtil.SizeOf<Tfooter>();
            
         }
         private protected override void OnSocketDisconnected()

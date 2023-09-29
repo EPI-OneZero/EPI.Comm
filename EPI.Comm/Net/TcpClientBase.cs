@@ -13,7 +13,7 @@ namespace EPI.Comm.Net
     {
         #region Field & Property
         private readonly object ConnectLock = new object();
-        private readonly KeepAlive KeepAliveConfig = new KeepAlive();
+        
         protected TcpClient TcpClient { get; set; }
         internal TcpNetSocket NetSocket { get; private set; }
         public int BufferSize { get; private set; }
@@ -53,19 +53,12 @@ namespace EPI.Comm.Net
         #region Socket Attach Detach
         private void AttachSocket(Socket client)
         {
-            SetKeepAlive(client);
             NetSocket = new TcpNetSocket(client, BufferSize);
             NetSocket.Received += SocketReceived;
             NetSocket.Closed += SocketClosed;
         }
       
-        private void SetKeepAlive(Socket socket)
-        {
-            var size = Marshal.SizeOf<KeepAlive>();
-            var result = new byte[size];
-
-            socket.IOControl(IOControlCode.KeepAliveValues, KeepAliveConfig.Generate(), result);
-        }
+       
         private void DetachSocket()
         {
             if (NetSocket != null)
