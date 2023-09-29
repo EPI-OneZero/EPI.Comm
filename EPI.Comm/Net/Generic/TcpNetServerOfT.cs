@@ -1,11 +1,9 @@
-﻿using EPI.Comm.Buffers;
-using EPI.Comm.Net.Generic.Events;
-using EPI.Comm.Net.Generic.Packets;
+﻿using EPI.Comm.Net.Generic.Events;
 using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Threading.Tasks;
-
+using static EPI.Comm.CommConfig;
 namespace EPI.Comm.Net.Generic
 {
 
@@ -57,7 +55,7 @@ namespace EPI.Comm.Net.Generic
             if (IsValidClientType(newClient) && !clients.Contains(newClient))
             {
                 AttachClient(newClient);
-                ClientAccpeted?.Invoke(this, new TcpEventArgs<Theader>(newClient));
+                ClientConnected?.Invoke(this, new TcpEventArgs<Theader>(newClient));
             }
         }
         private void AttachClient(TcpNetClient<Theader> client)
@@ -66,13 +64,11 @@ namespace EPI.Comm.Net.Generic
             client.Received += OnClientReceived;
 
         }
-        public event TcpEventHandler<Theader> ClientAccpeted;
+        public event TcpEventHandler<Theader> ClientConnected;
 
         #endregion
 
         #region Close
-
-
         private protected override void OnClientDisconnected(TcpClientBase client)
         {
             var oldClient = client as TcpNetClient<Theader>;
@@ -94,13 +90,6 @@ namespace EPI.Comm.Net.Generic
 
         public event TcpEventHandler<Theader> ClientDisconnected;
         #endregion
-
-        #region Event
-
-
-        #endregion
-
-
     }
 
     public class TcpNetServer<Theader, Tfooter> : TcpServerBase, IComm<Theader, Tfooter>
@@ -151,7 +140,7 @@ namespace EPI.Comm.Net.Generic
             if (IsValidClientType(newClient) && !clients.Contains(newClient))
             {
                 AttachClient(newClient);
-                ClientAccpeted?.Invoke(this, new TcpEventArgs<Theader, Tfooter>(newClient));
+                ClientConnected?.Invoke(this, new TcpEventArgs<Theader, Tfooter>(newClient));
             }
         }
         private void AttachClient(TcpNetClient<Theader, Tfooter> client)
@@ -160,7 +149,7 @@ namespace EPI.Comm.Net.Generic
             client.Received += OnClientReceived;
 
         }
-        public event TcpEventHandler<Theader, Tfooter> ClientAccpeted;
+        public event TcpEventHandler<Theader, Tfooter> ClientConnected;
 
         #endregion
 

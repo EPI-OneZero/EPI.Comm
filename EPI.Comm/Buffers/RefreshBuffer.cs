@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace EPI.Comm.Buffers
 {
-    
+
     internal class RefreshBuffer : IBuffer
     {
         protected byte[] buffer;

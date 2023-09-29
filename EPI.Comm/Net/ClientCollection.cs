@@ -10,6 +10,6 @@ namespace EPI.Comm.Net
         internal ClientCollection(IList<TcpNetClient> list) : base(list)
         {
         }
-        public TcpNetClient this[IPEndPoint remoteEndpoint] =>  this.FirstOrDefault(c=> c?.RemoteEndPoint == remoteEndpoint);
+        public TcpNetClient this[IPEndPoint remoteEndpoint] => this.FirstOrDefault(c => c?.RemoteEndPoint == remoteEndpoint);
     }
 }

@@ -6,9 +6,9 @@ namespace EPI.Comm.UTils
     internal static class ThreadUtil
     {
 
-        public static Thread Start(Action action)
+        public static Thread Start(ThreadStart start)
         {
-            var thread = new Thread(new ThreadStart(action));
+            var thread = new Thread(start);
             thread.Start();
             return thread;
         }

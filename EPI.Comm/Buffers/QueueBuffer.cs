@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-
+using static EPI.Comm.CommConfig;
 namespace EPI.Comm.Buffers
 {
-    
+
     internal class QueueBuffer : IBuffer
     {
         #region Field & Property
@@ -16,7 +16,7 @@ namespace EPI.Comm.Buffers
         #endregion
 
         #region CTOR
-        public QueueBuffer() : this(CommBase.DefaultBufferSize)
+        public QueueBuffer() : this(DefaultBufferSize)
         {
 
         }

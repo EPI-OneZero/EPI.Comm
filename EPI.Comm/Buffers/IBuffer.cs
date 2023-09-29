@@ -2,7 +2,7 @@
 
 namespace EPI.Comm.Buffers
 {
-   
+
     internal interface IBuffer : IEnumerable<byte>
     {
         int Count { get; }

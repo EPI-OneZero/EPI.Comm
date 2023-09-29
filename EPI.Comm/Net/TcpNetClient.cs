@@ -1,7 +1,6 @@
 ﻿using EPI.Comm.Net.Events;
-using System.Diagnostics;
 using System.Net.Sockets;
-
+using static EPI.Comm.CommConfig;
 namespace EPI.Comm.Net
 {
     public class TcpNetClient : TcpClientBase, IComm

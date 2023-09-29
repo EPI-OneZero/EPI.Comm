@@ -61,6 +61,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Endian\" />
     <Folder Include="Udp\" />
   </ItemGroup>
   <ItemGroup>

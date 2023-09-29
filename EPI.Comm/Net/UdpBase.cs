@@ -1,14 +1,13 @@
-﻿using EPI.Comm.Net.Events;
+﻿using EPI.Comm.Log;
+using EPI.Comm.Net.Events;
 using EPI.Comm.UTils;
 using System;
-using System.Diagnostics;
-using System.Diagnostics.Contracts;
 using System.Net;
 using System.Net.Sockets;
-
+using static EPI.Comm.CommConfig;
 namespace EPI.Comm.Net
 {
-    public abstract class UdpBase : CommBase, IDisposable
+    public abstract class UdpBase : IDisposable
     {
         private readonly object StartStopLock = new object();
         private readonly object SendLock = new object();
@@ -30,7 +29,7 @@ namespace EPI.Comm.Net
         {
             lock (StartStopLock)
             {
-                if(!isStarted)
+                if (!isStarted)
                 {
                     UdpClient = new UdpClient(new IPEndPoint(IPAddress.Any, recvPort));
                     RemoteEndPoint = new IPEndPoint(IPAddress.Parse(sendIp), sendPort);
@@ -49,7 +48,7 @@ namespace EPI.Comm.Net
                 UdpClient = null;
                 isStarted = false;
             }
-          
+
         }
         public void JoinMulticastGroup(string ip)
         {
@@ -69,8 +68,8 @@ namespace EPI.Comm.Net
                     UdpClient?.Send(bytes, bytes.Length, RemoteEndPoint);
                 }
             }
-         
-            catch (SocketException )
+
+            catch (SocketException)
             {
             }
             catch (ObjectDisposedException)
@@ -81,7 +80,7 @@ namespace EPI.Comm.Net
             }
             finally
             {
-                Debug.WriteLine(nameof(Receive));
+                Logger.Default.WriteLineCaller();
             }
         }
         private void Receive()
@@ -96,7 +95,7 @@ namespace EPI.Comm.Net
             {
                 throw CommException.CreateCommException(e);
             }
-            catch(NullReferenceException e)
+            catch (NullReferenceException e)
             {
                 throw CommException.CreateCommException(e);
             }
@@ -115,11 +114,11 @@ namespace EPI.Comm.Net
                 }
                 catch (CommException e)
                 {
-                    Debug.WriteLine(e.Message);
+                    Logger.Default.WriteLine(e.Message);
                     break;
                 }
             }
-           
+
         }
         private protected abstract void OnReceived(SocketReceiveEventArgs e);
         #region IDISPOSE
@@ -129,7 +128,7 @@ namespace EPI.Comm.Net
             if (!disposedValue)
             {
                 if (disposing)
-                {  
+                {
                     Stop();
                 }
 

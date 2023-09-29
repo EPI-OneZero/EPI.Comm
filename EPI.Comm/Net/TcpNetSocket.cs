@@ -1,23 +1,22 @@
-﻿using EPI.Comm.Net.Events;
+﻿using EPI.Comm.Log;
+using EPI.Comm.Net.Events;
 using EPI.Comm.Utils;
 using EPI.Comm.UTils;
 using System;
-using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using static EPI.Comm.CommException;
-
 namespace EPI.Comm.Net
 {
-    internal class TcpNetSocket : CommBase
+    internal class TcpNetSocket
     {
         #region Field & Property
         private readonly object SendLock = new object();
         private readonly object ReceiveLock = new object();
         private readonly KeepAlive KeepAliveConfig = new KeepAlive();
         protected Socket Socket { get; set; }
-        protected byte[] ReceiveBuffer { get;private set; }
+        protected byte[] ReceiveBuffer { get; private set; }
         public bool IsConnected => Socket?.Connected ?? false;
         public IPEndPoint LocalEndPoint => Socket?.LocalEndPoint as IPEndPoint;
         public IPEndPoint RemoteEndPoint => Socket?.RemoteEndPoint as IPEndPoint;
@@ -57,7 +56,7 @@ namespace EPI.Comm.Net
             {
                 lock (SendLock)
                 {
-                   var res= Socket.Send(bytes);
+                    var res = Socket.Send(bytes);
                 }
             }
             catch (SocketException e)
@@ -68,13 +67,13 @@ namespace EPI.Comm.Net
             {
                 throw CreateCommException(e);
             }
-            catch(NullReferenceException e)
+            catch (NullReferenceException e)
             {
                 throw CreateCommException(e);
             }
             finally
             {
-                Debug.WriteLine(nameof(Receive));
+                Logger.Default.WriteLineCaller();
             }
 
         }
@@ -106,7 +105,7 @@ namespace EPI.Comm.Net
             }
             finally
             {
-                Debug.WriteLine(nameof(Receive));
+                Logger.Default.WriteLineCaller();
             }
 
         }
@@ -125,13 +124,13 @@ namespace EPI.Comm.Net
                 }
                 catch (CommException e) // 연결을 끊었을 때
                 {
-                    Debug.WriteLine(e.Message);
+                    Logger.Default.WriteLine(e.Message);
                     RaiseClosed();
                     break;
                 }
                 finally
                 {
-                    Debug.WriteLine(nameof(ReceiveLoop));
+                    Logger.Default.WriteLineCaller();
                 }
 
             }

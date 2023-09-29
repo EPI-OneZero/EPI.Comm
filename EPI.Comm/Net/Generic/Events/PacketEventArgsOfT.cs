@@ -25,9 +25,7 @@ namespace EPI.Comm.Net.Generic.Events
             Packet = packet;
         }
     }
-
     public delegate void PacketEventHandler<Theader>(object sender, PacketEventArgs<Theader> e);
-
     public class TcpEventArgs<Theader> : EventArgs where Theader : new()
     {
         public TcpNetClient<Theader> TcpNetClient { get; private set; }

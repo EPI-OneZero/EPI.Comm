@@ -4,7 +4,7 @@ using EPI.Comm.Net.Generic.Events;
 namespace EPI.Comm
 {
 
-    public abstract class CommBase
+    public static class CommConfig
     {
         public const int DefaultBufferSize = 8192;
     }

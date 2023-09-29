@@ -1,21 +1,18 @@
-﻿using EPI.Comm.UTils;
+﻿using EPI.Comm.Log;
+using EPI.Comm.UTils;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
-using System.Threading.Tasks;
 using static EPI.Comm.CommException;
-
 namespace EPI.Comm.Net
 {
-    public abstract class TcpServerBase : CommBase, IDisposable
+    public abstract class TcpServerBase : IDisposable
     {
         #region Field & Property
         protected TcpListener Listener { get; set; }
         public IPEndPoint LocalEndPoint => Listener?.Server?.LocalEndPoint as IPEndPoint;
-        public int Port => ((IPEndPoint)Listener?.LocalEndpoint)?.Port ?? -1;
+        public int Port { get; private set; }
         public bool IsListening { get => isListening; }
 
         protected volatile bool isListening = false;
@@ -54,8 +51,6 @@ namespace EPI.Comm.Net
         }
         #endregion
 
-      
-
         #region StartStop
         public void StartListen(int port)
         {
@@ -65,12 +60,13 @@ namespace EPI.Comm.Net
                 {
                     Listener = new TcpListener(IPAddress.Any, port);
                     Listener.Start();
+                    Port = port;
                     isListening = true;
                     ThreadUtil.Start(AcceptLoop);
                 }
             }
-           
-            
+
+
         }
         public void Stop()
         {
@@ -81,11 +77,12 @@ namespace EPI.Comm.Net
                     isListening = false;
                     Listener.Stop();
                     Listener = null;
+                    Port = 0;
                     WaitAcceptLoopFinish();
                     DisposeAllClients();
                 }
             }
-          
+
         }
         private void OnDisconnected(object sender, EventArgs e)
         {
@@ -95,7 +92,7 @@ namespace EPI.Comm.Net
         private protected abstract void OnClientDisconnected(TcpClientBase client);
         private void DisposeAllClients()
         {
-            var clients = this.clients?.ToArray() ?? new TcpClientBase[0];
+            var clients = this.clients.ToArray();
             foreach (var client in clients)
             {
                 DetachClient(client);
@@ -114,11 +111,17 @@ namespace EPI.Comm.Net
                 {
                     try
                     {
-                        Accept();
+                        var tcpClient = Accept();
+                        if (tcpClient != null)
+                        {
+                            var client = CreateClient(tcpClient);
+                            AttachClient(client);
+                            OnClientConnected(client);
+                        }
                     }
                     catch (CommException e)
                     {
-                        Debug.WriteLine(e.Message);
+                        Logger.Default.WriteLine(e.Message);
                         if (!isListening)
                         {
                             break;
@@ -126,25 +129,19 @@ namespace EPI.Comm.Net
                     }
                     finally
                     {
-                        Debug.WriteLine(nameof(AcceptLoop));
+                        Logger.Default.WriteLineCaller();
                     }
                 }
                 acceptLoopingOn = false;
             }
 
         }
-        private void Accept()
+        private TcpClient Accept()
         {
             try
             {
                 var tcpClient = Listener?.AcceptTcpClient();
-                if (tcpClient != null)
-                {
-                    var client = CreateClient(tcpClient);
-                    AttachClient(client);
-                    OnClientConnected(client);
-                }
-
+                return tcpClient;
             }
             catch (ObjectDisposedException disposedException)
             {
@@ -161,7 +158,7 @@ namespace EPI.Comm.Net
             }
             finally
             {
-                Debug.WriteLine(nameof(Accept));
+                Logger.Default.WriteLineCaller();
             }
         }
         private void WaitAcceptLoopFinish()

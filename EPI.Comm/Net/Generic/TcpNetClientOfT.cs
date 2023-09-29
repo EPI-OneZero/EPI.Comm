@@ -5,6 +5,7 @@ using EPI.Comm.Net.Generic.Packets;
 using EPI.Comm.Utils;
 using System;
 using System.Net.Sockets;
+using static EPI.Comm.CommConfig;
 
 namespace EPI.Comm.Net.Generic
 {
@@ -96,7 +97,7 @@ namespace EPI.Comm.Net.Generic
         {
             SetPacketProperties(getBodySize);
         }
-        public TcpNetClient(Func<Theader, int> getBodySize) : this(DefaultBufferSize, getBodySize)
+        public TcpNetClient(Func<Theader, int> getBodySize) : this(CommConfig.DefaultBufferSize, getBodySize)
         {
         }
         internal TcpNetClient(TcpClient client, int bufferSize, Func<Theader, int> getBodySize) : base(client, bufferSize)
@@ -127,7 +128,7 @@ namespace EPI.Comm.Net.Generic
         public void Send(Theader header, byte[] body, Tfooter footer)
         {
             var headerDefinedBodySize = GetBodySize?.Invoke(header) ?? 0;
-            var packet = new Packet<Theader, Tfooter>(header,body,footer,GetBodySize);
+            var packet = new Packet<Theader, Tfooter>(header, body, footer, GetBodySize);
             var fullPacketBytes = packet.SerializePacket();
 
             SendBytes(fullPacketBytes);

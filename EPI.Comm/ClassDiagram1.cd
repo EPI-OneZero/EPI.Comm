@@ -1,123 +1,133 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1">
-  <Class Name="EPI.Comm.Net.Generic.Events.PacketEventArgs&lt;Theader, Tfooter&gt;" Collapsed="true">
-    <Position X="25.25" Y="1.75" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACA=</HashCode>
-      <FileName>Net\Generic\Events\PacketEventArgsOfT.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="EPI.Comm.Net.Generic.Events.PacketEventArgs&lt;Theader&gt;" Collapsed="true">
-    <Position X="27" Y="1.75" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACA=</HashCode>
-      <FileName>Net\Generic\Events\PacketEventArgsOfT.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="EPI.Comm.Net.Generic.Events.TcpEventArgs&lt;Theader&gt;" Collapsed="true">
-    <Position X="30.5" Y="2.75" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Net\Generic\Events\PacketEventArgsOfT.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="EPI.Comm.Net.Generic.Events.TcpEventArgs&lt;Theader, Tfooter&gt;" Collapsed="true">
-    <Position X="28.75" Y="2.75" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Net\Generic\Events\PacketEventArgsOfT.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="EPI.Comm.Net.Generic.Packets.Packet&lt;Theader&gt;" Collapsed="true">
-    <Position X="4.5" Y="4.75" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>BgABAEAAAAAAIAAJAABBAIAAAAAAIAIEAQACCAAAAAA=</HashCode>
-      <FileName>Net\Generic\Packets\PacketOfT.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="EPI.Comm.Net.Generic.Packets.Packet&lt;Theader, Tfooter&gt;" Collapsed="true">
-    <Position X="4.5" Y="6" Width="3" />
-    <TypeIdentifier>
-      <HashCode>BgAAAAAAAAAAAAAAIAAAAAAAAIAAIAAAAAAACAAAAAA=</HashCode>
-      <FileName>Net\Generic\Packets\PacketOfT.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="EPI.Comm.Net.Generic.ClientCollection&lt;Theader&gt;" Collapsed="true">
-    <Position X="25.25" Y="0.75" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Net\Generic\ClientCollectionOfT.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="EPI.Comm.Net.Generic.ClientCollection&lt;Theader, Tfooter&gt;" Collapsed="true">
-    <Position X="27" Y="0.75" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Net\Generic\ClientCollectionOfT.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="EPI.Comm.Net.Generic.TcpNetClient&lt;Theader&gt;">
-    <Position X="16.5" Y="3.5" Width="2" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAABAAAAAAAIAEAAAAAABAAAAAAAAQAAABAAACA=</HashCode>
-      <FileName>Net\Generic\TcpNetClientOfT.cs</FileName>
-    </TypeIdentifier>
-    <Lollipop Position="0.2" />
-  </Class>
-  <Class Name="EPI.Comm.Net.Generic.TcpNetClient&lt;Theader, Tfooter&gt;">
-    <Position X="18.75" Y="3.5" Width="2.25" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAABAAAAAAAIAEAQAAAABIAAAAAAAQAAABAAACA=</HashCode>
-      <FileName>Net\Generic\TcpNetClientOfT.cs</FileName>
-    </TypeIdentifier>
-    <Lollipop Position="0.2" />
-  </Class>
-  <Class Name="EPI.Comm.Net.Generic.TcpNetServer&lt;Theader&gt;" Collapsed="true">
-    <Position X="5.25" Y="3.5" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAIBAAAAAAAAIGAAAAAgAABAAAMAAQAAIAAogAA=</HashCode>
-      <FileName>Net\Generic\TcpNetServerOfT.cs</FileName>
-    </TypeIdentifier>
-    <Lollipop Position="0.2" />
-  </Class>
-  <Class Name="EPI.Comm.Net.Generic.TcpNetServer&lt;Theader, Tfooter&gt;" Collapsed="true">
-    <Position X="7.5" Y="3.5" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAIBAAAAAAAAIGAAAAAgAABAAAMAAQAAIAAogAA=</HashCode>
-      <FileName>Net\Generic\TcpNetServerOfT.cs</FileName>
-    </TypeIdentifier>
-    <Lollipop Position="0.2" />
-  </Class>
   <Class Name="EPI.Comm.Net.Events.PacketEventArgs" Collapsed="true">
-    <Position X="28.75" Y="1.75" Width="1.5" />
+    <Position X="34" Y="6.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAA=</HashCode>
       <FileName>Net\Events\PacketEventArgs.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="EPI.Comm.Net.Events.SocketReceiveEventArgs" Collapsed="true">
-    <Position X="27" Y="2.75" Width="1.5" />
+    <Position X="41.5" Y="5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAA=</HashCode>
       <FileName>Net\Events\PacketEventArgs.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="EPI.Comm.Net.Events.TcpEventArgs" Collapsed="true">
-    <Position X="23.5" Y="3.75" Width="1.5" />
+    <Position X="34" Y="8.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Net\Events\TcpEventArgs.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="EPI.Comm.Net.ClientCollection" Collapsed="true">
-    <Position X="23.5" Y="0.75" Width="1.5" />
+  <Class Name="EPI.Comm.Net.Generic.Events.PacketEventArgs&lt;Theader, Tfooter&gt;" Collapsed="true">
+    <Position X="38" Y="6.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACA=</HashCode>
+      <FileName>Net\Generic\Events\PacketEventArgsOfT.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EPI.Comm.Net.Generic.Events.PacketEventArgs&lt;Theader&gt;" Collapsed="true">
+    <Position X="36" Y="6.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACA=</HashCode>
+      <FileName>Net\Generic\Events\PacketEventArgsOfT.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EPI.Comm.Net.Generic.Events.TcpEventArgs&lt;Theader&gt;" Collapsed="true">
+    <Position X="36" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Net\Generic\Events\PacketEventArgsOfT.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EPI.Comm.Net.Generic.Events.TcpEventArgs&lt;Theader, Tfooter&gt;" Collapsed="true">
+    <Position X="38" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Net\Generic\Events\PacketEventArgsOfT.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EPI.Comm.Net.Generic.Packets.Packet&lt;Theader&gt;" Collapsed="true">
+    <Position X="27" Y="10.25" Width="1.5" />
+    <NestedTypes>
+      <Enum Name="EPI.Comm.Net.Generic.Packets.Packet&lt;Theader&gt;.DeserializeState" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Net\Generic\Packets\PacketOfT.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>BAABAAAAAAAAIAAJAABBAAAAAAAAIAIEAQACCAABAAA=</HashCode>
+      <FileName>Net\Generic\Packets\PacketOfT.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EPI.Comm.Net.Generic.Packets.Packet&lt;Theader, Tfooter&gt;" Collapsed="true">
+    <Position X="29.25" Y="10.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAAAAAAAAAAAAAAAIAAAAAAAAIAAIAAAAAAACAABAAA=</HashCode>
+      <FileName>Net\Generic\Packets\PacketOfT.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EPI.Comm.Net.Generic.ClientCollection&lt;Theader&gt;" Collapsed="true">
+    <Position X="36" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Net\Generic\ClientCollectionOfT.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EPI.Comm.Net.Generic.ClientCollection&lt;Theader, Tfooter&gt;" Collapsed="true">
+    <Position X="34" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Net\Generic\ClientCollectionOfT.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EPI.Comm.Net.Generic.TcpNetClient&lt;Theader&gt;">
+    <Position X="27" Y="6" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Properties" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>AAAAAAABAAEAAAAIAEAQAAAABAAAAAAQAQAAABAAACA=</HashCode>
+      <FileName>Net\Generic\TcpNetClientOfT.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="EPI.Comm.Net.Generic.TcpNetClient&lt;Theader, Tfooter&gt;">
+    <Position X="29.25" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAABAAEAAAAIAEAQAAAABIAAAAAQAQAAABAAACA=</HashCode>
+      <FileName>Net\Generic\TcpNetClientOfT.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="EPI.Comm.Net.Generic.TcpNetServer&lt;Theader&gt;">
+    <Position X="20.25" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAABAEAABAAAIGAAAAAgAABAAAIABQAAIAAoAAA=</HashCode>
+      <FileName>Net\Generic\TcpNetServerOfT.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="EPI.Comm.Net.Generic.TcpNetServer&lt;Theader, Tfooter&gt;">
+    <Position X="15.75" Y="6" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAABAEAABAAAIGAAAAAgAABAAAIABQAAIAAoAAA=</HashCode>
+      <FileName>Net\Generic\TcpNetServerOfT.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="EPI.Comm.Net.ClientCollection" Collapsed="true">
+    <Position X="38" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Net\ClientCollection.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="EPI.Comm.Net.TcpClientBase" Collapsed="true">
-    <Position X="16.5" Y="2" Width="1.5" />
+    <Position X="27" Y="4.5" Width="1.5" />
     <NestedTypes>
       <Class Name="EPI.Comm.Net.TcpClientBase.AutoConnectHelper" Collapsed="true">
         <TypeIdentifier>
@@ -126,59 +136,59 @@
       </Class>
     </NestedTypes>
     <TypeIdentifier>
-      <HashCode>IAAAAAAAICCASABQCAkAApAQDAAEAIAAIAEAAkAAYKA=</HashCode>
+      <HashCode>IAAAAAAAICEASABQCAkAApAQDAAAAIAQIAEAAkAAYIA=</HashCode>
       <FileName>Net\TcpClientBase.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="EPI.Comm.Net.TcpNetClient">
-    <Position X="14.25" Y="3.5" Width="2" />
+    <Position X="24.75" Y="7" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAABAAAAAAAAAEAAAAAABAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Net\TcpNetClient.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
-  <Class Name="EPI.Comm.Net.TcpNetServer" Collapsed="true">
-    <Position X="9.75" Y="3.5" Width="1.5" />
+  <Class Name="EPI.Comm.Net.TcpNetServer">
+    <Position X="18" Y="6" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAIBAAAAAAAAIGAAAAAgAABAAAMAAAAAIAAogAA=</HashCode>
+      <HashCode>AAAAAAABAEAABAAAIGAAAAAgAABAAAIABAAAIAAoAAA=</HashCode>
       <FileName>Net\TcpNetServer.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
-  <Class Name="EPI.Comm.Net.TcpNetSocket" Collapsed="true">
-    <Position X="21" Y="2" Width="1.5" />
+  <Class Name="EPI.Comm.Net.TcpNetSocket">
+    <Position X="31.5" Y="4.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAQAEABAAAAAABAAEAAAAAQQIACAQAQAAEAABCAAAA=</HashCode>
+      <HashCode>AAAQAEABAACAAABAAEAAAAAQQIAGAQAQAAEAABCAAAA=</HashCode>
       <FileName>Net\TcpNetSocket.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="EPI.Comm.Net.KeepAlive" Collapsed="true">
-    <Position X="30.5" Y="0.75" Width="1.5" />
+    <Position X="31.5" Y="10" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAACAAAgAAAAAAAAAAAAAAAAAAAAAAEgAAAA=</HashCode>
       <FileName>Net\TcpNetSocket.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="EPI.Comm.Net.TcpServerBase" Collapsed="true">
-    <Position X="7.5" Y="2" Width="1.5" />
+    <Position X="18" Y="4.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AYQBBEIEACAABAABCAAAAAAwCABAAACAIAAAAgAogAA=</HashCode>
+      <HashCode>AYQBBEIEAGAABAABCAAAAAAwCABAAACAIAAAAgAoAAA=</HashCode>
       <FileName>Net\TcpServerBase.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="EPI.Comm.Net.UdpBase" Collapsed="true">
-    <Position X="12" Y="2" Width="1.5" />
+    <Position X="22.5" Y="4.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAABAAAAICAAAAAACEAAAEAAAABCAAAQIAEAAzAAAAA=</HashCode>
+      <HashCode>AAAQAAAAICAAAAAACEAAAEAQAABCAEAQIAEAAyAAAQA=</HashCode>
       <FileName>Net\UdpBase.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
   <Class Name="EPI.Comm.Buffers.QueueBuffer" Collapsed="true" BaseTypeListCollapsed="true">
-    <Position X="23.5" Y="2.75" Width="1.5" />
+    <Position X="36" Y="1" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AACAAAAAgAAAABAAAIAAAAQCAAAAAAAEQABAAgBAAgA=</HashCode>
       <FileName>Buffers\QueueBuffer.cs</FileName>
@@ -186,123 +196,144 @@
     <Lollipop Position="0.2" Collapsed="true" />
   </Class>
   <Class Name="EPI.Comm.Buffers.RefreshBuffer" Collapsed="true" BaseTypeListCollapsed="true">
-    <Position X="25.25" Y="2.75" Width="1.5" />
+    <Position X="38" Y="1" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AACAAAAAAAAAABAAAAAAAAQAAAAAAAAEQABAAABAAAA=</HashCode>
       <FileName>Buffers\RefreshBuffer.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" Collapsed="true" />
   </Class>
-  <Class Name="EPI.Comm.Utils.ObjectUtil" Collapsed="true">
-    <Position X="23.5" Y="1.75" Width="1.5" />
+  <Class Name="EPI.Comm.Utils.MarshalTypeInfo" Collapsed="true">
+    <Position X="41.5" Y="8.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAgAAAAAgAAAAAAAAAAAAAAAAAAAAAAACAAEA=</HashCode>
+      <HashCode>AAAAAgAAAAAAIQAAAAAAAAAAAAABAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Utils\ObjectInfo.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EPI.Comm.Utils.MarshalFieldInfo" Collapsed="true">
+    <Position X="43.5" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACAAAAAAAAAIAAAAAAAAAUAAAAAAAAAAYAAAAAAwAA=</HashCode>
+      <FileName>Utils\ObjectInfo.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EPI.Comm.Utils.ObjectUtil" Collapsed="true">
+    <Position X="41.5" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Utils\ObjectUtil.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="EPI.Comm.Utils.PacketSerializer" Collapsed="true">
-    <Position X="30.5" Y="1.75" Width="1.5" />
+    <Position X="24.75" Y="10.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAACAAAAAAEAAQAAAAAACAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Utils\PacketSerializer.cs</FileName>
     </TypeIdentifier>
   </Class>
+  <Class Name="EPI.Comm.Utils.TypeUtil" Collapsed="true">
+    <Position X="43.5" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAgAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAEA=</HashCode>
+      <FileName>Utils\TypeUtil.cs</FileName>
+    </TypeIdentifier>
+  </Class>
   <Class Name="EPI.Comm.UTils.ThreadUtil" Collapsed="true">
-    <Position X="25.25" Y="3.75" Width="1.5" />
+    <Position X="43.5" Y="6.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Utils\ThreadUtil.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="EPI.Comm.CommException" Collapsed="true">
-    <Position X="28.75" Y="0.75" Width="1.5" />
+    <Position X="31.5" Y="10.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Exceptions\CommException.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="EPI.Comm.CommBase" Collapsed="true">
-    <Position X="13" Y="0.75" Width="1.5" />
+    <Position X="22.5" Y="3.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>CommBase.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Interface Name="EPI.Comm.Buffers.IBuffer" Collapsed="true">
-    <Position X="23.5" Y="5" Width="1.5" />
+    <Position X="34" Y="1" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AACAAAAAAAAAAAAAAAAAAAQAAAAAAAAAQAAAAABAAAA=</HashCode>
       <FileName>Buffers\IBuffer.cs</FileName>
     </TypeIdentifier>
   </Interface>
   <Interface Name="EPI.Comm.IComm" Collapsed="true">
-    <Position X="25.25" Y="5" Width="1.5" />
+    <Position X="24.5" Y="1.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAABAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>CommBase.cs</FileName>
     </TypeIdentifier>
   </Interface>
-  <Interface Name="EPI.Comm.IComm&lt;Theader, Tfooter&gt;">
-    <Position X="27" Y="5" Width="1.5" />
+  <Interface Name="EPI.Comm.IComm&lt;Theader, Tfooter&gt;" Collapsed="true">
+    <Position X="26.75" Y="1.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAABAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>CommBase.cs</FileName>
     </TypeIdentifier>
   </Interface>
-  <Interface Name="EPI.Comm.IComm&lt;Theader&gt;">
-    <Position X="28.75" Y="5" Width="1.5" />
+  <Interface Name="EPI.Comm.IComm&lt;Theader&gt;" Collapsed="true">
+    <Position X="29" Y="1.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAABAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>CommBase.cs</FileName>
     </TypeIdentifier>
   </Interface>
-  <Delegate Name="EPI.Comm.Net.Generic.Events.PacketEventHandler&lt;Theader, Tfooter&gt;" Collapsed="true">
-    <Position X="23.5" Y="6" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAQAAAAAAQAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Net\Generic\Events\PacketEventArgsOfT.cs</FileName>
-    </TypeIdentifier>
-  </Delegate>
-  <Delegate Name="EPI.Comm.Net.Generic.Events.PacketEventHandler&lt;Theader&gt;" Collapsed="true">
-    <Position X="25.25" Y="6" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAABAAAAAAAAAA=</HashCode>
-      <FileName>Net\Generic\Events\PacketEventArgsOfT.cs</FileName>
-    </TypeIdentifier>
-  </Delegate>
-  <Delegate Name="EPI.Comm.Net.Generic.Events.TcpEventHandler&lt;Theader&gt;">
-    <Position X="27" Y="7.25" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAQAAA=</HashCode>
-      <FileName>Net\Generic\Events\PacketEventArgsOfT.cs</FileName>
-    </TypeIdentifier>
-  </Delegate>
-  <Delegate Name="EPI.Comm.Net.Generic.Events.TcpEventHandler&lt;Theader, Tfooter&gt;">
-    <Position X="23.5" Y="7.25" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAEAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Net\Generic\Events\PacketEventArgsOfT.cs</FileName>
-    </TypeIdentifier>
-  </Delegate>
   <Delegate Name="EPI.Comm.Net.Events.PacketEventHandler" Collapsed="true">
-    <Position X="27" Y="6" Width="1.5" />
+    <Position X="34" Y="5.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAgAAA=</HashCode>
       <FileName>Net\Events\PacketEventArgs.cs</FileName>
     </TypeIdentifier>
   </Delegate>
   <Delegate Name="EPI.Comm.Net.Events.SocketReceiveEventHandler" Collapsed="true">
-    <Position X="28.75" Y="6" Width="1.5" />
+    <Position X="41.5" Y="6.25" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAABAAAAAQAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Net\Events\PacketEventArgs.cs</FileName>
     </TypeIdentifier>
   </Delegate>
-  <Delegate Name="EPI.Comm.Net.Events.TcpEventHandler">
-    <Position X="25.25" Y="7.25" Width="1.5" />
+  <Delegate Name="EPI.Comm.Net.Events.TcpEventHandler" Collapsed="true">
+    <Position X="34" Y="7.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAIAAAAAAA=</HashCode>
       <FileName>Net\Events\TcpEventArgs.cs</FileName>
+    </TypeIdentifier>
+  </Delegate>
+  <Delegate Name="EPI.Comm.Net.Generic.Events.PacketEventHandler&lt;Theader, Tfooter&gt;" Collapsed="true">
+    <Position X="36" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAQAAAAAAQAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Net\Generic\Events\PacketEventArgsOfT.cs</FileName>
+    </TypeIdentifier>
+  </Delegate>
+  <Delegate Name="EPI.Comm.Net.Generic.Events.PacketEventHandler&lt;Theader&gt;" Collapsed="true">
+    <Position X="38" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAABAAAAAAAAAA=</HashCode>
+      <FileName>Net\Generic\Events\PacketEventArgsOfT.cs</FileName>
+    </TypeIdentifier>
+  </Delegate>
+  <Delegate Name="EPI.Comm.Net.Generic.Events.TcpEventHandler&lt;Theader&gt;" Collapsed="true">
+    <Position X="36" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAQAAA=</HashCode>
+      <FileName>Net\Generic\Events\PacketEventArgsOfT.cs</FileName>
+    </TypeIdentifier>
+  </Delegate>
+  <Delegate Name="EPI.Comm.Net.Generic.Events.TcpEventHandler&lt;Theader, Tfooter&gt;" Collapsed="true">
+    <Position X="38" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAEAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Net\Generic\Events\PacketEventArgsOfT.cs</FileName>
     </TypeIdentifier>
   </Delegate>
   <Font Name="맑은 고딕" Size="9" />

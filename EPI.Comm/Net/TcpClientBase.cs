@@ -1,19 +1,17 @@
-﻿using EPI.Comm.Net.Events;
+﻿using EPI.Comm.Log;
+using EPI.Comm.Net.Events;
 using EPI.Comm.UTils;
 using System;
-using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
-using System.Runtime.InteropServices;
 using System.Threading;
-
 namespace EPI.Comm.Net
 {
-    public abstract class TcpClientBase : CommBase, IDisposable
+    public abstract class TcpClientBase : IDisposable
     {
         #region Field & Property
         private readonly object ConnectLock = new object();
-        
+
         protected TcpClient TcpClient { get; set; }
         internal TcpNetSocket NetSocket { get; private set; }
         public int BufferSize { get; private set; }
@@ -31,7 +29,7 @@ namespace EPI.Comm.Net
         private volatile bool isConnecting = false;
         private string ipToConnect;
         private int portToConnect;
-        public bool IsConnected => (TcpClient?.Client?.Connected ?? false);
+        public bool IsConnected => TcpClient?.Connected ?? false;
         private AutoConnectHelper connectHelper;
         #endregion
 
@@ -57,8 +55,8 @@ namespace EPI.Comm.Net
             NetSocket.Received += SocketReceived;
             NetSocket.Closed += SocketClosed;
         }
-      
-       
+
+
         private void DetachSocket()
         {
             if (NetSocket != null)
@@ -78,7 +76,7 @@ namespace EPI.Comm.Net
             }
             catch (CommException e)
             {
-                Debug.WriteLine(e.Message);
+                Logger.Default.WriteLine(e.Message);
             }
         }
         private protected abstract void SocketReceived(object sender, SocketReceiveEventArgs e);
@@ -100,17 +98,17 @@ namespace EPI.Comm.Net
                             Connect(TcpClient);
                         }
                     }
-                    catch (CommException e)   
+                    catch (CommException e)
                     {
                         TcpClient?.Dispose();
                         TcpClient = null;
                         RunAutoConnectIfUserWant();
-                        Debug.WriteLine(e.Message);
+                        Logger.Default.WriteLine(e.Message);
                     }
                     finally
                     {
                         isConnecting = false;
-                        Debug.WriteLine(nameof(Connect));
+                        Logger.Default.WriteLineCaller();
                     }
                 }
             }
@@ -139,7 +137,7 @@ namespace EPI.Comm.Net
             }
             finally
             {
-                Debug.WriteLine($"{nameof(IsConnected)} : {IsConnected}");
+                Logger.Default.WriteLine($"{nameof(IsConnected)} : {IsConnected}");
             }
         }
 
@@ -167,7 +165,7 @@ namespace EPI.Comm.Net
                 DetachSocket();
                 TcpClient?.Dispose();
                 TcpClient = null;
-                if(raiseEvent)
+                if (raiseEvent)
                 {
                     OnSocketDisconnected();
                 }
@@ -245,19 +243,11 @@ namespace EPI.Comm.Net
             {
                 while (AutoConnect && userRequestConnect)
                 {
-                    if (Tcp != null)
-                    {
-                        Tcp?.Connect(userConnectIp, userConnectPort);
-                        if (Tcp?.IsConnected ?? true)
-                        {
-                            break;
-                        }
-                    }
-                    else
+                    Tcp.Connect(userConnectIp, userConnectPort);
+                    if (Tcp.IsConnected)
                     {
                         break;
                     }
-
                     Thread.Sleep(3000);
                 }
             }

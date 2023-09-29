@@ -18,7 +18,7 @@ namespace CommSample.Sample
             server = new TcpNetServer(int.Parse(port.Text));
             server.Received += Server_BytesReceived;
             server.ClientDisconnected += Server_Closed;
-            server.ClientAccpeted += Server_Accpeted;
+            server.ClientConnected += Server_Accpeted;
 
         }
         public static int ServerPort { get; set; } = 4101;

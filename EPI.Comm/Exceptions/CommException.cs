@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace EPI.Comm
 {
- 
+
     internal class CommException : Exception
     {
         internal CommException(string message, Exception e) : base(message, e.InnerException)

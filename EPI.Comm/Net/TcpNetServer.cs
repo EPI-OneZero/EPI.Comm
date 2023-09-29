@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
-
+using static EPI.Comm.CommConfig;
 namespace EPI.Comm.Net
 {
     public class TcpNetServer : TcpServerBase, IComm
@@ -23,11 +23,6 @@ namespace EPI.Comm.Net
         }
         #endregion
         #region Send
-        public void Send(string message)
-        {
-            var bytes = Encoding.UTF8.GetBytes(message);
-            Send(bytes);
-        }
         public void Send(byte[] bytes)
         {
             var result = Parallel.ForEach(clients, c =>
@@ -57,7 +52,7 @@ namespace EPI.Comm.Net
             if (IsValidClientType(newClient) && !clients.Contains(newClient))
             {
                 AttachClient(newClient);
-                ClientAccpeted?.Invoke(this, new TcpEventArgs(newClient));
+                ClientConnected?.Invoke(this, new TcpEventArgs(newClient));
             }
         }
         private void AttachClient(TcpNetClient client)
@@ -66,7 +61,7 @@ namespace EPI.Comm.Net
             client.Received += OnClientReceived;
 
         }
-        public event TcpEventHandler ClientAccpeted;
+        public event TcpEventHandler ClientConnected;
         #endregion
 
         #region Close

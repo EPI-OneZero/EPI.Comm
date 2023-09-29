@@ -15,5 +15,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <Deterministic>True</Deterministic>
   </PropertyGroup>
-
+  <PropertyGroup>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+  </PropertyGroup>
 </Project>
