@@ -73,7 +73,6 @@ namespace EPI.Comm.Net
             }
 
         }
-        private volatile int ccc = 0;
         private byte[] Receive()
         {
             try

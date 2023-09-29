@@ -1,7 +1,10 @@
-﻿using System;
+﻿using EPI.Comm.Utils;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Sockets;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -34,6 +37,7 @@ namespace ConsoleTest
             public int B;
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)]
             public ushort[] Shorts;
+            public int D;
             public MyClass()
             {
                 Shorts = new ushort[3] { 65, 0, 66 };
@@ -46,6 +50,7 @@ namespace ConsoleTest
             public int B;
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 3)]
             public char[] Chars;
+            public int D;
             public MyClass2()
             {
                 Chars = new char[3];
@@ -71,36 +76,24 @@ namespace ConsoleTest
         }
         public static void Main(string[] args)
         {
-            try
+            var fields = ObjectUtil.GetFields(typeof(MyClass));
+
+            foreach (var item in fields)
             {
-                var m1 = new MyClass() { A = 1, B = 2 };
-                var m3 = new MyStruct() { AAA = 1, BBB = 2, C = "0123456789", D = "9876543210" };
-                var size1 = Marshal.SizeOf(m3);
-                byte[] bytes = new byte[size1];
-                var handle = GCHandle.Alloc(bytes, GCHandleType.Pinned);
-                var ptr1 = handle.AddrOfPinnedObject();
-                Marshal.StructureToPtr(m3, handle.AddrOfPinnedObject(), false);
-                var t = Marshal.PtrToStructure<MyStruct2>(ptr1);
-                var t2 = Marshal.PtrToStructure<MyStruct2>(ptr1);
-                Marshal.DestroyStructure(ptr1, typeof(MyStruct));
-                var t3 =  Marshal.PtrToStructure<MyStruct2>(ptr1);
-                var f1 = object.ReferenceEquals(m3.C, t.C);
-                var f2 = object.ReferenceEquals(m3.D, t.D);
-                Marshal.DestroyStructure(handle.AddrOfPinnedObject(), typeof(MyStruct));
-                handle.Free();
-
-
+                Console.WriteLine($"{item.Name}  {item.FieldType} {GetFieldOffset(item)} " +
+                    $"{item.GetCustomAttribute(typeof(MarshalAsAttribute))?.GetType()?.Name ?? string.Empty}");
+              
             }
-            catch (Exception)
-            {
-
-            }
-
+            var x = IntPtr.Size;
         }
         public static void ReverseEndian<T>(T t)
         {
-
         }
+        public static int GetFieldOffset(FieldInfo fi) =>
+                    GetFieldOffset(fi.FieldHandle);
+
+        public static int GetFieldOffset(RuntimeFieldHandle h) =>
+                            Marshal.ReadInt32(h.Value + (4 + IntPtr.Size)) & 0xFFFFFF;
 
 
     }
