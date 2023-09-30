@@ -52,9 +52,28 @@ namespace EPI.Comm.Net
         }
         public void Send(byte[] bytes)
         {
-            lock (SendLock)
+            try
             {
-                var res = Socket?.Send(bytes);
+                lock (SendLock)
+                {
+                    var res = Socket.Send(bytes);
+                }
+            }
+            catch (SocketException e)
+            {
+                throw CreateCommException(e);
+            }
+            catch (ObjectDisposedException e)
+            {
+                throw CreateCommException(e);
+            }
+            catch (NullReferenceException e)
+            {
+                throw CreateCommException(e);
+            }
+            finally
+            {
+                //Logger.Default.WriteLineCaller();
             }
 
         }

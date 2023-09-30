@@ -77,7 +77,6 @@ namespace EPI.Comm.Net
         {
             try
             {
-              
                 NetSocket?.Send(bytes);
             }
             catch (CommException e)

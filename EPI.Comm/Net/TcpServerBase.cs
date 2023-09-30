@@ -34,7 +34,7 @@ namespace EPI.Comm.Net
         #endregion
 
         #region Client Attach Detach 
-        private protected virtual void AttachClient(TcpClientBase client)
+        private void AttachClient(TcpClientBase client)
         {
             client.Disconnected += OnDisconnected;
             clients.Add(client);

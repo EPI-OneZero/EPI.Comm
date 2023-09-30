@@ -11,6 +11,7 @@ namespace EPI.Comm.Net
         private readonly List<TcpNetClient> clients = new List<TcpNetClient>();
         public ClientCollection Clients { get; private set; }
         #endregion
+        
         #region CTOR
         public TcpNetServer(int bufferSize) : base(bufferSize)
         {
@@ -21,6 +22,7 @@ namespace EPI.Comm.Net
 
         }
         #endregion
+
         #region Send
         public void Send(byte[] bytes)
         {
@@ -30,6 +32,7 @@ namespace EPI.Comm.Net
             });
         }
         #endregion
+        
         #region Receive
         private void OnClientReceived(object sender, PacketEventArgs e)
         {
