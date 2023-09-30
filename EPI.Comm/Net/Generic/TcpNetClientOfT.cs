@@ -2,7 +2,6 @@
 using EPI.Comm.Net.Events;
 using EPI.Comm.Net.Generic.Events;
 using EPI.Comm.Net.Generic.Packets;
-using EPI.Comm.Utils;
 using System;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
@@ -36,7 +35,7 @@ namespace EPI.Comm.Net.Generic
             SetPacketProperties(getBodySize);
         }
         #endregion
-        
+
         #region Method & Event
         private protected override void OnSocketDisconnected()
         {
@@ -69,14 +68,11 @@ namespace EPI.Comm.Net.Generic
                 ReceiveBuffer.AddBytes(e.ReceivedBytes);
                 while (Packet.TryDeserialize(ReceiveBuffer))
                 {
-
                     var packet = Packet;
-
                     Received?.Invoke(this, new PacketEventArgs<Theader>(e.From, packet));
                     Packet = new Packet<Theader>(GetBodySize);
                 }
             }
-
         }
 
         public event PacketEventHandler<Theader> Received;

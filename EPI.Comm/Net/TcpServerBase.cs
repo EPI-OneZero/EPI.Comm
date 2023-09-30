@@ -79,7 +79,7 @@ namespace EPI.Comm.Net
                     WaitAcceptLoopFinish();
                     Listener = null;
                     Port = 0;
-                 
+
                     DisposeAllClients();
                 }
             }
@@ -90,7 +90,7 @@ namespace EPI.Comm.Net
             var client = sender as TcpClientBase;
             DetachClient(client);
         }
-       
+
         private void DisposeAllClients()
         {
             var clients = this.clients.ToArray();
@@ -143,7 +143,7 @@ namespace EPI.Comm.Net
                 var tcpClient = Listener.AcceptTcpClient();
                 return tcpClient;
             }
-          
+
             catch (SocketException socketException)
             {
                 throw CreateCommException(socketException);
@@ -171,7 +171,7 @@ namespace EPI.Comm.Net
             {
                 if (disposing)
                 {
-                   Stop();
+                    Stop();
                 }
                 clients.Clear();
                 Listener = null;

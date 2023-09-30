@@ -1,5 +1,4 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
 namespace EPI.Comm.Log
@@ -50,5 +49,5 @@ namespace EPI.Comm.Log
             Debug.Write(message);
         }
     }
-   
+
 }

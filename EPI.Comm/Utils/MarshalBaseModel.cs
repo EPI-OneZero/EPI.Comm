@@ -1,13 +1,12 @@
-﻿using System.Collections.Generic;
-using System;
-using System.Reflection;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
-using System.IO;
 
 namespace EPI.Comm.Utils
 {
-    internal abstract class MarshalNodeBase :  IDisposable
+    internal abstract class MarshalNodeBase : IDisposable
     {
         private static readonly Dictionary<Type, EndianInfo[]> EndianInfos = new Dictionary<Type, EndianInfo[]>();
         public void ReverseEndian(byte[] bytes)
@@ -15,12 +14,12 @@ namespace EPI.Comm.Utils
 
         }
         public abstract void GenerateInfo(List<EndianInfo> infos);
-      
+
         public int Offset { get; internal set; }
         public int Size { get; internal set; }
         internal static EndianInfo[] Create(Type type)
         {
-            if(!EndianInfos.ContainsKey(type))
+            if (!EndianInfos.ContainsKey(type))
             {
                 var item = new MarshalNode(type, 0);
                 var list = new List<EndianInfo>();
@@ -31,7 +30,7 @@ namespace EPI.Comm.Utils
             }
             return EndianInfos[type];
         }
-    
+
         public static FieldInfo[] GetFields(Type type)
         {
             var result = type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
@@ -77,12 +76,12 @@ namespace EPI.Comm.Utils
 
             }
         }
-     
+
         public override void GenerateInfo(List<EndianInfo> infos)
         {
             if (TypeNodes.Count == 0 && Size > 1)
             {
-                infos.Add(new EndianInfo() { Offset = Offset, Size = Size});
+                infos.Add(new EndianInfo() { Offset = Offset, Size = Size });
             }
             foreach (var item in TypeNodes)
             {
@@ -109,7 +108,7 @@ namespace EPI.Comm.Utils
             var itemType = ienumerable.GenericTypeArguments[0];
             ItemType = new MarshalNode(itemType, offset);
             Count = sizeConst;
-            Offset= offset;
+            Offset = offset;
         }
         public override void GenerateInfo(List<EndianInfo> infos)
         {

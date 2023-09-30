@@ -1,9 +1,6 @@
 ﻿using EPI.Comm.Net.Events;
-using EPI.Comm.Net.Generic;
 using System.Collections.Generic;
-using System.Net;
 using System.Net.Sockets;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using static EPI.Comm.CommConfig;
 namespace EPI.Comm.Net
@@ -14,7 +11,7 @@ namespace EPI.Comm.Net
         private readonly List<TcpNetClient> clients = new List<TcpNetClient>();
         public ClientCollection Clients { get; private set; }
         #endregion
-        
+
         #region CTOR
         public TcpNetServer(int bufferSize) : base(bufferSize)
         {
@@ -35,7 +32,7 @@ namespace EPI.Comm.Net
             });
         }
         #endregion
-        
+
         #region Receive
         private void OnClientReceived(object sender, PacketEventArgs e)
         {
@@ -51,7 +48,7 @@ namespace EPI.Comm.Net
             return new TcpNetClient(client, BufferSize);
         }
 
-    
+
         private protected override void AttachClient(TcpClientBase client)
         {
             base.AttachClient(client);
@@ -72,7 +69,7 @@ namespace EPI.Comm.Net
             clients.Remove(oldClient);
             oldClient.Received -= OnClientReceived;
             ClientDisconnected?.Invoke(this, new TcpEventArgs(oldClient));
-          
+
         }
         public event TcpEventHandler ClientDisconnected;
         #endregion

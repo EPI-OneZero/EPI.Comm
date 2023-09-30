@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Globalization;
 using System.Runtime.InteropServices;
-using System.Security.Cryptography.X509Certificates;
 
 namespace EPI.Comm.Utils
 {
@@ -48,7 +46,7 @@ namespace EPI.Comm.Utils
             {
                 Array.Reverse(bytes, infos[i].Offset, infos[i].Size);
             }
-        
+
         }
 
     }

@@ -98,7 +98,7 @@ namespace EPI.Comm.Net
                 {
                     recv = UdpClient.Receive(ref from);
                 }
-               
+
                 OnReceived(new PacketEventArgs(new IPEndPoint(from.Address, from.Port), recv));
             }
             catch (ObjectDisposedException e)

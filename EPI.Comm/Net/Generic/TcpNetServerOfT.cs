@@ -1,7 +1,6 @@
 ﻿using EPI.Comm.Net.Generic.Events;
 using System;
 using System.Collections.Generic;
-using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using static EPI.Comm.CommConfig;
@@ -49,7 +48,7 @@ namespace EPI.Comm.Net.Generic
             var result = new TcpNetClient<Theader>(client, BufferSize, GetBodySize);
             return result;
         }
-       
+
         private protected override void AttachClient(TcpClientBase client)
         {
             base.AttachClient(client);
@@ -63,7 +62,7 @@ namespace EPI.Comm.Net.Generic
         #endregion
 
         #region Close
-      
+
         private protected override void DetachClient(TcpClientBase client)
         {
             base.DetachClient(client);
@@ -73,7 +72,7 @@ namespace EPI.Comm.Net.Generic
             oldClient.Received -= OnClientReceived;
             ClientDisconnected?.Invoke(this, new TcpEventArgs<Theader>(oldClient));
         }
-        
+
         public event TcpEventHandler<Theader> ClientDisconnected;
         #endregion
     }

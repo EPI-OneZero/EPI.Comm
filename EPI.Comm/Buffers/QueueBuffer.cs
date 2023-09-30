@@ -34,7 +34,7 @@ namespace EPI.Comm.Buffers
         public byte[] GetBytes(int count)
         {
             var array = new byte[count];
-           
+
             int headerToLength = buffer.Length - head;
             if (count > 0)
             {

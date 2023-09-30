@@ -91,7 +91,7 @@ namespace EPI.Comm.Net
                 return result;
 
             }
-            catch(NullReferenceException e)
+            catch (NullReferenceException e)
             {
                 throw CreateCommException(e);
             }
