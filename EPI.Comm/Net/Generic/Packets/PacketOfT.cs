@@ -132,7 +132,6 @@ namespace EPI.Comm.Net.Generic.Packets
         #endregion
 
         #region CTOR
-
         internal Packet(Func<Theader, int> getBodySize) : this(default(Theader), null, default(Tfooter), getBodySize)
         {
 

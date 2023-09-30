@@ -2,6 +2,7 @@
 using System;
 using System.Diagnostics;
 using System.Net;
+using System.Runtime.InteropServices;
 
 namespace UnitTest.Endian
 {
@@ -12,7 +13,7 @@ namespace UnitTest.Endian
         public void TestMethod1()
         {
             byte[] data = new byte[32];
-            short[] longs= new short[16];
+            short[] longs = new short[16];
             for (int i = 0; i < data.Length; i++)
             {
                 data[i] = (byte)i;
@@ -42,7 +43,7 @@ namespace UnitTest.Endian
                 Array.Reverse(data, 28, 2);
                 Array.Reverse(data, 30, 2);
             }
-            
+
             var now1 = DateTime.Now;
             for (int i = 0; i < 100000; i++)
             {
@@ -63,7 +64,7 @@ namespace UnitTest.Endian
                 longs[15] = IPAddress.HostToNetworkOrder(longs[15]);
             }
 
-        
+
             var now2 = DateTime.Now;
 
             var dt1 = now1 - now0;
@@ -71,6 +72,65 @@ namespace UnitTest.Endian
             Console.WriteLine(dt1.TotalMilliseconds);
             Console.WriteLine(dt2.TotalMilliseconds);
         }
-      
+
+        [TestMethod]
+        public void TestMethod2()
+        {
+            var a = new MyStruct()
+            {
+                A = 1,
+                B = 2,
+                C = 3,
+            };
+            var b = a;
+
+            var now0 = DateTime.Now;
+
+            for (int i = 0; i < 1000000; i++)
+            {
+                a.A = IPAddress.HostToNetworkOrder(a.A);
+                a.B = IPAddress.HostToNetworkOrder(a.B);
+                a.C = IPAddress.HostToNetworkOrder(a.C);
+            }
+            var fields = b.GetType().GetFields();
+            var now1 = DateTime.Now;
+            for (int i = 0; i < 1000000; i++)
+            {
+              
+                for (int j = 0; j < fields.Length; j++)
+                {
+                    var f = fields[j];
+                    var t = f.FieldType;
+
+                    switch (t.Name)
+                    {
+                        case nameof(Int16):
+                            f.SetValue(b,IPAddress.HostToNetworkOrder((short)f.GetValue(b)));
+                            break;
+                        case nameof(Int32):
+                            f.SetValue(b, IPAddress.HostToNetworkOrder((int)f.GetValue(b)));
+                            break;
+                        case nameof(Int64):
+                            f.SetValue(b, IPAddress.HostToNetworkOrder((long)f.GetValue(b)));
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+            var now2 = DateTime.Now;
+            var dt1 = now1 - now0;
+            var dt2 = now2 - now1;
+            Console.WriteLine(dt1.TotalMilliseconds);
+            Console.WriteLine(dt2.TotalMilliseconds);
+
+        }
+    }
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    struct MyStruct
+    {
+        public short A;
+        public int B;
+        public long C;
     }
 }

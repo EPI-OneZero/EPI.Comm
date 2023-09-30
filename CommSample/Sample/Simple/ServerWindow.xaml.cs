@@ -50,24 +50,24 @@ namespace CommSample.Sample
         private  volatile int count = 0;
         private void Server_BytesReceived(object sender, PacketEventArgs e)
         {
-            server.Clients.FirstOrDefault().Send(e.ReceivedBytes);
-            count++;
+            //server.Clients.FirstOrDefault().Send(e.ReceivedBytes);
+ 
             Dispatcher.BeginInvoke(new Action(() =>
             {
-                //var build = new StringBuilder();
-                //build.AppendLine($"받은 바이트 수 :  {e.ReceivedBytes.Length}");
-                //for (int i = 0; i < e.ReceivedBytes.Length; i++)
-                //{
-                //    if (i % 8 == 0)
-                //    {
-                //        build.AppendLine();
-                //    }
-                //    var b = e.ReceivedBytes[i];
-                //    build.Append(b + " ");
+                var build = new StringBuilder();
+                build.AppendLine($"받은 바이트 수 :  {e.ReceivedBytes.Length}");
+                for (int i = 0; i < e.ReceivedBytes.Length; i++)
+                {
+                    if (i % 8 == 0)
+                    {
+                        build.AppendLine();
+                    }
+                    var b = e.ReceivedBytes[i];
+                    build.Append($"{b:D3}\t");
 
-                //}
-                //build.AppendLine();
-               // recv.Text += count.ToString();
+                }
+                build.AppendLine();
+                recv.Text += build.ToString();
 
             }));
         }
@@ -100,47 +100,23 @@ namespace CommSample.Sample
 
         private void Send(object sender, RoutedEventArgs e)
         {
-            //var split = text.Text.Split((char[])null, StringSplitOptions.RemoveEmptyEntries);
-            //var bytes = new List<byte>();
+            var split = text.Text.Split((char[])null, StringSplitOptions.RemoveEmptyEntries);
+            var bytes = new List<byte>();
 
-            //foreach (var s in split)
-            //{
-            //    try
-            //    {
-            //        var b = byte.Parse(s);
-            //        bytes.Add(b);
-            //    }
-            //    catch (Exception)
-            //    {
-
-            //    }
-            //}
-            //server.Send(bytes.ToArray());
-            for (int i = 0; i < 10000; i++)
+            foreach (var s in split)
             {
-                foreach (var item in server.Clients)
+                try
+                {
+                    var b = byte.Parse(s);
+                    bytes.Add(b);
+                }
+                catch (Exception)
                 {
 
-
-                    item.Send(new byte[]
-                  {
-                        1,0,0,0,
-                        2,0,0,0,
-                        3,0,0,0,
-                        32,0,0,0,
-
-                        1,2,3,4,
-                        1,2,3,4,
-                        1,2,3,4,
-                        1,2,3,4,
-
-                        1,2,3,4,
-                        1,2,3,4,
-                        1,2,3,4,
-                        1,2,3,4,
-                  });
                 }
             }
+            server.Send(bytes.ToArray());
+
         }
         private void Clear(object sender, RoutedEventArgs e)
         {

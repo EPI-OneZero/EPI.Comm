@@ -18,19 +18,24 @@ namespace UnitTest.Endian
             var size= Marshal.SizeOf(outer);
             var bytes = new byte[size];
             Serialize(outer, bytes, 0, size);
-            var time = DateTime.Now;
             ReverseEndian<Outer>(bytes);
-            var now = DateTime.Now;
+        
             outer.ReverseEndian();
-            var now2 = DateTime.Now;
-            var dt2 = now2 - now;
-            var dt1 = now - time;
 
             var t = Deserialize<Outer>(bytes);
             Assert.AreEqual(outer, t);
-            Console.WriteLine(dt1.TotalMilliseconds);
-            Console.WriteLine(dt2.TotalMilliseconds);
         }
+
+        [TestMethod]
+        public void TestMethod2() 
+        {
+            Console.WriteLine(Marshal.SizeOf(typeof(Myenum)));
+            var type = Enum.GetUnderlyingType(typeof(MyEnum));
+            Console.WriteLine(Marshal.OffsetOf(typeof(Myenum), "a")) ;
+            Console.WriteLine(Marshal.SizeOf(type)) ;
+        }
+       
+
     }
     #region Model
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -149,5 +154,18 @@ namespace UnitTest.Endian
             return base.GetHashCode();
         }
     }
+    #endregion
+    #region Model2
+    [StructLayout( LayoutKind.Sequential, Pack =1)]
+    struct Myenum
+    {
+        int b;
+        MyEnum a;
+    }
+    enum MyEnum :byte
+    {
+        a,b,c= 2
+    }
+  
     #endregion
 }

@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommSample", "CommSample\Co
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EPI.Comm", "EPI.Comm\EPI.Comm.csproj", "{E765ABE9-2B15-4CB4-9553-57CE2479D6BA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileTrans", "FileTrans\FileTrans.csproj", "{B586063D-2F5C-405F-B3A2-9296C871D0CD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{E765ABE9-2B15-4CB4-9553-57CE2479D6BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E765ABE9-2B15-4CB4-9553-57CE2479D6BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E765ABE9-2B15-4CB4-9553-57CE2479D6BA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B586063D-2F5C-405F-B3A2-9296C871D0CD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B586063D-2F5C-405F-B3A2-9296C871D0CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B586063D-2F5C-405F-B3A2-9296C871D0CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B586063D-2F5C-405F-B3A2-9296C871D0CD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

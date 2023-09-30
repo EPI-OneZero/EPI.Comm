@@ -34,10 +34,7 @@ namespace EPI.Comm.Buffers
         public byte[] GetBytes(int count)
         {
             var array = new byte[count];
-            if (queueDataCount < count)
-            {
-                throw new IndexOutOfRangeException("count");
-            }
+           
             int headerToLength = buffer.Length - head;
             if (count > 0)
             {
@@ -66,11 +63,6 @@ namespace EPI.Comm.Buffers
             if (Capacity < count + queueDataCount)
             {
                 int newCapacity = (count + queueDataCount) * 2;
-                if (newCapacity < buffer.Length + 4)
-                {
-                    newCapacity = buffer.Length + 4;
-                }
-
                 SetCapacity(newCapacity);
             }
             if (count < Capacity - tail)

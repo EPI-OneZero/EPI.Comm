@@ -22,8 +22,9 @@
             <TextBox x:Name="port" Text="4101" />
             <Button Width="100" Height="50" Content="Start" Click="Start"/>
             <Button Width="100" Height="50" Content="Stop" Click="Stop"/>
-            <Button Width="100" Height="50" Content="Send" Click="Send"/>
+          
             <Button Width="100" Height="50" Content="Clear" Click="Clear"/>
+            <Button Width="100" Height="50" Content="Send" Click="Send"/>
         </StackPanel>
 
     </Grid>

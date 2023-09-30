@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography.X509Certificates;
 
@@ -35,11 +36,19 @@ namespace EPI.Comm.Utils
                 throw new IndexOutOfRangeException($"{nameof(srcSize)}");
             }
         }
+        public static void CreateEndian<T>()
+        {
+            MarshalNodeBase.Create(typeof(T));
+        }
         public static void ReverseEndian<T>(byte[] bytes)
         {
-            var node = MarshalBaseModel.Create(typeof(T));
+            var infos = MarshalNodeBase.Create(typeof(T));
 
-            node.ReverseEndian(bytes);
+            for (int i = 0; i < infos.Length; i++)
+            {
+                Array.Reverse(bytes, infos[i].Offset, infos[i].Size);
+            }
+        
         }
 
     }

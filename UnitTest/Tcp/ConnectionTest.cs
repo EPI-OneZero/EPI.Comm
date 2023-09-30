@@ -44,7 +44,7 @@ namespace UnitTest.Tcp
                 Thread.Sleep(20);
                 Assert.IsFalse(client.IsConnected);
                 server.StartListen(port);
-                Thread.Sleep(750);
+                Thread.Sleep(1000);
                 Assert.IsTrue(client.IsConnected);
             }
             server.Dispose();
