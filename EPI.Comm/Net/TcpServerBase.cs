@@ -34,18 +34,17 @@ namespace EPI.Comm.Net
         #endregion
 
         #region Client Attach Detach 
-        private void AttachClient(TcpClientBase client)
+        private protected virtual void AttachClient(TcpClientBase client)
         {
             client.Disconnected += OnDisconnected;
             clients.Add(client);
         }
-        private void DetachClient(TcpClientBase client)
+        private protected virtual void DetachClient(TcpClientBase client)
         {
             client.Disconnected -= OnDisconnected;
             if (clients.Contains(client))
             {
                 clients.Remove(client);
-                OnClientDisconnected(client);
                 client.Dispose();
             }
         }
@@ -89,7 +88,7 @@ namespace EPI.Comm.Net
             var client = sender as TcpClientBase;
             DetachClient(client);
         }
-        private protected abstract void OnClientDisconnected(TcpClientBase client);
+       
         private void DisposeAllClients()
         {
             var clients = this.clients.ToArray();
@@ -116,7 +115,6 @@ namespace EPI.Comm.Net
                         {
                             var client = CreateClient(tcpClient);
                             AttachClient(client);
-                            OnClientConnected(client);
                         }
                     }
                     catch (CommException e)
@@ -168,7 +166,6 @@ namespace EPI.Comm.Net
 
             }
         }
-        private protected abstract void OnClientConnected(TcpClientBase client);
         private protected abstract TcpClientBase CreateClient(TcpClient client);
 
         #endregion

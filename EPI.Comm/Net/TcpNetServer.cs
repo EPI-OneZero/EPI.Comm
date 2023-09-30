@@ -1,6 +1,9 @@
 ﻿using EPI.Comm.Net.Events;
+using EPI.Comm.Net.Generic;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Sockets;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using static EPI.Comm.CommConfig;
 namespace EPI.Comm.Net
@@ -48,36 +51,28 @@ namespace EPI.Comm.Net
             return new TcpNetClient(client, BufferSize);
         }
 
-        private protected override void OnClientConnected(TcpClientBase client)
+    
+        private protected override void AttachClient(TcpClientBase client)
         {
-            if (client is TcpNetClient newClient && !clients.Contains(newClient))
-            {
-                AttachClient(newClient);
-                ClientConnected?.Invoke(this, new TcpEventArgs(newClient));
-            }
-        }
-        private void AttachClient(TcpNetClient client)
-        {
-            clients.Add(client);
-            client.Received += OnClientReceived;
+            base.AttachClient(client);
+            var newClient = client as TcpNetClient;
+            clients.Add(newClient);
+            newClient.Received += OnClientReceived;
+            ClientConnected?.Invoke(this, new TcpEventArgs(newClient));
 
         }
         public event TcpEventHandler ClientConnected;
         #endregion
 
         #region Close
-        private protected override void OnClientDisconnected(TcpClientBase client)
+        private protected override void DetachClient(TcpClientBase client)
         {
-            if (client is TcpNetClient oldClient && clients.Contains(oldClient))
-            {
-                DetachClient(oldClient);
-                ClientDisconnected?.Invoke(this, new TcpEventArgs(oldClient));
-            }
-        }
-        private void DetachClient(TcpNetClient client)
-        {
-            clients.Remove(client);
-            client.Received -= OnClientReceived;
+            base.DetachClient(client);
+            var oldClient = client as TcpNetClient;
+            clients.Remove(oldClient);
+            oldClient.Received -= OnClientReceived;
+            ClientDisconnected?.Invoke(this, new TcpEventArgs(oldClient));
+          
         }
         public event TcpEventHandler ClientDisconnected;
         #endregion

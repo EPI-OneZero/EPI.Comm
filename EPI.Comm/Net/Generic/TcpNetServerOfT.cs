@@ -1,6 +1,7 @@
 ﻿using EPI.Comm.Net.Generic.Events;
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using static EPI.Comm.CommConfig;
@@ -49,37 +50,29 @@ namespace EPI.Comm.Net.Generic
             var result = new TcpNetClient<Theader>(client, BufferSize, GetBodySize);
             return result;
         }
-        private protected override void OnClientConnected(TcpClientBase client)
+       
+        private protected override void AttachClient(TcpClientBase client)
         {
-            if (client is TcpNetClient<Theader> newClient && !clients.Contains(newClient))
-            {
-                AttachClient(newClient);
-                ClientConnected?.Invoke(this, new TcpEventArgs<Theader>(newClient));
-            }
-        }
-        private void AttachClient(TcpNetClient<Theader> client)
-        {
-            clients.Add(client);
-            client.Received += OnClientReceived;
-
+            base.AttachClient(client);
+            var newClient = client as TcpNetClient<Theader>;
+            clients.Add(newClient);
+            newClient.Received += OnClientReceived;
+            ClientConnected?.Invoke(this, new TcpEventArgs<Theader>(newClient));
         }
         public event TcpEventHandler<Theader> ClientConnected;
 
         #endregion
 
         #region Close
-        private protected override void OnClientDisconnected(TcpClientBase client)
+      
+        private protected override void DetachClient(TcpClientBase client)
         {
-            if (client is TcpNetClient<Theader> oldClient && clients.Contains(oldClient))
-            {
-                DetachClient(oldClient);
-                ClientDisconnected?.Invoke(this, new TcpEventArgs<Theader>(oldClient));
-            }
-        }
-        private void DetachClient(TcpNetClient<Theader> client)
-        {
-            clients.Remove(client);
-            client.Received -= OnClientReceived;
+            base.DetachClient(client);
+
+            var oldClient = client as TcpNetClient<Theader>;
+            clients.Remove(oldClient);
+            oldClient.Received -= OnClientReceived;
+            ClientDisconnected?.Invoke(this, new TcpEventArgs<Theader>(oldClient));
         }
         
         public event TcpEventHandler<Theader> ClientDisconnected;
@@ -127,42 +120,28 @@ namespace EPI.Comm.Net.Generic
             var result = new TcpNetClient<Theader, Tfooter>(client, BufferSize, GetBodySize);
             return result;
         }
-        private protected override void OnClientConnected(TcpClientBase client)
+       
+        private protected override void AttachClient(TcpClientBase client)
         {
-            if (client is TcpNetClient<Theader, Tfooter> newClient && !clients.Contains(newClient))
-            {
-                AttachClient(newClient);
-                ClientConnected?.Invoke(this, new TcpEventArgs<Theader, Tfooter>(newClient));
-            }
-        }
-        private void AttachClient(TcpNetClient<Theader, Tfooter> client)
-        {
-            clients.Add(client);
-            client.Received += OnClientReceived;
-
+            base.AttachClient(client);
+            var newClient = client as TcpNetClient<Theader, Tfooter>;
+            clients.Add(newClient);
+            newClient.Received += OnClientReceived;
+            ClientConnected?.Invoke(this, new TcpEventArgs<Theader, Tfooter>(newClient));
         }
         public event TcpEventHandler<Theader, Tfooter> ClientConnected;
 
         #endregion
 
         #region Close
-        private protected override void OnClientDisconnected(TcpClientBase client)
+      
+        private protected override void DetachClient(TcpClientBase client)
         {
+            base.DetachClient(client);
             var oldClient = client as TcpNetClient<Theader, Tfooter>;
-            if (IsValidClientType(oldClient) && clients.Contains(oldClient))
-            {
-                DetachClient(oldClient);
-                ClientDisconnected?.Invoke(this, new TcpEventArgs<Theader, Tfooter>(oldClient));
-            }
-        }
-        private void DetachClient(TcpNetClient<Theader, Tfooter> client)
-        {
-            clients.Remove(client);
-            client.Received -= OnClientReceived;
-        }
-        private static bool IsValidClientType(TcpClientBase client)
-        {
-            return client is TcpNetClient<Theader, Tfooter>;
+            clients.Remove(oldClient);
+            oldClient.Received -= OnClientReceived;
+            ClientDisconnected?.Invoke(this, new TcpEventArgs<Theader, Tfooter>(oldClient));
         }
 
         public event TcpEventHandler<Theader, Tfooter> ClientDisconnected;
