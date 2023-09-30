@@ -1,5 +1,6 @@
 ﻿using EPI.Comm.Net.Events;
 using EPI.Comm.Net.Generic.Events;
+using System.Net;
 
 namespace EPI.Comm
 {
@@ -14,17 +15,20 @@ namespace EPI.Comm
         event PacketEventHandler Received;
     }
 
-    public interface IComm<Theader, Tfooter>
+    public interface IComm<Theader, Tfooter> : IEndian
     {
         void Send(Theader header, byte[] body, Tfooter footer);
         event PacketEventHandler<Theader, Tfooter> Received;
 
 
     }
-    public interface IComm<Theader>
+    public interface IComm<Theader> : IEndian
     {
         void Send(Theader header, byte[] body);
         event PacketEventHandler<Theader> Received;
-
+    }
+    public interface IEndian
+    {
+        bool IsBigEndian { get; set; }
     }
 }

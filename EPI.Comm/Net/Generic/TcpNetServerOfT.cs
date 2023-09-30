@@ -1,6 +1,7 @@
 ﻿using EPI.Comm.Net.Generic.Events;
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using static EPI.Comm.CommConfig;
@@ -10,9 +11,29 @@ namespace EPI.Comm.Net.Generic
         where Theader : new()
     {
         #region Field & Property
+        private readonly object clientLock = new object();
         private readonly List<TcpNetClient<Theader>> clients = new List<TcpNetClient<Theader>>();
         public ClientCollection<Theader> Clients { get; private set; }
         internal Func<Theader, int> GetBodySize { get; private set; }
+        protected bool isBigEndian;
+        public bool IsBigEndian
+        {
+            get
+            {
+                return isBigEndian;
+            }
+            set
+            {
+                isBigEndian = value;
+                foreach (var client in clients)
+                {
+                    lock (clientLock)
+                    {
+                        client.IsBigEndian = isBigEndian;
+                    }
+                }
+            }
+        }
         #endregion
 
         #region CTOR
@@ -45,7 +66,8 @@ namespace EPI.Comm.Net.Generic
         #region Accept
         private protected override TcpClientBase CreateClient(TcpClient client)
         {
-            var result = new TcpNetClient<Theader>(client, BufferSize, GetBodySize);
+            var result = new TcpNetClient<Theader>(client, BufferSize, GetBodySize) 
+            {IsBigEndian = IsBigEndian };
             return result;
         }
 
@@ -53,7 +75,10 @@ namespace EPI.Comm.Net.Generic
         {
             base.AttachClient(client);
             var newClient = client as TcpNetClient<Theader>;
-            clients.Add(newClient);
+            lock (clientLock)
+            {
+                clients.Add(newClient);
+            }
             newClient.Received += OnClientReceived;
             ClientConnected?.Invoke(this, new TcpEventArgs<Theader>(newClient));
         }
@@ -68,7 +93,10 @@ namespace EPI.Comm.Net.Generic
             base.DetachClient(client);
 
             var oldClient = client as TcpNetClient<Theader>;
-            clients.Remove(oldClient);
+            lock (clientLock)
+            {
+                clients.Remove(oldClient);
+            }
             oldClient.Received -= OnClientReceived;
             ClientDisconnected?.Invoke(this, new TcpEventArgs<Theader>(oldClient));
         }
@@ -80,9 +108,29 @@ namespace EPI.Comm.Net.Generic
        where Theader : new() where Tfooter : new()
     {
         #region Field & Property
+        private readonly object clientLock = new object();
         private readonly List<TcpNetClient<Theader, Tfooter>> clients = new List<TcpNetClient<Theader, Tfooter>>();
         public ClientCollection<Theader, Tfooter> Clients { get; private set; }
         internal Func<Theader, int> GetBodySize { get; private set; }
+        protected bool isBigEndian;
+        public bool IsBigEndian 
+        { 
+            get
+            {
+                return isBigEndian;
+            }
+            set
+            {
+                isBigEndian = value;
+                foreach (var client in clients)
+                {
+                    lock (clientLock)
+                    {
+                        client.IsBigEndian = isBigEndian;
+                    }
+                }
+            }
+        }
         #endregion
 
         #region CTOR
@@ -114,14 +162,19 @@ namespace EPI.Comm.Net.Generic
         #region Accept
         private protected override TcpClientBase CreateClient(TcpClient client)
         {
-            var result = new TcpNetClient<Theader, Tfooter>(client, BufferSize, GetBodySize);
+            var result = new TcpNetClient<Theader, Tfooter>(client, BufferSize, GetBodySize)
+            { IsBigEndian = IsBigEndian };
             return result;
         }
         private protected override void AttachClient(TcpClientBase client)
         {
             base.AttachClient(client);
             var newClient = client as TcpNetClient<Theader, Tfooter>;
-            clients.Add(newClient);
+            lock (clientLock)
+            {
+                clients.Add(newClient);
+            }
+
             newClient.Received += OnClientReceived;
             ClientConnected?.Invoke(this, new TcpEventArgs<Theader, Tfooter>(newClient));
         }
@@ -133,7 +186,11 @@ namespace EPI.Comm.Net.Generic
         {
             base.DetachClient(client);
             var oldClient = client as TcpNetClient<Theader, Tfooter>;
-            clients.Remove(oldClient);
+            lock (clientLock)
+            {
+                clients.Remove(oldClient);
+            }
+
             oldClient.Received -= OnClientReceived;
             ClientDisconnected?.Invoke(this, new TcpEventArgs<Theader, Tfooter>(oldClient));
         }

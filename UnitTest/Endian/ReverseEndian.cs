@@ -18,7 +18,7 @@ namespace UnitTest.Endian
             var size= Marshal.SizeOf(outer);
             var bytes = new byte[size];
             Serialize(outer, bytes, 0, size);
-            ReverseEndian<Outer>(bytes);
+            ReverseEndian<Outer>(bytes, 0);
         
             outer.ReverseEndian();
 

@@ -17,6 +17,7 @@ namespace EPI.Comm.Net.Generic
         internal IBuffer ReceiveBuffer { get; set; } = new QueueBuffer();
         internal Func<Theader, int> GetBodySize { get; private set; }
         internal Packet<Theader> Packet { get; set; }
+        public bool IsBigEndian { get; set; }
         #endregion
 
         #region CTOR
@@ -58,7 +59,7 @@ namespace EPI.Comm.Net.Generic
         {
             var headerDefinedBodySize = GetBodySize?.Invoke(header) ?? 0;
             var packet = new Packet<Theader>(header, body, GetBodySize);
-            var fullPacketBytes = packet.SerializePacket();
+            var fullPacketBytes = packet.SerializePacket(IsBigEndian);
             SendBytes(fullPacketBytes);
         }
         private protected override void SocketReceived(object sender, PacketEventArgs e)
@@ -66,7 +67,7 @@ namespace EPI.Comm.Net.Generic
             lock (this)
             {
                 ReceiveBuffer.AddBytes(e.ReceivedBytes);
-                while (Packet.TryDeserialize(ReceiveBuffer))
+                while (Packet.TryDeserialize(ReceiveBuffer,IsBigEndian))
                 {
                     var packet = Packet;
                     Received?.Invoke(this, new PacketEventArgs<Theader>(e.From, packet));
@@ -87,6 +88,7 @@ namespace EPI.Comm.Net.Generic
         internal IBuffer ReceiveBuffer { get; set; } = new QueueBuffer();
         private Packet<Theader, Tfooter> Packet { get; set; }
         internal Func<Theader, int> GetBodySize { get; private set; }
+        public bool IsBigEndian { get; set; }
         #endregion
 
         #region CTOR
@@ -126,7 +128,7 @@ namespace EPI.Comm.Net.Generic
         {
             var headerDefinedBodySize = GetBodySize?.Invoke(header) ?? 0;
             var packet = new Packet<Theader, Tfooter>(header, body, footer, GetBodySize);
-            var fullPacketBytes = packet.SerializePacket();
+            var fullPacketBytes = packet.SerializePacket(IsBigEndian);
 
             SendBytes(fullPacketBytes);
         }
@@ -135,7 +137,7 @@ namespace EPI.Comm.Net.Generic
             lock (this)
             {
                 ReceiveBuffer.AddBytes(e.ReceivedBytes);
-                while (Packet.TryDeserialize(ReceiveBuffer))
+                while (Packet.TryDeserialize(ReceiveBuffer, IsBigEndian))
                 {
                     Received?.Invoke(this, new PacketEventArgs<Theader, Tfooter>(e.From, Packet));
                     Packet = new Packet<Theader, Tfooter>(GetBodySize);

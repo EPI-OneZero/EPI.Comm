@@ -25,8 +25,8 @@ namespace UnitTest.Tcp
         public void Init()
         {
             const int Port = 5555;
-            Server = new TcpNetServer<Header, Footer>(Header.GetBodySize);
-            Client = new TcpNetClient<Header, Footer>(Header.GetBodySize);
+            Server = new TcpNetServer<Header, Footer>(Header.GetBodySize) { IsBigEndian = true };
+            Client = new TcpNetClient<Header, Footer>(Header.GetBodySize) { IsBigEndian = true };
             int packetCount = 10;
             Data = new List<PacketWithHeaderFooter>(packetCount);
             for (int i = 0; i < packetCount; i++)

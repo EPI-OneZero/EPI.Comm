@@ -38,13 +38,13 @@ namespace EPI.Comm.Utils
         {
             MarshalNodeBase.Create(typeof(T));
         }
-        public static void ReverseEndian<T>(byte[] bytes)
+        public static void ReverseEndian<T>(byte[] bytes, int offset)
         {
             var infos = MarshalNodeBase.Create(typeof(T));
 
             for (int i = 0; i < infos.Length; i++)
             {
-                Array.Reverse(bytes, infos[i].Offset, infos[i].Size);
+                Array.Reverse(bytes, infos[i].Offset + offset, infos[i].Size);
             }
 
         }
