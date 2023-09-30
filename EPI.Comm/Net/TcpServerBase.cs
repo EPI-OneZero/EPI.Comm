@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading;
 using static EPI.Comm.CommException;
 namespace EPI.Comm.Net
 {
@@ -61,7 +62,7 @@ namespace EPI.Comm.Net
                     Listener.Start();
                     Port = port;
                     isListening = true;
-                    DelegateUtil.Start(AcceptLoop);
+                    ThreadUtil.Start(AcceptLoop);
                 }
             }
 
@@ -75,9 +76,10 @@ namespace EPI.Comm.Net
                 {
                     isListening = false;
                     Listener.Stop();
+                    WaitAcceptLoopFinish();
                     Listener = null;
                     Port = 0;
-                    WaitAcceptLoopFinish();
+                 
                     DisposeAllClients();
                 }
             }
@@ -141,18 +143,10 @@ namespace EPI.Comm.Net
                 var tcpClient = Listener.AcceptTcpClient();
                 return tcpClient;
             }
-            catch (ObjectDisposedException disposedException)
-            {
-                throw CreateCommException(disposedException);
-            }
+          
             catch (SocketException socketException)
             {
                 throw CreateCommException(socketException);
-            }
-
-            catch (NullReferenceException nullException)
-            {
-                throw CreateCommException(nullException);
             }
             finally
             {
@@ -163,7 +157,7 @@ namespace EPI.Comm.Net
         {
             while (acceptLoopingOn)
             {
-
+                Thread.Sleep(1);
             }
         }
         private protected abstract TcpClientBase CreateClient(TcpClient client);
@@ -177,8 +171,7 @@ namespace EPI.Comm.Net
             {
                 if (disposing)
                 {
-                    Listener?.Stop();
-                    DisposeAllClients();
+                   Stop();
                 }
                 clients.Clear();
                 Listener = null;

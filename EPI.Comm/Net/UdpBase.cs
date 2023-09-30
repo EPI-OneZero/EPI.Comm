@@ -11,6 +11,7 @@ namespace EPI.Comm.Net
     {
         private readonly object StartStopLock = new object();
         private readonly object SendLock = new object();
+        private readonly object RecvLock = new object();
         public UdpClient UdpClient { get; private set; }
         public IPEndPoint LocalEndPoint => UdpClient?.Client?.LocalEndPoint as IPEndPoint;
         public IPEndPoint RemoteEndPoint { get; private set; }
@@ -34,7 +35,7 @@ namespace EPI.Comm.Net
                     UdpClient = new UdpClient(new IPEndPoint(IPAddress.Any, recvPort));
                     RemoteEndPoint = new IPEndPoint(IPAddress.Parse(sendIp), sendPort);
                     SetSocketOption();
-                    DelegateUtil.Start(ReceiveLoop);
+                    ThreadUtil.Start(ReceiveLoop);
                     isStarted = true;
                 }
             }
@@ -63,7 +64,7 @@ namespace EPI.Comm.Net
             UdpClient?.DropMulticastGroup(IPAddress.Parse(ip));
         }
 
-        public void Send(byte[] bytes)
+        internal void SendBytes(byte[] bytes)
         {
             try
             {
@@ -92,7 +93,12 @@ namespace EPI.Comm.Net
             try
             {
                 var from = new IPEndPoint(IPAddress.Any, 0);
-                var recv = UdpClient.Receive(ref from);
+                byte[] recv = null;
+                lock (RecvLock)
+                {
+                    recv = UdpClient.Receive(ref from);
+                }
+               
                 OnReceived(new PacketEventArgs(new IPEndPoint(from.Address, from.Port), recv));
             }
             catch (ObjectDisposedException e)

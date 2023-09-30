@@ -1,26 +1,27 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography.X509Certificates;
 
 namespace EPI.Comm.Utils
 {
-    internal static class MarshalSerializer
+    public static class MarshalSerializer
     {
-        internal static bool IsEnoughSizeToDeserialize(int sourceSize, int targetSize)
+        public static bool IsEnoughSizeToDeserialize(int sourceSize, int targetSize)
         {
             return sourceSize >= targetSize;
         }
-        internal static T Deserialize<T>(byte[] srcBytes)
+        public static T Deserialize<T>(byte[] srcBytes)
         {
             var handle = GCHandle.Alloc(srcBytes, GCHandleType.Pinned);
             var result = Marshal.PtrToStructure<T>(handle.AddrOfPinnedObject());
             handle.Free();
             return result;
         }
-        internal static bool IsEnoughSizeToSerialize(int sourceSize, int targetSize, int dstOffset)
+        public static bool IsEnoughSizeToSerialize(int sourceSize, int targetSize, int dstOffset)
         {
             return sourceSize <= targetSize - dstOffset;
         }
-        internal static void Serialize<T>(T src, byte[] dst, int dstOffset, int srcSize)
+        public static void Serialize<T>(T src, byte[] dst, int dstOffset, int srcSize)
         {
             if (IsEnoughSizeToSerialize(srcSize, dst.Length, dstOffset))
             {
@@ -33,7 +34,12 @@ namespace EPI.Comm.Utils
             {
                 throw new IndexOutOfRangeException($"{nameof(srcSize)}");
             }
+        }
+        public static void ReverseEndian<T>(byte[] bytes)
+        {
+            var node = MarshalTypeNodeBase.Create(typeof(T));
 
+            node.ReverseEndian(bytes);
         }
 
     }

@@ -31,7 +31,7 @@ namespace EPI.Comm.Net
             RemoteEndPoint = socket.RemoteEndPoint as IPEndPoint;
             ReceiveBuffer = new byte[bufferSize];
             SetSocketOption(socket);
-            DelegateUtil.Start(ReceiveLoop);
+            ThreadUtil.Start(ReceiveLoop);
         }
 
         #endregion

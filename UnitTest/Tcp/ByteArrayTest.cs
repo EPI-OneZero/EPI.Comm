@@ -33,6 +33,12 @@ namespace UnitTest.Tcp
             Server.StartListen(Port);
             Client.Connect(IPAddress.Loopback.ToString(), Port);
         }
+        [TestCleanup]
+        public void Close()
+        {
+            Server?.Dispose();
+            Client?.Dispose();
+        }
         private byte[] GetBytes()
         {
             var random = new Random();
@@ -40,12 +46,7 @@ namespace UnitTest.Tcp
             random.NextBytes(result);
             return result;
         }
-        [TestCleanup]
-        public void Close()
-        {
-            Server?.Dispose();
-            Client?.Dispose();
-        }
+       
         [TestMethod]
         public void ClientsToServer()
         {

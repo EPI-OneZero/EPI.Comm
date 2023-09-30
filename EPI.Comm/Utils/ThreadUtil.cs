@@ -2,7 +2,7 @@
 
 namespace EPI.Comm.Utils
 {
-    internal static class DelegateUtil
+    internal static class ThreadUtil
     {
 
         public static Thread Start(ThreadStart start)

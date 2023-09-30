@@ -89,7 +89,7 @@
   <Class Name="EPI.Comm.Net.Generic.TcpNetServer&lt;Theader&gt;" Collapsed="true">
     <Position X="30.5" Y="5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAABAEAABAAAAGAAAAAgAABAAAIABQAAIAAoAAA=</HashCode>
+      <HashCode>AAAAAAABAAAAAAAAAGAAAAAgAABAAAIABQAAIAAoAAA=</HashCode>
       <FileName>Net\Generic\TcpNetServerOfT.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
@@ -97,7 +97,7 @@
   <Class Name="EPI.Comm.Net.Generic.TcpNetServer&lt;Theader, Tfooter&gt;" Collapsed="true">
     <Position X="32.75" Y="5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAABAEAABAAAIGAAAAAgAABAAAIABQAAIAAoAAA=</HashCode>
+      <HashCode>AAAAAAABAAAAAAAAAGAAAAAgAABAAAIABQAAIAAoAAA=</HashCode>
       <FileName>Net\Generic\TcpNetServerOfT.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
@@ -111,13 +111,6 @@
   </Class>
   <Class Name="EPI.Comm.Net.TcpClientBase" Collapsed="true">
     <Position X="26.5" Y="3.75" Width="1.5" />
-    <NestedTypes>
-      <Class Name="EPI.Comm.Net.TcpClientBase.AutoConnectHelper" Collapsed="true">
-        <TypeIdentifier>
-          <NewMemberFileName>Net\TcpClientBase.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Class>
-    </NestedTypes>
     <TypeIdentifier>
       <HashCode>IAAAAAAAICEASABQCAkAApAQDAAAAIAQIAEAAkAAYIA=</HashCode>
       <FileName>Net\TcpClientBase.cs</FileName>
@@ -135,7 +128,7 @@
   <Class Name="EPI.Comm.Net.TcpNetServer" Collapsed="true">
     <Position X="35" Y="5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAABAEAABAAAAGAAAAAgAABAAAIABAAAIAAoAAA=</HashCode>
+      <HashCode>AAAAAAABAAAAAAAAAGAAAAAgAABAAAIABAAAIAAoAAA=</HashCode>
       <FileName>Net\TcpNetServer.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
@@ -157,7 +150,7 @@
   <Class Name="EPI.Comm.Net.TcpServerBase" Collapsed="true">
     <Position X="32.75" Y="3.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AYQBBEIEAGAABAABCAAAAAAwCABAAACAIAAAAgAoAAA=</HashCode>
+      <HashCode>AYQBBEIEACAAAAABCAAAAAAwCABAAACAIAAAAgAoAAA=</HashCode>
       <FileName>Net\TcpServerBase.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" />
@@ -165,7 +158,7 @@
   <Class Name="EPI.Comm.Net.UdpBase" Collapsed="true" BaseTypeListCollapsed="true">
     <Position X="37.5" Y="6.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAQAAAAICAAAAAACEAAAEAQAABCAEAQIAEAAyCAAQA=</HashCode>
+      <HashCode>AAAQAAAAICAgAAAACAAAAEAQAABCAMAQIAEAAyCAAQA=</HashCode>
       <FileName>Net\UdpBase.cs</FileName>
     </TypeIdentifier>
     <Lollipop Position="0.2" Collapsed="true" />

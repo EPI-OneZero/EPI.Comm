@@ -229,7 +229,7 @@ namespace EPI.Comm.Net
             }
             private void RunAutoConnect()
             {
-                DelegateUtil.Start(() =>
+                ThreadUtil.Start(() =>
                 {
                     lock (this)
                     {

@@ -10,7 +10,6 @@ using static EPI.Comm.CommConfig;
 
 namespace EPI.Comm.Net.Generic
 {
-
     public class TcpNetClient<Theader> : TcpClientBase, IComm<Theader>
         where Theader : new()
     {
@@ -20,6 +19,7 @@ namespace EPI.Comm.Net.Generic
         internal Func<Theader, int> GetBodySize { get; private set; }
         internal Packet<Theader> Packet { get; set; }
         #endregion
+
         #region CTOR
         public TcpNetClient(int bufferSize, Func<Theader, int> getBodySize) : base(bufferSize)
         {
@@ -36,6 +36,7 @@ namespace EPI.Comm.Net.Generic
             SetPacketProperties(getBodySize);
         }
         #endregion
+        
         #region Method & Event
         private protected override void OnSocketDisconnected()
         {
@@ -81,7 +82,6 @@ namespace EPI.Comm.Net.Generic
         public event PacketEventHandler<Theader> Received;
         #endregion
     }
-
     public class TcpNetClient<Theader, Tfooter> : TcpClientBase, IComm<Theader, Tfooter>
         where Theader : new()
     {
@@ -141,10 +141,7 @@ namespace EPI.Comm.Net.Generic
                 ReceiveBuffer.AddBytes(e.ReceivedBytes);
                 while (Packet.TryDeserialize(ReceiveBuffer))
                 {
-
-                    var packet = Packet;
-
-                    Received?.Invoke(this, new PacketEventArgs<Theader, Tfooter>(e.From, packet));
+                    Received?.Invoke(this, new PacketEventArgs<Theader, Tfooter>(e.From, Packet));
                     Packet = new Packet<Theader, Tfooter>(GetBodySize);
                 }
             }
@@ -153,5 +150,4 @@ namespace EPI.Comm.Net.Generic
         public event PacketEventHandler<Theader, Tfooter> Received;
         #endregion
     }
-
 }

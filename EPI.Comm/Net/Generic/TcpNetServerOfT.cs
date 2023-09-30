@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using static EPI.Comm.CommConfig;
 namespace EPI.Comm.Net.Generic
 {
-
     public class TcpNetServer<Theader> : TcpServerBase, IComm<Theader>
         where Theader : new()
     {
@@ -78,7 +77,6 @@ namespace EPI.Comm.Net.Generic
         public event TcpEventHandler<Theader> ClientDisconnected;
         #endregion
     }
-
     public class TcpNetServer<Theader, Tfooter> : TcpServerBase, IComm<Theader, Tfooter>
        where Theader : new() where Tfooter : new()
     {
@@ -120,7 +118,6 @@ namespace EPI.Comm.Net.Generic
             var result = new TcpNetClient<Theader, Tfooter>(client, BufferSize, GetBodySize);
             return result;
         }
-       
         private protected override void AttachClient(TcpClientBase client)
         {
             base.AttachClient(client);
@@ -130,11 +127,9 @@ namespace EPI.Comm.Net.Generic
             ClientConnected?.Invoke(this, new TcpEventArgs<Theader, Tfooter>(newClient));
         }
         public event TcpEventHandler<Theader, Tfooter> ClientConnected;
-
         #endregion
 
         #region Close
-      
         private protected override void DetachClient(TcpClientBase client)
         {
             base.DetachClient(client);
@@ -143,7 +138,6 @@ namespace EPI.Comm.Net.Generic
             oldClient.Received -= OnClientReceived;
             ClientDisconnected?.Invoke(this, new TcpEventArgs<Theader, Tfooter>(oldClient));
         }
-
         public event TcpEventHandler<Theader, Tfooter> ClientDisconnected;
         #endregion
     }

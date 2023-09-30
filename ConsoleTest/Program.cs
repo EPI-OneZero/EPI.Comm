@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Reflection;
@@ -31,7 +32,7 @@ namespace ConsoleTest
     [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Unicode)]
     struct MyStruct2
     {
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 10)]
+        [MarshalAs(UnmanagedType.LPStr, SizeConst = 10)]
         public string S;
     }
     class MyClass
@@ -47,6 +48,8 @@ namespace ConsoleTest
         {
             var s1 = Marshal.SizeOf(typeof(MyStruct));
             var s2 = Marshal.SizeOf(typeof(MyStruct2));
+            Console.WriteLine(s1);
+            Console.WriteLine(s2);
             var fields = GetFields(typeof(MyObject));
             var type = typeof(MyObject);
             var s = type.IsAnsiClass;
@@ -63,11 +66,13 @@ namespace ConsoleTest
         {
             Console.WriteLine("Name : " + field.Name);
             Console.WriteLine("Type : " + field.FieldType.Name);
-            var inter = field.FieldType.GetInterface("IEnumerable`1");
-            Console.WriteLine("GenericTypeArguments");
+            var inter = field.FieldType.GetInterface(typeof(IEnumerable<>).Name);
+            var ienum = typeof(IEnumerable<>);
+         
             foreach (var item in inter?.GenericTypeArguments?? new Type[0])
             {
-                Console.WriteLine($"{item.Name}");
+                Console.WriteLine($"IEnumerable<{item?.Name}>");
+                Console.WriteLine(item.IsPrimitive);
             }
             var marshalAs = GetMarshalAs(field);
             if(marshalAs != null)
@@ -97,7 +102,7 @@ namespace ConsoleTest
                     }
                 }
             }
-            catch (Exception e) { }
+            catch (Exception) { }
             finally { Console.WriteLine(); }
         }
         public static FieldInfo[] GetFields(Type type)
