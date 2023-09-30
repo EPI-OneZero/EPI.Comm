@@ -52,6 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Endian\ReverseEndian.cs" />
+    <Compile Include="Endian\ReverseSpeedTest.cs" />
     <Compile Include="Models\Models.cs" />
     <Compile Include="Tcp\PacketHeaderTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

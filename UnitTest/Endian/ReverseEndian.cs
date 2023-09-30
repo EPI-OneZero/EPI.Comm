@@ -18,11 +18,18 @@ namespace UnitTest.Endian
             var size= Marshal.SizeOf(outer);
             var bytes = new byte[size];
             Serialize(outer, bytes, 0, size);
+            var time = DateTime.Now;
             ReverseEndian<Outer>(bytes);
+            var now = DateTime.Now;
+            outer.ReverseEndian();
+            var now2 = DateTime.Now;
+            var dt2 = now2 - now;
+            var dt1 = now - time;
 
             var t = Deserialize<Outer>(bytes);
-            outer.ReverseEndian();
             Assert.AreEqual(outer, t);
+            Console.WriteLine(dt1.TotalMilliseconds);
+            Console.WriteLine(dt2.TotalMilliseconds);
         }
     }
     #region Model
@@ -37,6 +44,10 @@ namespace UnitTest.Endian
         public long D = 0x4567890123456789;
         public Outer()
         {
+            var random = new Random();
+            B= (short)random.Next(short.MinValue,short.MaxValue);
+            C= random.Next(int.MinValue,int.MaxValue);
+            D = (((long)random.Next(int.MinValue, int.MaxValue)) << 32) | (long)random.Next(int.MinValue, int.MaxValue);
             for (int i = 0; i < Inners.Length; i++)
             {
                 Inners[i] = new Inner();
@@ -138,7 +149,5 @@ namespace UnitTest.Endian
             return base.GetHashCode();
         }
     }
-    #endregion
-    #region Model2
     #endregion
 }

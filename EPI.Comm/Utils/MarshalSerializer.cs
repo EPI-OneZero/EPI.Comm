@@ -37,7 +37,7 @@ namespace EPI.Comm.Utils
         }
         public static void ReverseEndian<T>(byte[] bytes)
         {
-            var node = MarshalTypeNodeBase.Create(typeof(T));
+            var node = MarshalBaseModel.Create(typeof(T));
 
             node.ReverseEndian(bytes);
         }

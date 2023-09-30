@@ -10,14 +10,13 @@ namespace EPI.Comm.Utils
     {
         void ReverseEndian(byte[] bytes);
     }
-    internal abstract class MarshalTypeNodeBase : IReverseEndian
+    internal abstract class MarshalBaseModel
     {
-        private static readonly Dictionary<Type, MarshalTypeNodeBase> MarshalNodes = new Dictionary<Type, MarshalTypeNodeBase>();
-
+        private static readonly Dictionary<Type, MarshalBaseModel> MarshalNodes = new Dictionary<Type, MarshalBaseModel>();
         public abstract void ReverseEndian(byte[] bytes);
         public int Offset { get; internal set; }
         public int Size { get; internal set; }
-        internal static MarshalTypeNodeBase Create(Type type)
+        internal static MarshalBaseModel Create(Type type)
         {
             if(!MarshalNodes.ContainsKey(type))
             {
@@ -26,9 +25,9 @@ namespace EPI.Comm.Utils
             }
             return MarshalNodes[type];
         }
-        private static MarshalTypeNode CreateSingleType(Type type, int offset)
+        private static MarshalSingleModel CreateSingleType(Type type, int offset)
         {
-            var result = new MarshalTypeNode(type);
+            var result = new MarshalSingleModel(type);
             result.Offset = offset;
             result.Size= Marshal.SizeOf(type);
             if (!type.IsPrimitive)
@@ -53,14 +52,14 @@ namespace EPI.Comm.Utils
             }
             return result;
         }
-        private static MarshalArrayTypeNode CreateArrayType(FieldInfo fieldInfo, int offset)
+        private static MarshalArrayModel CreateArrayType(FieldInfo fieldInfo, int offset)
         {
             var ienumerable = fieldInfo.FieldType.GetInterface(typeof(IEnumerable<>).Name);
             var sizeConst = fieldInfo.GetCustomAttribute<MarshalAsAttribute>().SizeConst;
             var itemType = ienumerable.GenericTypeArguments[0];
             var itemMarshalType = CreateSingleType(itemType, offset);
 
-            var result = new MarshalArrayTypeNode(itemMarshalType, sizeConst);
+            var result = new MarshalArrayModel(itemMarshalType, sizeConst);
 
             result.Offset = offset;
             return result;
@@ -79,18 +78,18 @@ namespace EPI.Comm.Utils
             return result;
         }
     }
-    internal sealed class MarshalTypeNode : MarshalTypeNodeBase
+    internal sealed class MarshalSingleModel : MarshalBaseModel
     {
         public Type Type { get; set; }
 
-        public List<MarshalTypeNodeBase> TypeNodes { get; set; } = new List<MarshalTypeNodeBase>();
-        public MarshalTypeNode(Type t)
+        public List<MarshalBaseModel> TypeNodes { get; set; } = new List<MarshalBaseModel>();
+        public MarshalSingleModel(Type t)
         {
             Type = t;
         }
         public override void ReverseEndian(byte[] bytes)
         {
-            if (TypeNodes.Count == 0)
+            if (TypeNodes.Count == 0 && Size > 1)
             {
                 Array.Reverse(bytes, Offset, Size);
             }
@@ -100,11 +99,11 @@ namespace EPI.Comm.Utils
             }
         }
     }
-    internal sealed class MarshalArrayTypeNode : MarshalTypeNodeBase
+    internal sealed class MarshalArrayModel : MarshalBaseModel
     {
-        public MarshalTypeNode ItemType { get; set; }
+        public MarshalSingleModel ItemType { get; set; }
         public int Count { get; set; }
-        public MarshalArrayTypeNode(MarshalTypeNode itemMarshalType, int count)
+        public MarshalArrayModel(MarshalSingleModel itemMarshalType, int count)
         {
             ItemType = itemMarshalType;
             Count = count;
