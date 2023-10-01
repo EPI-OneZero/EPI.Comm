@@ -46,8 +46,6 @@ namespace EPI.Comm.Net
         {
             return new TcpNetClient(client, BufferSize);
         }
-
-
         private protected override void AttachClient(TcpClientBase client)
         {
             base.AttachClient(client);
