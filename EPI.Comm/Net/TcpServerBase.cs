@@ -11,19 +11,19 @@ namespace EPI.Comm.Net
     public abstract class TcpServerBase : IDisposable
     {
         #region Field & Property
+        private readonly object startStopLock = new object();
         internal TcpListener Listener { get; private set; }
         public IPEndPoint LocalEndPoint => Listener?.Server?.LocalEndPoint as IPEndPoint;
         public int Port { get; private set; }
         public bool IsListening { get => isListening; }
 
-        private volatile bool isListening = false;
+        private volatile bool isListening;
         public int BufferSize { get; private set; }
 
         private List<TcpClientBase> clients = new List<TcpClientBase>();
 
 
-        protected object startStopLock = new object();
-        private volatile bool acceptLoopingOn = false;
+        private volatile bool acceptLoopingOn;
         #endregion
 
         #region CTOR

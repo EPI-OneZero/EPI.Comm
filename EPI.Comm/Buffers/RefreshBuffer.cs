@@ -5,10 +5,10 @@ using System.Collections.Generic;
 namespace EPI.Comm.Buffers
 {
 
-    internal class RefreshBuffer : IBuffer
+    internal sealed class RefreshBuffer : IBuffer
     {
-        protected byte[] buffer;
-        protected int offset = 0;
+        private byte[] buffer;
+        private int offset;
 
         public RefreshBuffer()
         {
@@ -48,8 +48,8 @@ namespace EPI.Comm.Buffers
         #region IEnumerable
         public IEnumerator<byte> GetEnumerator()
         {
-            IEnumerable<byte> ienum = buffer ?? new byte[0];
-            return ienum?.GetEnumerator();
+            IEnumerable<byte> enumrator = buffer ?? Array.Empty<byte>();
+            return enumrator.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
@@ -59,7 +59,7 @@ namespace EPI.Comm.Buffers
 
         public void Clear()
         {
-            buffer = new byte[0];
+            buffer = Array.Empty<byte>();
             offset = 0;
         }
         #endregion

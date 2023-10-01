@@ -5,14 +5,14 @@ using static EPI.Comm.CommConfig;
 namespace EPI.Comm.Buffers
 {
 
-    internal class QueueBuffer : IBuffer
+    internal sealed class QueueBuffer : IBuffer
     {
         #region Field & Property
-        protected byte[] buffer;
+        private byte[] buffer;
         public int Capacity => buffer.Length;
-        protected int head;
-        protected int tail;
-        protected int queueDataCount;
+        private int head;
+        private int tail;
+        private int queueDataCount;
         #endregion
 
         #region CTOR
