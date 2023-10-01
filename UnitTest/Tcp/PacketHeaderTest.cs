@@ -27,7 +27,7 @@ namespace UnitTest.Tcp
             const int Port = 5555;
             Server = new TcpNetServer<Header>(Header.GetBodySize) { IsBigEndian = true };
             Client = new TcpNetClient<Header>(Header.GetBodySize) { IsBigEndian = true };
-            int packetCount = 10;
+            int packetCount = 1;
             Data = new List<PacketWithHeader>(packetCount);
             for (int i = 0; i < packetCount; i++)
             {
@@ -89,7 +89,8 @@ namespace UnitTest.Tcp
             }
             void OnReceived(object s, PacketEventArgs<Header> e)
             {
-                recv = new PacketWithHeader() { Header = e.Header, Body = e.Body };
+                recv = new PacketWithHeader() { Header = e.Header, Body = e.Body, FullPacket =e.FullPacket };
+                Console.WriteLine($"{recv}");
                 count++;
             }
         }

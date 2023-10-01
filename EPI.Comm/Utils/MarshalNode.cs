@@ -9,17 +9,14 @@ namespace EPI.Comm.Utils
     internal abstract class MarshalNodeBase : IDisposable
     {
      
-        public void ReverseEndian(byte[] bytes)
-        {
-
-        }
+  
         public abstract void GenerateInfo(List<EndianInfo> infos);
 
         public int Offset { get; internal set; }
         public int Size { get; internal set; }
         internal static EndianInfo[] Create(Type type)
         {
-            var item = new MarshalNode(type, 0);
+            var item = new MarshalNode(type, 0, type.IsUnicodeClass);
             var result = new List<EndianInfo>();
             item.GenerateInfo(result);
             item.Dispose();
@@ -43,16 +40,24 @@ namespace EPI.Comm.Utils
         public Type Type { get; set; }
 
         public List<MarshalNodeBase> TypeNodes { get; set; } = new List<MarshalNodeBase>();
-        public MarshalNode(Type t, int offset)
+        public MarshalNode(Type t, int offset,bool isUnicodeClass)
         {
             Offset = offset;
             Type = ConvertEnumToNumType(t);
-
-            Size = Marshal.SizeOf(Type);
+            bool charIs2byte = isUnicodeClass;
+            if(Type == typeof(char) && charIs2byte)
+            {
+                Size = 2;
+            }
+            else
+            {
+                Size = Marshal.SizeOf(Type);
+            }
             if (!Type.IsPrimitive)
-                InitSubNodes();
+                InitSubNodes(isUnicodeClass);
         }
-        private void InitSubNodes()
+        
+        private void InitSubNodes(bool isUnicodeClass)
         {
             var fields = from field in GetFields(Type)
                          let off = (int)Marshal.OffsetOf(Type, field.Name)
@@ -60,14 +65,15 @@ namespace EPI.Comm.Utils
             foreach (var fi in fields)
             {
                 var fieldType = fi.field.FieldType;
+                var fieldOffset = fi.off + Offset;
                 if (IsArrayType(fieldType))
                 {
-                    TypeNodes.Add(new MarshalArrayNode(fi.field, fi.off + Offset));
+                    TypeNodes.Add(new MarshalArrayNode(fi.field, fieldOffset, isUnicodeClass));
                 }
                 else
                 {
 
-                    TypeNodes.Add(new MarshalNode(fieldType, fi.off + Offset));
+                    TypeNodes.Add(new MarshalNode(fieldType, fieldOffset, isUnicodeClass));
                 }
             }
         }
@@ -95,12 +101,13 @@ namespace EPI.Comm.Utils
     {
         public MarshalNode ItemType { get; set; }
         public int Count { get; set; }
-        public MarshalArrayNode(FieldInfo fieldInfo, int offset)
+        public MarshalArrayNode(FieldInfo fieldInfo, int offset,bool isUnicodeClass)
         {
+            int sizeConst = fieldInfo.GetCustomAttribute<MarshalAsAttribute>().SizeConst;
+
             var ienumerable = fieldInfo.FieldType.GetInterface(typeof(IEnumerable<>).Name);
-            var sizeConst = fieldInfo.GetCustomAttribute<MarshalAsAttribute>().SizeConst;
             var itemType = ienumerable.GenericTypeArguments[0];
-            ItemType = new MarshalNode(itemType, offset);
+            ItemType = new MarshalNode(itemType, offset, isUnicodeClass);
             Count = sizeConst;
             Offset = offset;
         }

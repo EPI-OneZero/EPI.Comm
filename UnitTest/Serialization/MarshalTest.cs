@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace UnitTest.Serialization
 {
+    
     internal class MarshalTest
     {
     }

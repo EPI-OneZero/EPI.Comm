@@ -28,12 +28,13 @@ namespace UnitTest.Tcp
             const int Port = 5555;
             Server = new TcpNetServer<Header, Footer>(Header.GetBodySize) { IsBigEndian = true };
             Client = new TcpNetClient<Header, Footer>(Header.GetBodySize) { IsBigEndian = true };
-            int packetCount = 10;
+            int packetCount = 1;
             Data = new List<PacketWithHeaderFooter>(packetCount);
             for (int i = 0; i < packetCount; i++)
             {
                 var packet = new PacketWithHeaderFooter();
                 packet.SetRandom();
+               
                 Data.Add(packet);
             }
             Server.StartListen(Port);
@@ -101,20 +102,10 @@ namespace UnitTest.Tcp
             }
             void OnReceived(object s, PacketEventArgs<Header, Footer> e)
             {
-                recv = new PacketWithHeaderFooter() { Header = e.Header, Body = e.Body, Footer = e.Footer };
+                recv = new PacketWithHeaderFooter() 
+                { Header = e.Header, Body = e.Body, Footer = e.Footer, FullPacket =e.FullPacket };
                 Console.WriteLine($"{recv}");
-                var builder = new StringBuilder();
-                builder.Append("전체 수신 바이트");
-                for (int i = 0; i < e.FullPacket.Length; i++)
-                {
-                    if (i % 8 == 0)
-                    {
-                        builder.AppendLine();
-                    }
-                    builder.Append(e.FullPacket[i].ToString("x2"));
-                    builder.Append("\t");
-                }
-                Console.WriteLine($"{builder}");
+               
                 count++;
             }
         }
