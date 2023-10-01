@@ -11,7 +11,6 @@ namespace EPI.Comm.Net
         private readonly List<TcpNetClient> clients = new List<TcpNetClient>();
         public ClientCollection Clients => new ClientCollection(clients.ToArray());
         #endregion
-
         #region CTOR
         public TcpNetServer(int bufferSize) : base(bufferSize)
         {
