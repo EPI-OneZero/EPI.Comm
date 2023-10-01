@@ -135,7 +135,7 @@ namespace EPI.Comm.Net
                 if (client.Connected && returned)
                 {
                     AttachSocket(client.Client);
-                    OnSocketConnected();
+                    Connected?.Invoke(this, EventArgs.Empty);
                 }
                 else
                 {
@@ -159,10 +159,7 @@ namespace EPI.Comm.Net
             ipToConnect = ip;
             portToConnect = port;
         }
-        private void OnSocketConnected()
-        {
-            Connected?.Invoke(this, EventArgs.Empty);
-        }
+
         public event EventHandler Connected;
 
         #endregion
@@ -183,7 +180,7 @@ namespace EPI.Comm.Net
 
         private protected virtual void OnSocketDisconnected()
         {
-            Logger.Default.WriteLine( $"{HolderName} {nameof(OnSocketDisconnected)}");
+            Logger.Default.WriteLine($"{HolderName} {nameof(OnSocketDisconnected)}");
             Disconnected?.Invoke(this, EventArgs.Empty);
         }
         private void SocketClosed(object sender, EventArgs e)

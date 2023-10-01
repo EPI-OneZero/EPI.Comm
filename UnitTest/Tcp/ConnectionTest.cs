@@ -22,7 +22,6 @@ namespace UnitTest.Tcp
                 for (int i = 0; i < 3; i++)
                 {
                     client.Connect(loopback, port);
-                    Console.WriteLine(i);
                     Assert.IsTrue(client.IsConnected);
                     client.Stop();
                     Assert.IsFalse(client.IsConnected);
@@ -55,10 +54,10 @@ namespace UnitTest.Tcp
                 for (int i = 0; i < 3; i++)
                 {
                     server.Stop();
-                    Thread.Sleep(200);
+                    Thread.Sleep(300);
                     Assert.IsFalse(client.IsConnected);
                     server.StartListen(port);
-                    Thread.Sleep(1300);
+                    Thread.Sleep(500);
                     Assert.IsTrue(client.IsConnected);
                 }
             }

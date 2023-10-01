@@ -117,7 +117,7 @@ namespace EPI.Comm.Net
                 catch (CommException e) // 연결을 끊었을 때
                 {
                     Logger.Default.WriteLine(e.Message);
-                    RaiseClosed();
+                    Closed?.Invoke(this, EventArgs.Empty);
                     break;
                 }
                 finally
@@ -126,10 +126,6 @@ namespace EPI.Comm.Net
                 }
 
             }
-        }
-        private void RaiseClosed()
-        {
-            Closed?.Invoke(this, EventArgs.Empty);
         }
         #endregion
 
