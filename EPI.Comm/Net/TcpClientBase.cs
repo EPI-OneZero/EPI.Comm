@@ -33,7 +33,7 @@ namespace EPI.Comm.Net
         private int portToConnect;
         public bool IsConnected => isSocketAttached;
         private readonly AutoConnectHelper connectHelper;
-        private readonly string HolderName = "";
+     
         #endregion
 
         #region CTOR
@@ -42,14 +42,12 @@ namespace EPI.Comm.Net
             connectHelper = new AutoConnectHelper(this);
             BufferSize = bufferSize;
             AutoConnect = true;
-            HolderName = "클라";
         }
         private protected TcpClientBase(TcpClient client, int bufferSize) : base()
         {
             TcpClient = client;
             BufferSize = bufferSize;
             AttachSocket(TcpClient.Client);
-            HolderName = "서버";
         }
 
         #endregion
@@ -105,28 +103,19 @@ namespace EPI.Comm.Net
                 lock (ConnectLock)
                 {
                     isConnecting = true;
-                    try
-                    {
-                        TcpClient = new TcpClient();
-                        Connect(TcpClient);
-                    }
-                    catch (CommException e)
+                    TcpClient = new TcpClient();
+                    if(!Connect(TcpClient))
                     {
                         TcpClient?.Dispose();
                         TcpClient = null;
                         connectHelper?.RunAutoConnectIfUserWant();
-                        Logger.Default.WriteLine(e.Message);
                     }
-                    finally
-                    {
-                        isConnecting = false;
-                        Logger.Default.WriteLineCaller();
-                    }
+                    isConnecting = false;
                 }
             }
 
         }
-        private void Connect(TcpClient client)
+        private bool Connect(TcpClient client)
         {
             try
             {
@@ -136,16 +125,16 @@ namespace EPI.Comm.Net
                 {
                     AttachSocket(client.Client);
                     Connected?.Invoke(this, EventArgs.Empty);
+                    return true;
                 }
                 else
                 {
-                    throw CommException.CreateCommException("Connection Time Out");
+                    return false;
                 }
             }
             catch (SocketException e)
             {
-
-                throw CommException.CreateCommException(e);
+                return false;
             }
             finally
             {
@@ -180,7 +169,6 @@ namespace EPI.Comm.Net
 
         private protected virtual void OnSocketDisconnected()
         {
-            Logger.Default.WriteLine($"{HolderName} {nameof(OnSocketDisconnected)}");
             Disconnected?.Invoke(this, EventArgs.Empty);
         }
         private void SocketClosed(object sender, EventArgs e)
