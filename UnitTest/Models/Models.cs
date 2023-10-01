@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading;
 
@@ -128,8 +129,20 @@ namespace UnitTest.Models
 
         }
     }
-
-
+    [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Unicode)]
+    public class Msg
+    {
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 5)]
+        public string Message;
+        public Msg(string msg)
+        {
+            Message = msg;
+        }
+        public override string ToString()
+        {
+            return Message; 
+        }
+    }
     [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Ansi)]
     public class Footer //: IEquatable<Footer>
     {
@@ -137,8 +150,7 @@ namespace UnitTest.Models
         {
             AABB = 0xAABB,
         }
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst =5)]
-        public string Message  = "한글";
+        public Msg Message  = new Msg("한글");
         public MyEnum My { get; set; } = MyEnum.AABB;
         public ushort Etx { get; set; }
         public static Footer Get()

@@ -147,7 +147,9 @@ namespace EPI.Comm.Net.Generic.Packets
             if (base.TryDeserializePacket(buffer, isBigEndian) && IsEnoughSizeToDeserialize(buffer.Count, FooterSize))
             {
                 var bytes = buffer.GetBytes(FooterSize);
+                queue.AddBytes(bytes);
                 Footer = Deserialize<Tfooter>(bytes, isBigEndian);
+                
                 return true;
             }
             else

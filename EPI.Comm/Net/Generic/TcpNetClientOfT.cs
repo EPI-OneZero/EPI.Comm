@@ -24,7 +24,6 @@ namespace EPI.Comm.Net.Generic
         #region CTOR
         public TcpNetClient(int bufferSize, Func<Theader, int> getBodySize) : base(bufferSize)
         {
-            HeaderSize = Marshal.SizeOf<Theader>();
             SetPacketProperties(getBodySize);
         }
         public TcpNetClient(Func<Theader, int> getBodySize) : this(DefaultBufferSize, getBodySize)
@@ -50,8 +49,7 @@ namespace EPI.Comm.Net.Generic
             GetBodySize = getBodySize;
             PacketToSend = new Packet<Theader>(GetBodySize);
             PacketToReceive = new Packet<Theader>(GetBodySize);
-            HeaderSize = Marshal.SizeOf<Theader>();
-
+            HeaderSize = PacketToReceive.HeaderSize;
         }
         public void Send(Theader header, byte[] body)
         {
@@ -108,8 +106,8 @@ namespace EPI.Comm.Net.Generic
         {
             PacketToSend = new Packet<Theader, Tfooter>(getBodySize);
             PacketToReceive = new Packet<Theader, Tfooter>(getBodySize);
-            HeaderSize = Marshal.SizeOf<Theader>();
-            FooterSize = Marshal.SizeOf<Tfooter>();
+            HeaderSize = PacketToReceive.HeaderSize;
+            FooterSize = PacketToReceive.FooterSize;
 
         }
         private protected override void OnSocketDisconnected()

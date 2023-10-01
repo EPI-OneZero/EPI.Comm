@@ -19,10 +19,11 @@ namespace UnitTest.Tcp
         public ByteArrayTest()
         {
         }
+        public static int Port = 5553;
         [TestInitialize]
         public void Init()
         {
-            const int Port = 5555;
+       
             Server = new TcpNetServer();
             Client = new TcpNetClient();
             Data = new List<byte[]>();
@@ -32,6 +33,8 @@ namespace UnitTest.Tcp
             }
             Server.StartListen(Port);
             Client.Connect(IPAddress.Loopback.ToString(), Port);
+            Console.WriteLine(Port);
+            Port++;
         }
         [TestCleanup]
         public void Close()

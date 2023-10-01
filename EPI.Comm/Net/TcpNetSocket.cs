@@ -156,9 +156,9 @@ namespace EPI.Comm.Net
 
         public byte[] Generate()
         {
-            var size = Marshal.SizeOf<KeepAlive>();
-            var result = new byte[size];
-            MarshalSerializer.Serialize(this, result, 0, size);
+            const int Size = 12;
+            var result = new byte[Size];
+            MarshalSerializer.Serialize(this, result, 0, Size);
             return result;
         }
     }

@@ -21,10 +21,10 @@ namespace UnitTest.Tcp
         public PacketHeaderTest()
         {
         }
+        public static int Port = 5557;
         [TestInitialize]
         public void Init()
         {
-            const int Port = 5555;
             Server = new TcpNetServer<Header>(Header.GetBodySize) { IsBigEndian = true };
             Client = new TcpNetClient<Header>(Header.GetBodySize) { IsBigEndian = true };
             int packetCount = 1;
@@ -37,6 +37,8 @@ namespace UnitTest.Tcp
             }
             Server.StartListen(Port);
             Client.Connect(IPAddress.Loopback.ToString(), Port);
+            Console.WriteLine(Port);
+            Port++;
         }
 
         [TestCleanup]

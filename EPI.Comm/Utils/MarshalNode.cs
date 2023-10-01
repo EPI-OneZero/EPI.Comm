@@ -6,10 +6,8 @@ using System.Runtime.InteropServices;
 
 namespace EPI.Comm.Utils
 {
-    internal abstract class MarshalNodeBase : IDisposable
+    internal abstract class MarshalNodeBase
     {
-
-
         public abstract void GenerateInfo(List<EndianInfo> infos);
 
         public int Offset { get; internal set; }
@@ -19,20 +17,12 @@ namespace EPI.Comm.Utils
             var item = new MarshalNode(type, 0, type.IsUnicodeClass);
             var result = new List<EndianInfo>();
             item.GenerateInfo(result);
-            item.Dispose();
             return result.ToArray();
         }
         public static FieldInfo[] GetFields(Type type)
         {
             var result = type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
             return result;
-        }
-        internal static Type ConvertEnumToNumType(Type t)
-        {
-            return !t.IsEnum ? t : Enum.GetUnderlyingType(t);
-        }
-        public void Dispose()
-        {
         }
     }
     internal sealed class MarshalNode : MarshalNodeBase
@@ -43,9 +33,8 @@ namespace EPI.Comm.Utils
         public MarshalNode(Type t, int offset, bool isUnicodeClass)
         {
             Offset = offset;
-            Type = ConvertEnumToNumType(t);
-            bool charIs2byte = isUnicodeClass;
-            if (Type == typeof(char) && charIs2byte)
+            Type = !t.IsEnum ? t : Enum.GetUnderlyingType(t);
+            if (Type == typeof(char) && isUnicodeClass)
             {
                 Size = 2;
             }
@@ -54,21 +43,21 @@ namespace EPI.Comm.Utils
                 Size = Marshal.SizeOf(Type);
             }
             if (!Type.IsPrimitive)
-                InitSubNodes(isUnicodeClass);
+                InitSubNodes(Type.IsUnicodeClass);
         }
 
         private void InitSubNodes(bool isUnicodeClass)
         {
-            var fields = from field in GetFields(Type)
-                         let off = (int)Marshal.OffsetOf(Type, field.Name)
-                         select (field, off);
-            foreach (var fi in fields)
+            var fields = from info in GetFieldInfos(Type)
+                         let off = (int)Marshal.OffsetOf(Type, info.Name)
+                         select (info, off);
+            foreach (var field in fields)
             {
-                var fieldType = fi.field.FieldType;
-                var fieldOffset = fi.off + Offset;
-                if (IsArrayType(fieldType))
+                var fieldType = field.info.FieldType;
+                var fieldOffset = field.off + Offset;
+                if (fieldType.IsArray || fieldType == typeof(string))
                 {
-                    TypeNodes.Add(new MarshalArrayNode(fi.field, fieldOffset, isUnicodeClass));
+                    TypeNodes.Add(new MarshalArrayNode(field.info, fieldOffset, isUnicodeClass));
                 }
                 else
                 {
@@ -76,6 +65,10 @@ namespace EPI.Comm.Utils
                     TypeNodes.Add(new MarshalNode(fieldType, fieldOffset, isUnicodeClass));
                 }
             }
+        }
+        private static FieldInfo[] GetFieldInfos(Type type)
+        {
+            return type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
         }
         public override void GenerateInfo(List<EndianInfo> infos)
         {
@@ -88,14 +81,7 @@ namespace EPI.Comm.Utils
                 item.GenerateInfo(infos);
             }
         }
-        private static bool IsArrayType(Type t)
-        {
-            if (t.IsArray || t == typeof(string))
-            {
-                return true;
-            }
-            return false;
-        }
+     
     }
     internal sealed class MarshalArrayNode : MarshalNodeBase
     {
