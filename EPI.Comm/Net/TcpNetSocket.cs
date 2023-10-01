@@ -17,8 +17,6 @@ namespace EPI.Comm.Net
         internal Socket Socket { get; private set; }
         internal byte[] ReceiveBuffer { get; private set; }
         public bool IsConnected => Socket != null && Socket.Connected;
-        public IPEndPoint LocalEndPoint { get; private set; }
-        public IPEndPoint RemoteEndPoint { get; private set; }
         private static readonly LingerOption lingerOption = new LingerOption(true, 0);
 
         #endregion
@@ -27,8 +25,6 @@ namespace EPI.Comm.Net
         internal TcpNetSocket(Socket socket, int bufferSize)
         {
             Socket = socket;
-            LocalEndPoint = socket.LocalEndPoint as IPEndPoint;
-            RemoteEndPoint = socket.RemoteEndPoint as IPEndPoint;
             ReceiveBuffer = new byte[bufferSize];
             SetSocketOption(socket);
             ThreadUtil.Start(ReceiveLoop);
@@ -112,7 +108,7 @@ namespace EPI.Comm.Net
                     {
                         recv = Receive();
                     }
-                    Received?.Invoke(this, new PacketEventArgs(RemoteEndPoint, recv));
+                    Received?.Invoke(this, new PacketEventArgs(Socket?.RemoteEndPoint as IPEndPoint, recv));
                 }
                 catch (CommException e) // 연결을 끊었을 때
                 {

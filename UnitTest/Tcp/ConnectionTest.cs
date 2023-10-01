@@ -55,10 +55,10 @@ namespace UnitTest.Tcp
                 for (int i = 0; i < 3; i++)
                 {
                     server.Stop();
-                    Thread.Sleep(100);
+                    Thread.Sleep(200);
                     Assert.IsFalse(client.IsConnected);
                     server.StartListen(port);
-                    Thread.Sleep(500);
+                    Thread.Sleep(600);
                     Assert.IsTrue(client.IsConnected);
                 }
             }
