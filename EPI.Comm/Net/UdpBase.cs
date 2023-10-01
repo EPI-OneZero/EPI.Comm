@@ -13,7 +13,7 @@ namespace EPI.Comm.Net
         private readonly object SendLock = new object();
         private readonly object RecvLock = new object();
         public UdpClient UdpClient { get; private set; }
-        public IPEndPoint LocalEndPoint => UdpClient?.Client?.LocalEndPoint as IPEndPoint;
+        public IPEndPoint LocalEndPoint { get; private set; }
         public IPEndPoint RemoteEndPoint { get; private set; }
         public int BufferSize { get; private set; }
         private volatile bool isStarted;
@@ -33,9 +33,13 @@ namespace EPI.Comm.Net
                 if (!isStarted)
                 {
                     UdpClient = new UdpClient(new IPEndPoint(IPAddress.Any, recvPort));
+                    LocalEndPoint = UdpClient.Client.LocalEndPoint as IPEndPoint;
                     RemoteEndPoint = new IPEndPoint(IPAddress.Parse(sendIp), sendPort);
                     SetSocketOption();
-                    ThreadUtil.Start(ReceiveLoop);
+                    ThreadUtil.Start(() =>
+                    {
+                        while (Receive());
+                    });
                     isStarted = true;
                 }
             }
@@ -51,6 +55,8 @@ namespace EPI.Comm.Net
             {
                 UdpClient?.Dispose();
                 UdpClient = null;
+                LocalEndPoint = null;
+                RemoteEndPoint = null;
                 isStarted = false;
             }
 
@@ -88,7 +94,7 @@ namespace EPI.Comm.Net
                 Logger.Default.WriteLineCaller();
             }
         }
-        private void Receive()
+        private bool Receive()
         {
             try
             {
@@ -98,38 +104,23 @@ namespace EPI.Comm.Net
                 {
                     recv = UdpClient.Receive(ref from);
                 }
-
                 OnReceived(new PacketEventArgs(new IPEndPoint(from.Address, from.Port), recv));
+                return true;
             }
-            catch (ObjectDisposedException e)
+            catch (ObjectDisposedException)
             {
-                throw CommException.CreateCommException(e);
+                return false;
             }
-            catch (NullReferenceException e)
+            catch (NullReferenceException)
             {
-                throw CommException.CreateCommException(e);
+                return false;
             }
-            catch (SocketException e)
+            catch (SocketException)
             {
-                throw CommException.CreateCommException(e);
+                return false;
             }
         }
-        private void ReceiveLoop()
-        {
-            while (isStarted)
-            {
-                try
-                {
-                    Receive();
-                }
-                catch (CommException e)
-                {
-                    Logger.Default.WriteLine(e.Message);
-                    break;
-                }
-            }
-
-        }
+     
         private protected abstract void OnReceived(PacketEventArgs e);
         #region IDISPOSE
         private bool disposedValue;

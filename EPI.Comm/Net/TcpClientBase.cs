@@ -82,14 +82,7 @@ namespace EPI.Comm.Net
         #region Send Receive
         internal void SendBytes(byte[] bytes)
         {
-            try
-            {
-                NetSocket?.Send(bytes);
-            }
-            catch (CommException e)
-            {
-                Logger.Default.WriteLine(e.Message);
-            }
+            NetSocket?.Send(bytes);
         }
         private protected abstract void SocketReceived(object sender, PacketEventArgs e);
         #endregion
@@ -132,7 +125,7 @@ namespace EPI.Comm.Net
                     return false;
                 }
             }
-            catch (SocketException e)
+            catch (SocketException)
             {
                 return false;
             }

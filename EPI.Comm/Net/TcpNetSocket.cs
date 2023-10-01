@@ -61,11 +61,11 @@ namespace EPI.Comm.Net
             }
             catch (SocketException e)
             {
-                throw CreateCommException(e);
+                Logger.Default.WriteLine(e.Message);
             }
             catch (ObjectDisposedException e)
             {
-                throw CreateCommException(e);
+                Logger.Default.WriteLine(e.Message);
             }
             finally
             {

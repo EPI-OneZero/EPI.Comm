@@ -116,7 +116,6 @@ namespace EPI.Comm.Net
                         AttachClient(client);
                     }
                 }
-
             }
             catch (SocketException e)
             {
@@ -130,7 +129,6 @@ namespace EPI.Comm.Net
 
         }
         private protected abstract TcpClientBase CreateClient(TcpClient client);
-
         #endregion
 
         #region IDISPOSE
