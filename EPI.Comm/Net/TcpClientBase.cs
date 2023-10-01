@@ -73,7 +73,7 @@ namespace EPI.Comm.Net
         }
         #endregion
         #region Send Receive
-        public void SendBytes(byte[] bytes)
+        internal void SendBytes(byte[] bytes)
         {
             try
             {
