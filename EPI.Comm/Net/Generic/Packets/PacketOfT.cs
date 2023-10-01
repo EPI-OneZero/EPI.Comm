@@ -68,7 +68,7 @@ namespace EPI.Comm.Net.Generic.Packets
         }
         private bool TryDeserializeHeader(IBuffer buffer, bool isBigEndian)
         {
-            if (IsEnoughSizeToDeserialize(buffer.Count, HeaderSize))
+            if (buffer.Count >= HeaderSize)
             {
                 var bytes = buffer.GetBytes(HeaderSize);
                 queue.AddBytes(bytes);
@@ -85,7 +85,7 @@ namespace EPI.Comm.Net.Generic.Packets
         private bool TryDeserializeBody(IBuffer buffer)
         {
             var bodySize = CalculateBodySize();
-            if (IsEnoughSizeToDeserialize(buffer.Count, bodySize))
+            if (buffer.Count>= bodySize)
             {
                 var bytes = buffer.GetBytes(bodySize);
                 queue.AddBytes(bytes);
@@ -144,7 +144,7 @@ namespace EPI.Comm.Net.Generic.Packets
         #region Method
         private protected override bool TryDeserializePacket(IBuffer buffer, bool isBigEndian)
         {
-            if (base.TryDeserializePacket(buffer, isBigEndian) && IsEnoughSizeToDeserialize(buffer.Count, FooterSize))
+            if (base.TryDeserializePacket(buffer, isBigEndian) && buffer.Count >= FooterSize)
             {
                 var bytes = buffer.GetBytes(FooterSize);
                 queue.AddBytes(bytes);

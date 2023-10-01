@@ -2,6 +2,7 @@
 using EPI.Comm.Net.Events;
 using EPI.Comm.Utils;
 using System;
+using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
@@ -26,26 +27,31 @@ namespace EPI.Comm.Net
                     connectHelper.AutoConnect = value;
             }
         }
+        private volatile bool isSocketAttached;
         private volatile bool isConnecting;
         private string ipToConnect;
         private int portToConnect;
         public bool IsConnected => TcpClient?.Connected ?? false;
         private readonly AutoConnectHelper connectHelper;
+        private readonly string HolderName = "";
         #endregion
 
         #region CTOR
-        protected TcpClientBase(int bufferSize)
+        private protected TcpClientBase(int bufferSize)
         {
             connectHelper = new AutoConnectHelper(this);
             BufferSize = bufferSize;
             AutoConnect = true;
+            HolderName = "클라";
         }
-        protected TcpClientBase(TcpClient client, int bufferSize) : base()
+        private protected TcpClientBase(TcpClient client, int bufferSize) : base()
         {
             TcpClient = client;
             BufferSize = bufferSize;
             AttachSocket(TcpClient.Client);
+            HolderName = "서버";
         }
+
         #endregion
 
         #region Socket Attach Detach
@@ -57,11 +63,13 @@ namespace EPI.Comm.Net
             NetSocket.Closed += SocketClosed;
             LocalEndPoint = NetSocket.LocalEndPoint;
             RemoteEndPoint = NetSocket.RemoteEndPoint;
+            isSocketAttached = true;
         }
 
 
         private void DetachSocket()
         {
+            isSocketAttached = false;
             if (NetSocket != null)
             {
                 NetSocket.Received -= SocketReceived;
@@ -106,7 +114,7 @@ namespace EPI.Comm.Net
                     {
                         TcpClient?.Dispose();
                         TcpClient = null;
-                        RunAutoConnectIfUserWant();
+                        connectHelper?.RunAutoConnectIfUserWant();
                         Logger.Default.WriteLine(e.Message);
                     }
                     finally
@@ -162,23 +170,20 @@ namespace EPI.Comm.Net
         #region Stop
         public void Stop()
         {
-            StopAutoConnectIfLoopOn();
+            connectHelper?.StopAutoConnectIfLoopOn();
             lock (ConnectLock)
             {
-                bool raiseEvent = IsConnected;
-                DetachSocket();
                 TcpClient?.Dispose();
                 TcpClient = null;
-                if (raiseEvent)
+                while (isSocketAttached)
                 {
-                    OnSocketDisconnected();
                 }
-
             }
         }
 
         private protected virtual void OnSocketDisconnected()
         {
+            Logger.Default.WriteLine( $"{HolderName} {nameof(OnSocketDisconnected)}");
             Disconnected?.Invoke(this, EventArgs.Empty);
         }
         private void SocketClosed(object sender, EventArgs e)
@@ -187,24 +192,12 @@ namespace EPI.Comm.Net
             TcpClient?.Dispose();
             TcpClient = null;
             OnSocketDisconnected();
-
-            RunAutoConnectIfUserWant();
+            connectHelper?.RunAutoConnectIfUserWant();
         }
         public event EventHandler Disconnected;
         #endregion
 
         #region AutoConnect
-        private void StopAutoConnectIfLoopOn()
-        {
-
-            connectHelper?.StopAutoConnectIfLoopOn();
-
-        }
-        private void RunAutoConnectIfUserWant()
-        {
-            connectHelper?.RunAutoConnectIfUserWant();
-        }
-
         private sealed class AutoConnectHelper
         {
             public bool AutoConnect { get; set; }

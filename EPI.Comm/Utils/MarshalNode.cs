@@ -19,11 +19,6 @@ namespace EPI.Comm.Utils
             item.GenerateInfo(result);
             return result.ToArray();
         }
-        public static FieldInfo[] GetFields(Type type)
-        {
-            var result = type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-            return result;
-        }
     }
     internal sealed class MarshalNode : MarshalNodeBase
     {

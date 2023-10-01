@@ -7,10 +7,6 @@ namespace EPI.Comm.Utils
     public static class MarshalSerializer
     {
         private static readonly Dictionary<Type, EndianInfo[]> EndianInfos = new Dictionary<Type, EndianInfo[]>();
-        public static bool IsEnoughSizeToDeserialize(int sourceSize, int dstSize)
-        {
-            return sourceSize >= dstSize;
-        }
         public static T Deserialize<T>(byte[] srcBytes, bool isBigEndian = false)
         {
             if (isBigEndian)
@@ -22,28 +18,17 @@ namespace EPI.Comm.Utils
             handle.Free();
             return result;
         }
-        public static bool IsEnoughSizeToSerialize(int sourceSize, int dstSize, int dstOffset)
-        {
-            return sourceSize <= dstSize - dstOffset;
-        }
         public static void Serialize<T>(T src, byte[] dst, int dstOffset, int srcSize, bool isBigEndian = false)
         {
-            if (IsEnoughSizeToSerialize(srcSize, dst.Length, dstOffset))
+            var handle = GCHandle.Alloc(dst, GCHandleType.Pinned);
+            var ptr = handle.AddrOfPinnedObject() + dstOffset;
+            Marshal.StructureToPtr(src, ptr, false);
+            Marshal.DestroyStructure(ptr, typeof(T));
+            if (isBigEndian)
             {
-                var handle = GCHandle.Alloc(dst, GCHandleType.Pinned);
-                var ptr = handle.AddrOfPinnedObject() + dstOffset;
-                Marshal.StructureToPtr(src, ptr, false);
-                Marshal.DestroyStructure(ptr, typeof(T));
-                if (isBigEndian)
-                {
-                    ReverseEndian<T>(dst, dstOffset);
-                }
-                handle.Free();
+                ReverseEndian<T>(dst, dstOffset);
             }
-            else
-            {
-                throw new IndexOutOfRangeException($"{nameof(srcSize)}");
-            }
+            handle.Free();
         }
         public static void ReverseEndian<T>(byte[] bytes, int offset)
         {

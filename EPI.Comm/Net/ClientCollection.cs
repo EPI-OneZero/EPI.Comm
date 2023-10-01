@@ -5,7 +5,7 @@ using System.Net;
 
 namespace EPI.Comm.Net
 {
-    public sealed class ClientCollection : ReadOnlyCollection<TcpNetClient>
+    public class ClientCollection : ReadOnlyCollection<TcpNetClient>
     {
         internal ClientCollection(IList<TcpNetClient> list) : base(list)
         {

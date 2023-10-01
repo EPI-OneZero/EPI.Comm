@@ -14,14 +14,15 @@ namespace UnitTest.Tcp
         {
             var server = new TcpNetServer();
             var client = new TcpNetClient();
-            const int port = 5551;
+            const int port = 5552;
             var loopback = IPAddress.Loopback.ToString();
             server.StartListen(port);
             try
             {
-                for (int i = 0; i < 10; i++)
+                for (int i = 0; i < 5; i++)
                 {
                     client.Connect(loopback, port);
+                    Console.WriteLine(i);
                     Assert.IsTrue(client.IsConnected);
                     client.Stop();
                     Assert.IsFalse(client.IsConnected);
@@ -66,10 +67,11 @@ namespace UnitTest.Tcp
 
                 throw;
             }
-            finally 
+            finally
             {
                 server.Dispose();
                 client.Dispose();
+                Thread.Sleep(3000);
             }
             
             

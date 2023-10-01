@@ -87,10 +87,6 @@ namespace EPI.Comm.Net
                 return result;
 
             }
-            catch (NullReferenceException e)
-            {
-                throw CreateCommException(e);
-            }
             catch (SocketException e)
             {
                 throw CreateCommException(e);
