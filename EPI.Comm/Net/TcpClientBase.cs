@@ -189,7 +189,7 @@ namespace EPI.Comm.Net
             {
                 Tcp = tcp;
             }
-            public void SetEndPoint(string ip, int port, bool requestConnect)
+            public void SetEndPoint(string ip, int port)
             {
                 userConnectIp = ip;
                 userConnectPort = port;
