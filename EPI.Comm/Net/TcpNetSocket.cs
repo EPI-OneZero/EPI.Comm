@@ -67,13 +67,9 @@ namespace EPI.Comm.Net
             {
                 throw CreateCommException(e);
             }
-            catch (NullReferenceException e)
-            {
-                throw CreateCommException(e);
-            }
             finally
             {
-                //Logger.Default.WriteLineCaller();
+                Logger.Default.WriteLineCaller();
             }
 
         }
