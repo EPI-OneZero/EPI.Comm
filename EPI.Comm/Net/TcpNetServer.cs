@@ -9,13 +9,12 @@ namespace EPI.Comm.Net
     {
         #region Field & Property
         private readonly List<TcpNetClient> clients = new List<TcpNetClient>();
-        public ClientCollection Clients { get; private set; }
+        public ClientCollection Clients => new ClientCollection(clients.ToArray());
         #endregion
 
         #region CTOR
         public TcpNetServer(int bufferSize) : base(bufferSize)
         {
-            Clients = new ClientCollection(clients);
         }
         public TcpNetServer() : this(DefaultBufferSize)
         {

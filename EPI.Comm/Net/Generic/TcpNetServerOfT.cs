@@ -1,6 +1,7 @@
 ﻿using EPI.Comm.Net.Generic.Events;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
@@ -13,7 +14,7 @@ namespace EPI.Comm.Net.Generic
         #region Field & Property
         private readonly object clientLock = new object();
         private readonly List<TcpNetClient<Theader>> clients = new List<TcpNetClient<Theader>>();
-        public ClientCollection<Theader> Clients { get; private set; }
+        public ClientCollection<Theader> Clients =>  new ClientCollection<Theader>(clients.ToArray());
         internal Func<Theader, int> GetBodySize { get; private set; }
         protected bool isBigEndian;
         public bool IsBigEndian
@@ -25,12 +26,9 @@ namespace EPI.Comm.Net.Generic
             set
             {
                 isBigEndian = value;
-                foreach (var client in clients)
+                foreach (var client in Clients)
                 {
-                    lock (clientLock)
-                    {
-                        client.IsBigEndian = isBigEndian;
-                    }
+                    client.IsBigEndian = isBigEndian;
                 }
             }
         }
@@ -39,7 +37,6 @@ namespace EPI.Comm.Net.Generic
         #region CTOR
         public TcpNetServer(int bufferSize, Func<Theader, int> getBodySize) : base(bufferSize)
         {
-            Clients = new ClientCollection<Theader>(clients);
             GetBodySize = getBodySize;
 
         }
@@ -110,7 +107,7 @@ namespace EPI.Comm.Net.Generic
         #region Field & Property
         private readonly object clientLock = new object();
         private readonly List<TcpNetClient<Theader, Tfooter>> clients = new List<TcpNetClient<Theader, Tfooter>>();
-        public ClientCollection<Theader, Tfooter> Clients { get; private set; }
+        public ClientCollection<Theader, Tfooter> Clients => new ClientCollection<Theader, Tfooter>(clients.ToArray());
         internal Func<Theader, int> GetBodySize { get; private set; }
         protected bool isBigEndian;
         public bool IsBigEndian 
@@ -122,12 +119,9 @@ namespace EPI.Comm.Net.Generic
             set
             {
                 isBigEndian = value;
-                foreach (var client in clients)
+                foreach (var client in Clients)
                 {
-                    lock (clientLock)
-                    {
-                        client.IsBigEndian = isBigEndian;
-                    }
+                    client.IsBigEndian = isBigEndian;
                 }
             }
         }
@@ -136,7 +130,6 @@ namespace EPI.Comm.Net.Generic
         #region CTOR
         public TcpNetServer(int bufferSize, Func<Theader, int> getBodySize) : base(bufferSize)
         {
-            Clients = new ClientCollection<Theader, Tfooter>(clients);
             GetBodySize = getBodySize;
         }
         public TcpNetServer(Func<Theader, int> getBodySize) : this(DefaultBufferSize, getBodySize)
@@ -170,11 +163,7 @@ namespace EPI.Comm.Net.Generic
         {
             base.AttachClient(client);
             var newClient = client as TcpNetClient<Theader, Tfooter>;
-            lock (clientLock)
-            {
-                clients.Add(newClient);
-            }
-
+            clients.Add(newClient);
             newClient.Received += OnClientReceived;
             ClientConnected?.Invoke(this, new TcpEventArgs<Theader, Tfooter>(newClient));
         }
@@ -186,11 +175,7 @@ namespace EPI.Comm.Net.Generic
         {
             base.DetachClient(client);
             var oldClient = client as TcpNetClient<Theader, Tfooter>;
-            lock (clientLock)
-            {
-                clients.Remove(oldClient);
-            }
-
+            clients.Remove(oldClient);
             oldClient.Received -= OnClientReceived;
             ClientDisconnected?.Invoke(this, new TcpEventArgs<Theader, Tfooter>(oldClient));
         }
