@@ -91,7 +91,7 @@ namespace UnitTest.Tcp
             }
             void OnReceived(object s, EPI.Comm.Net.Events.PacketEventArgs e)
             {
-                recv = e.ReceivedBytes;
+                recv = e.FullPacket;
                 count++;
             }
         }

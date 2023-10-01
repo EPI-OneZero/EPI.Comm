@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 using static EPI.Comm.Utils.MarshalSerializer;
 namespace EPI.Comm.Net.Generic.Packets
 {
-    public class Packet<Theader>
+    internal class Packet<Theader>
     {
         #region Field & Property
         private protected QueueBuffer queue;
@@ -15,8 +15,8 @@ namespace EPI.Comm.Net.Generic.Packets
             BodyCompleted,
         }
         public byte[] FullPacket { get; private set; }
-        public Theader Header { get; private set; }
-        public byte[] Body { get; private set; }
+        public Theader Header { get; internal set; }
+        public byte[] Body { get; internal set; }
         public int HeaderSize { get; private set; }
         public int BodySize => Body?.Length ?? 0;
         public virtual int FullSize => HeaderSize + BodySize;
@@ -24,22 +24,17 @@ namespace EPI.Comm.Net.Generic.Packets
         #endregion
 
         #region CTOR
-        internal Packet(Func<Theader, int> getBodySize) : this(default(Theader), null, getBodySize)
-        {
-
-        }
-        internal Packet(Theader header, byte[] body, Func<Theader, int> getBodySize)
+        internal Packet(Func<Theader, int> getBodySize)
         {
             GetBodySize = getBodySize;
             HeaderSize = Marshal.SizeOf<Theader>();
             queue = new QueueBuffer();
-            Header = header;
-            Body = body;
         }
+      
         #endregion
 
         #region Method
-        protected int CalculateBodySize()
+        private int CalculateBodySize()
         {
             return GetBodySize?.Invoke(Header) ?? 0;
         }
@@ -76,11 +71,11 @@ namespace EPI.Comm.Net.Generic.Packets
             if (IsEnoughSizeToDeserialize(buffer.Count, HeaderSize))
             {
                 var bytes = buffer.GetBytes(HeaderSize);
+                queue.AddBytes(bytes);
                 if (isBigEndian)
                 {
                     ReverseEndian<Theader>(bytes, 0);
                 }
-                queue.AddBytes(bytes);
                 Header = Deserialize<Theader>(bytes);
                 state = DeserializeState.HeaderCompleted;
                 return true;
@@ -125,28 +120,28 @@ namespace EPI.Comm.Net.Generic.Packets
             else
             {
                 throw new ArgumentOutOfRangeException
-                    ($"Body length is differs from header definition.\r\n body length :{BodySize}, header definition : {headerDefinedBodySize}");
+                    ($"바디의 크기가 헤더 정의와 다릅니다. 헤더에서 계산된 바디 크기 : {headerDefinedBodySize} 바이트");
             }
-
+        }
+        internal virtual void Clear()
+        {
+            Header = default(Theader);
+            Body = null;
+            state= DeserializeState.None;
         }
         #endregion
     }
-    public sealed class Packet<Theader, Tfooter> : Packet<Theader>
+    internal sealed class Packet<Theader, Tfooter> : Packet<Theader>
     {
         #region Field & Property
         public override int FullSize => base.FullSize + FooterSize;
-        public Tfooter Footer { get; private set; }
+        public Tfooter Footer { get; internal set; }
         public int FooterSize { get; private set; }
         #endregion
 
         #region CTOR
-        internal Packet(Func<Theader, int> getBodySize) : this(default(Theader), null, default(Tfooter), getBodySize)
+        internal Packet(Func<Theader, int> getBodySize) : base(getBodySize)
         {
-
-        }
-        internal Packet(Theader header, byte[] body, Tfooter footer, Func<Theader, int> getBodySize) : base(header, body, getBodySize)
-        {
-            Footer = footer;
             FooterSize = Marshal.SizeOf<Tfooter>();
         }
         #endregion
@@ -168,11 +163,12 @@ namespace EPI.Comm.Net.Generic.Packets
             if (IsEnoughSizeToDeserialize(buffer.Count, FooterSize))
             {
                 var bytes = buffer.GetBytes(FooterSize);
-                if(isBigEndian)
+                queue.AddBytes(bytes);
+                if (isBigEndian)
                 {
                     ReverseEndian<Tfooter>(bytes,0);
                 }
-                queue.AddBytes(bytes);
+                
                 Footer = Deserialize<Tfooter>(bytes);
                 return true;
             }
@@ -188,9 +184,15 @@ namespace EPI.Comm.Net.Generic.Packets
             Serialize(Footer, fullPacketBytes, HeaderSize + BodySize, FooterSize);
             if(isBigEndian)
             {
-                ReverseEndian<Tfooter>(fullPacketBytes,HeaderSize + BodySize);
+                ReverseEndian<Tfooter>(fullPacketBytes, HeaderSize + BodySize);
             }
             return fullPacketBytes;
+        }
+
+        internal override void Clear()
+        {
+            base.Clear();
+            Footer = default(Tfooter);
         }
         #endregion
     }

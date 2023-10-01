@@ -5,6 +5,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Text;
 using System.Threading;
 using UnitTest.Models;
 
@@ -100,7 +101,20 @@ namespace UnitTest.Tcp
             }
             void OnReceived(object s, PacketEventArgs<Header, Footer> e)
             {
-                recv = new PacketWithHeaderFooter() { Header = e.Packet.Header, Body = e.Packet.Body, Footer = e.Packet.Footer };
+                recv = new PacketWithHeaderFooter() { Header = e.Header, Body = e.Body, Footer = e.Footer };
+                Console.WriteLine($"{recv}");
+                var builder = new StringBuilder();
+                builder.Append("전체 수신 바이트");
+                for (int i = 0; i < e.FullPacket.Length; i++)
+                {
+                    if (i % 8 == 0)
+                    {
+                        builder.AppendLine();
+                    }
+                    builder.Append(e.FullPacket[i].ToString("x2"));
+                    builder.Append("\t");
+                }
+                Console.WriteLine($"{builder}");
                 count++;
             }
         }

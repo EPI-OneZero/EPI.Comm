@@ -18,10 +18,17 @@ namespace UnitTest.Endian
             var size= Marshal.SizeOf(outer);
             var bytes = new byte[size];
             Serialize(outer, bytes, 0, size);
+            var now0 = DateTime.Now;
             ReverseEndian<Outer>(bytes, 0);
-        
+            var now1 = DateTime.Now;
             outer.ReverseEndian();
 
+
+            var now2 = DateTime.Now;
+            var dt2 = now2 - now1;
+            var dt1 = now1 - now0;
+            Console.WriteLine(dt1.TotalMilliseconds);
+            Console.WriteLine(dt2.TotalMilliseconds);
             var t = Deserialize<Outer>(bytes);
             Assert.AreEqual(outer, t);
         }
@@ -166,6 +173,19 @@ namespace UnitTest.Endian
     {
         a,b,c= 2
     }
-  
+
+    [StructLayout(LayoutKind.Sequential, Pack =1)]
+    class AAA
+    {
+
+    }
+    [StructLayout(LayoutKind.Sequential)]
+    class BBB
+    {
+        int a;
+        short b;
+        int c;
+        short d;
+    }
     #endregion
 }

@@ -1,13 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 namespace EPI.Comm.Utils
 {
     public static class MarshalSerializer
     {
-        public static bool IsEnoughSizeToDeserialize(int sourceSize, int targetSize)
+        private static readonly Dictionary<Type, EndianInfo[]> EndianInfos = new Dictionary<Type, EndianInfo[]>();
+        public static bool IsEnoughSizeToDeserialize(int sourceSize, int dstSize)
         {
-            return sourceSize >= targetSize;
+            return sourceSize >= dstSize;
         }
         public static T Deserialize<T>(byte[] srcBytes)
         {
@@ -16,9 +18,9 @@ namespace EPI.Comm.Utils
             handle.Free();
             return result;
         }
-        public static bool IsEnoughSizeToSerialize(int sourceSize, int targetSize, int dstOffset)
+        public static bool IsEnoughSizeToSerialize(int sourceSize, int dstSize, int dstOffset)
         {
-            return sourceSize <= targetSize - dstOffset;
+            return sourceSize <= dstSize - dstOffset;
         }
         public static void Serialize<T>(T src, byte[] dst, int dstOffset, int srcSize)
         {
@@ -34,19 +36,20 @@ namespace EPI.Comm.Utils
                 throw new IndexOutOfRangeException($"{nameof(srcSize)}");
             }
         }
-        public static void CreateEndian<T>()
-        {
-            MarshalNodeBase.Create(typeof(T));
-        }
         public static void ReverseEndian<T>(byte[] bytes, int offset)
         {
-            var infos = MarshalNodeBase.Create(typeof(T));
+            var type = typeof(T);
+            if (!EndianInfos.ContainsKey(type))
+            {
+                EndianInfos.Add(type, MarshalNodeBase.Create(typeof(T)));
+            }
+
+            var infos = EndianInfos[type];
 
             for (int i = 0; i < infos.Length; i++)
             {
                 Array.Reverse(bytes, infos[i].Offset + offset, infos[i].Size);
             }
-
         }
 
     }

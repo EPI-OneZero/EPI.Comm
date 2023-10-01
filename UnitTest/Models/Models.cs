@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace UnitTest.Models
 {
@@ -54,6 +55,10 @@ namespace UnitTest.Models
             hashCode = hashCode * -1521134295 + BodySize.GetHashCode();
             return hashCode;
         }
+        public override string ToString()
+        {
+            return $"{Src:x8}\t{Dst:x8}\t{Code:x8}\t{BodySize:x8}";
+        }
     }
     public class PacketWithHeader : IEquatable<PacketWithHeader>
     {
@@ -90,7 +95,21 @@ namespace UnitTest.Models
             random.NextBytes(body);
             Body = body;
         }
-
+        public override string ToString()
+        {
+            var builder = new StringBuilder();
+            builder.Append("바디");
+            for (int i = 0; i < Body.Length; i++)
+            {
+                if (i % 8 == 0) 
+                {
+                    builder.AppendLine();
+                }
+                builder.Append(Body[i].ToString("x2"));
+                builder.Append("\t");
+            }
+            return $"헤더 : {Header}\r\n{builder}";
+        }
     }
 
 

@@ -55,14 +55,14 @@ namespace CommSample.Sample
             Dispatcher.BeginInvoke(new Action(() =>
             {
                 var build = new StringBuilder();
-                build.AppendLine($"받은 바이트 수 :  {e.ReceivedBytes.Length}");
-                for (int i = 0; i < e.ReceivedBytes.Length; i++)
+                build.AppendLine($"받은 바이트 수 :  {e.FullPacket.Length}");
+                for (int i = 0; i < e.FullPacket.Length; i++)
                 {
                     if (i % 8 == 0)
                     {
                         build.AppendLine();
                     }
-                    var b = e.ReceivedBytes[i];
+                    var b = e.FullPacket[i];
                     build.Append($"{b:D3}\t");
 
                 }

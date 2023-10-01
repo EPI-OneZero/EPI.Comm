@@ -89,7 +89,7 @@ namespace UnitTest.Tcp
             }
             void OnReceived(object s, PacketEventArgs<Header> e)
             {
-                recv = new PacketWithHeader() { Header = e.Packet.Header, Body = e.Packet.Body };
+                recv = new PacketWithHeader() { Header = e.Header, Body = e.Body };
                 count++;
             }
         }

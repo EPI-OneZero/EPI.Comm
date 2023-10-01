@@ -12,7 +12,7 @@ namespace EPI.Comm.Net
         #region Field & Property
         private readonly object ConnectLock = new object();
 
-        protected TcpClient TcpClient { get; set; }
+        internal TcpClient TcpClient { get; private set; }
         internal TcpNetSocket NetSocket { get; private set; }
         public int BufferSize { get; private set; }
         public IPEndPoint LocalEndPoint { get; private set; }

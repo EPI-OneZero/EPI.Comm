@@ -4,7 +4,6 @@ using System.Net;
 
 namespace EPI.Comm
 {
-
     public static class CommConfig
     {
         public const int DefaultBufferSize = 8192;

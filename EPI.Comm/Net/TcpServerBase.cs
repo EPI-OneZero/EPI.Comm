@@ -11,13 +11,13 @@ namespace EPI.Comm.Net
     public abstract class TcpServerBase : IDisposable
     {
         #region Field & Property
-        protected TcpListener Listener { get; set; }
+        internal TcpListener Listener { get; private set; }
         public IPEndPoint LocalEndPoint => Listener?.Server?.LocalEndPoint as IPEndPoint;
         public int Port { get; private set; }
         public bool IsListening { get => isListening; }
 
-        protected volatile bool isListening = false;
-        protected int BufferSize { get; private set; }
+        private volatile bool isListening = false;
+        public int BufferSize { get; private set; }
 
         private List<TcpClientBase> clients = new List<TcpClientBase>();
 

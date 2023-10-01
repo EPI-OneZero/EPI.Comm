@@ -8,7 +8,7 @@ namespace EPI.Comm.Utils
 {
     internal abstract class MarshalNodeBase : IDisposable
     {
-        private static readonly Dictionary<Type, EndianInfo[]> EndianInfos = new Dictionary<Type, EndianInfo[]>();
+     
         public void ReverseEndian(byte[] bytes)
         {
 
@@ -19,18 +19,12 @@ namespace EPI.Comm.Utils
         public int Size { get; internal set; }
         internal static EndianInfo[] Create(Type type)
         {
-            if (!EndianInfos.ContainsKey(type))
-            {
-                var item = new MarshalNode(type, 0);
-                var list = new List<EndianInfo>();
-                item.GenerateInfo(list);
-                item.Dispose();
-                item = null;
-                EndianInfos.Add(type, list.ToArray());
-            }
-            return EndianInfos[type];
+            var item = new MarshalNode(type, 0);
+            var result = new List<EndianInfo>();
+            item.GenerateInfo(result);
+            item.Dispose();
+            return result.ToArray();
         }
-
         public static FieldInfo[] GetFields(Type type)
         {
             var result = type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
@@ -56,27 +50,27 @@ namespace EPI.Comm.Utils
 
             Size = Marshal.SizeOf(Type);
             if (!Type.IsPrimitive)
+                InitSubNodes();
+        }
+        private void InitSubNodes()
+        {
+            var fields = from field in GetFields(Type)
+                         let off = (int)Marshal.OffsetOf(Type, field.Name)
+                         select (field, off);
+            foreach (var fi in fields)
             {
-                var fields = from field in GetFields(Type)
-                             let off = (int)Marshal.OffsetOf(Type, field.Name)
-                             select (field, off);
-                foreach (var fi in fields)
+                var fieldType = fi.field.FieldType;
+                if (IsArrayType(fieldType))
                 {
-                    var fieldType = fi.field.FieldType;
-                    if (IsArrayType(fieldType))
-                    {
-                        TypeNodes.Add(new MarshalArrayNode(fi.field, fi.off + offset));
-                    }
-                    else
-                    {
-
-                        TypeNodes.Add(new MarshalNode(fieldType, fi.off + offset));
-                    }
+                    TypeNodes.Add(new MarshalArrayNode(fi.field, fi.off + Offset));
                 }
+                else
+                {
 
+                    TypeNodes.Add(new MarshalNode(fieldType, fi.off + Offset));
+                }
             }
         }
-
         public override void GenerateInfo(List<EndianInfo> infos)
         {
             if (TypeNodes.Count == 0 && Size > 1)

@@ -6,12 +6,12 @@ namespace EPI.Comm.Net.Events
     public class PacketEventArgs : EventArgs
     {
         public IPEndPoint From { get; private set; }
-        public byte[] ReceivedBytes { get; private set; }
+        public byte[] FullPacket { get; private set; }
 
         public PacketEventArgs(IPEndPoint from, byte[] receivedBytes)
         {
             From = from;
-            ReceivedBytes = receivedBytes;
+            FullPacket = receivedBytes;
         }
     }
 
