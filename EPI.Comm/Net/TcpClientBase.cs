@@ -72,6 +72,7 @@ namespace EPI.Comm.Net
             }
         }
         #endregion
+
         #region Send Receive
         internal void SendBytes(byte[] bytes)
         {
@@ -86,6 +87,7 @@ namespace EPI.Comm.Net
         }
         private protected abstract void SocketReceived(object sender, PacketEventArgs e);
         #endregion
+
         #region Connect
         public void Connect(string ip, int port)
         {

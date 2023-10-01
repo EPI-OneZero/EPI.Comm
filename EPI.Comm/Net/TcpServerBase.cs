@@ -23,7 +23,6 @@ namespace EPI.Comm.Net
         private List<TcpClientBase> clients = new List<TcpClientBase>();
 
 
-        private volatile bool acceptLoopingOn;
         #endregion
 
         #region CTOR
@@ -105,35 +104,27 @@ namespace EPI.Comm.Net
         #region Accept
         private void AcceptLoop()
         {
-            if (!acceptLoopingOn)
+            while (isListening)
             {
-                acceptLoopingOn = true;
-                while (isListening)
+                try
                 {
-                    try
+                    var tcpClient = Accept();
+                    if (tcpClient != null)
                     {
-                        var tcpClient = Accept();
-                        if (tcpClient != null)
-                        {
-                            var client = CreateClient(tcpClient);
-                            AttachClient(client);
-                        }
-                    }
-                    catch (CommException e)
-                    {
-                        Logger.Default.WriteLine(e.Message);
-                        if (!isListening)
-                        {
-                            break;
-                        }
-                    }
-                    finally
-                    {
-                        Logger.Default.WriteLineCaller();
+                        var client = CreateClient(tcpClient);
+                        AttachClient(client);
                     }
                 }
-                acceptLoopingOn = false;
+                catch (CommException e)
+                {
+                    Logger.Default.WriteLine(e.Message);
+                }
+                finally
+                {
+                    Logger.Default.WriteLineCaller();
+                }
             }
+            isListening = false;
 
         }
         private TcpClient Accept()
@@ -155,7 +146,7 @@ namespace EPI.Comm.Net
         }
         private void WaitAcceptLoopFinish()
         {
-            while (acceptLoopingOn)
+            while (isListening)
             {
                 Thread.Sleep(1);
             }
