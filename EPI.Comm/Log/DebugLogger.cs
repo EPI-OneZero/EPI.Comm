@@ -41,7 +41,7 @@ namespace EPI.Comm.Log
         }
         protected override void WriteLineMessage(string message)
         {
-            Logger.Default.WriteLine(message);
+            Debug.WriteLine(message);
         }
 
         protected override void WriteMessage(string message)

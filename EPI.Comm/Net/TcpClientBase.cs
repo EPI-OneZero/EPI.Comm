@@ -151,7 +151,7 @@ namespace EPI.Comm.Net
             ipToConnect = ip;
             portToConnect = port;
         }
-        private protected virtual void OnSocketConnected()
+        private void OnSocketConnected()
         {
             Connected?.Invoke(this, EventArgs.Empty);
         }

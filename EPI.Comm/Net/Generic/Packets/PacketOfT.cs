@@ -30,7 +30,7 @@ namespace EPI.Comm.Net.Generic.Packets
             HeaderSize = Marshal.SizeOf<Theader>();
             queue = new QueueBuffer();
         }
-      
+
         #endregion
 
         #region Method
@@ -39,7 +39,7 @@ namespace EPI.Comm.Net.Generic.Packets
             return GetBodySize?.Invoke(Header) ?? 0;
         }
         private DeserializeState state = DeserializeState.None;
-        internal bool TryDeserialize(IBuffer buffer,bool isBigEndian)
+        internal bool TryDeserialize(IBuffer buffer, bool isBigEndian)
         {
             var success = TryDeserializePacket(buffer, isBigEndian);
             if (success)
@@ -66,17 +66,14 @@ namespace EPI.Comm.Net.Generic.Packets
                     throw new InvalidOperationException($"Unexpected state: {state}");
             }
         }
-        private bool TryDeserializeHeader(IBuffer buffer,bool isBigEndian)
+        private bool TryDeserializeHeader(IBuffer buffer, bool isBigEndian)
         {
             if (IsEnoughSizeToDeserialize(buffer.Count, HeaderSize))
             {
                 var bytes = buffer.GetBytes(HeaderSize);
                 queue.AddBytes(bytes);
-                if (isBigEndian)
-                {
-                    ReverseEndian<Theader>(bytes, 0);
-                }
-                Header = Deserialize<Theader>(bytes);
+
+                Header = Deserialize<Theader>(bytes, isBigEndian);
                 state = DeserializeState.HeaderCompleted;
                 return true;
             }
@@ -101,7 +98,7 @@ namespace EPI.Comm.Net.Generic.Packets
                 return false;
             }
         }
-       
+
         internal virtual byte[] SerializePacket(bool isBigEndian)
         {
             int bodySize = Body.Length;
@@ -109,12 +106,9 @@ namespace EPI.Comm.Net.Generic.Packets
             if (headerDefinedBodySize == bodySize)
             {
                 var fullPacketBytes = new byte[FullSize];
-                Serialize(Header, fullPacketBytes, 0, HeaderSize);
+                Serialize(Header, fullPacketBytes, 0, HeaderSize, isBigEndian);
                 Buffer.BlockCopy(Body, 0, fullPacketBytes, HeaderSize, bodySize);
-                if (isBigEndian)
-                {
-                    ReverseEndian<Theader>(fullPacketBytes, 0);
-                }
+
                 return fullPacketBytes;
             }
             else
@@ -127,7 +121,8 @@ namespace EPI.Comm.Net.Generic.Packets
         {
             Header = default(Theader);
             Body = null;
-            state= DeserializeState.None;
+            state = DeserializeState.None;
+            queue.Clear();
         }
         #endregion
     }
@@ -149,27 +144,10 @@ namespace EPI.Comm.Net.Generic.Packets
         #region Method
         private protected override bool TryDeserializePacket(IBuffer buffer, bool isBigEndian)
         {
-            if (base.TryDeserializePacket(buffer, isBigEndian))
-            {
-                return TryDeserializeFooter(buffer, isBigEndian);
-            }
-            else
-            {
-                return false;
-            }
-        }
-        private bool TryDeserializeFooter(IBuffer buffer, bool isBigEndian)
-        {
-            if (IsEnoughSizeToDeserialize(buffer.Count, FooterSize))
+            if (base.TryDeserializePacket(buffer, isBigEndian) && IsEnoughSizeToDeserialize(buffer.Count, FooterSize))
             {
                 var bytes = buffer.GetBytes(FooterSize);
-                queue.AddBytes(bytes);
-                if (isBigEndian)
-                {
-                    ReverseEndian<Tfooter>(bytes,0);
-                }
-                
-                Footer = Deserialize<Tfooter>(bytes);
+                Footer = Deserialize<Tfooter>(bytes, isBigEndian);
                 return true;
             }
             else
@@ -178,14 +156,11 @@ namespace EPI.Comm.Net.Generic.Packets
             }
         }
 
+
         internal override byte[] SerializePacket(bool isBigEndian)
         {
             var fullPacketBytes = base.SerializePacket(isBigEndian);
-            Serialize(Footer, fullPacketBytes, HeaderSize + BodySize, FooterSize);
-            if(isBigEndian)
-            {
-                ReverseEndian<Tfooter>(fullPacketBytes, HeaderSize + BodySize);
-            }
+            Serialize(Footer, fullPacketBytes, base.FullSize, FooterSize, isBigEndian);
             return fullPacketBytes;
         }
 

@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
-using static EPI.Comm.CommException;
 namespace EPI.Comm.Net
 {
     public abstract class TcpServerBase : IDisposable
@@ -65,7 +64,6 @@ namespace EPI.Comm.Net
                 }
             }
 
-
         }
         public void Stop()
         {
@@ -75,7 +73,10 @@ namespace EPI.Comm.Net
                 {
                     isListening = false;
                     Listener.Stop();
-                    WaitAcceptLoopFinish();
+                    while (isListening)
+                    {
+                        Thread.Sleep(1);
+                    }
                     Listener = null;
                     Port = 0;
 
@@ -104,52 +105,29 @@ namespace EPI.Comm.Net
         #region Accept
         private void AcceptLoop()
         {
-            while (isListening)
+            try
             {
-                try
+                while (isListening)
                 {
-                    var tcpClient = Accept();
+                    var tcpClient = Listener.AcceptTcpClient();
                     if (tcpClient != null)
                     {
                         var client = CreateClient(tcpClient);
                         AttachClient(client);
                     }
                 }
-                catch (CommException e)
-                {
-                    Logger.Default.WriteLine(e.Message);
-                }
-                finally
-                {
-                    Logger.Default.WriteLineCaller();
-                }
-            }
-            isListening = false;
 
-        }
-        private TcpClient Accept()
-        {
-            try
-            {
-                var tcpClient = Listener.AcceptTcpClient();
-                return tcpClient;
             }
-
-            catch (SocketException socketException)
+            catch (SocketException e)
             {
-                throw CreateCommException(socketException);
+                Logger.Default.WriteLine(e.Message);
             }
             finally
             {
                 Logger.Default.WriteLineCaller();
+                isListening = false;
             }
-        }
-        private void WaitAcceptLoopFinish()
-        {
-            while (isListening)
-            {
-                Thread.Sleep(1);
-            }
+
         }
         private protected abstract TcpClientBase CreateClient(TcpClient client);
 
@@ -173,7 +151,6 @@ namespace EPI.Comm.Net
 
         public void Dispose()
         {
-            // 이 코드를 변경하지 마세요. 'Dispose(bool disposing)' 메서드에 정리 코드를 입력합니다.
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
         }

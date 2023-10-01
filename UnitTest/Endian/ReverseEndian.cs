@@ -29,7 +29,7 @@ namespace UnitTest.Endian
             var dt1 = now1 - now0;
             Console.WriteLine(dt1.TotalMilliseconds);
             Console.WriteLine(dt2.TotalMilliseconds);
-            var t = Deserialize<Outer>(bytes);
+            var t = Deserialize<Outer>(bytes,false);
             Assert.AreEqual(outer, t);
         }
 

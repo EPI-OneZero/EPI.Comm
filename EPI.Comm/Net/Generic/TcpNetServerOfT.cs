@@ -1,8 +1,6 @@
 ﻿using EPI.Comm.Net.Generic.Events;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using static EPI.Comm.CommConfig;
@@ -14,7 +12,7 @@ namespace EPI.Comm.Net.Generic
         #region Field & Property
         private readonly object clientLock = new object();
         private readonly List<TcpNetClient<Theader>> clients = new List<TcpNetClient<Theader>>();
-        public ClientCollection<Theader> Clients =>  new ClientCollection<Theader>(clients.ToArray());
+        public ClientCollection<Theader> Clients => new ClientCollection<Theader>(clients.ToArray());
         internal Func<Theader, int> GetBodySize { get; private set; }
         protected bool isBigEndian;
         public bool IsBigEndian
@@ -63,8 +61,8 @@ namespace EPI.Comm.Net.Generic
         #region Accept
         private protected override TcpClientBase CreateClient(TcpClient client)
         {
-            var result = new TcpNetClient<Theader>(client, BufferSize, GetBodySize) 
-            {IsBigEndian = IsBigEndian };
+            var result = new TcpNetClient<Theader>(client, BufferSize, GetBodySize)
+            { IsBigEndian = IsBigEndian };
             return result;
         }
 
@@ -110,8 +108,8 @@ namespace EPI.Comm.Net.Generic
         public ClientCollection<Theader, Tfooter> Clients => new ClientCollection<Theader, Tfooter>(clients.ToArray());
         internal Func<Theader, int> GetBodySize { get; private set; }
         protected bool isBigEndian;
-        public bool IsBigEndian 
-        { 
+        public bool IsBigEndian
+        {
             get
             {
                 return isBigEndian;

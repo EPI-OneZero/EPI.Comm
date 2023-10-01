@@ -41,13 +41,10 @@ namespace EPI.Comm.Net.Generic
         private protected override void OnSocketDisconnected()
         {
             ReceiveBuffer.Clear();
+            PacketToReceive.Clear();
             base.OnSocketDisconnected();
         }
-        private protected override void OnSocketConnected()
-        {
-            ReceiveBuffer.Clear();
-            base.OnSocketConnected();
-        }
+
         private void SetPacketProperties(Func<Theader, int> getBodySize)
         {
             GetBodySize = getBodySize;
@@ -68,7 +65,7 @@ namespace EPI.Comm.Net.Generic
             lock (this)
             {
                 ReceiveBuffer.AddBytes(e.FullPacket);
-                while (PacketToReceive.TryDeserialize(ReceiveBuffer,IsBigEndian))
+                while (PacketToReceive.TryDeserialize(ReceiveBuffer, IsBigEndian))
                 {
                     var packet = PacketToReceive;
                     Received?.Invoke(this, new PacketEventArgs<Theader>(e.From, packet));
@@ -118,12 +115,8 @@ namespace EPI.Comm.Net.Generic
         private protected override void OnSocketDisconnected()
         {
             ReceiveBuffer.Clear();
+            PacketToReceive.Clear();
             base.OnSocketDisconnected();
-        }
-        private protected override void OnSocketConnected()
-        {
-            ReceiveBuffer.Clear();
-            base.OnSocketConnected();
         }
         public void Send(Theader header, byte[] body, Tfooter footer)
         {

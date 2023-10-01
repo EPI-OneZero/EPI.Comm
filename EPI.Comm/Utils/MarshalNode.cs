@@ -8,8 +8,8 @@ namespace EPI.Comm.Utils
 {
     internal abstract class MarshalNodeBase : IDisposable
     {
-     
-  
+
+
         public abstract void GenerateInfo(List<EndianInfo> infos);
 
         public int Offset { get; internal set; }
@@ -40,12 +40,12 @@ namespace EPI.Comm.Utils
         public Type Type { get; set; }
 
         public List<MarshalNodeBase> TypeNodes { get; set; } = new List<MarshalNodeBase>();
-        public MarshalNode(Type t, int offset,bool isUnicodeClass)
+        public MarshalNode(Type t, int offset, bool isUnicodeClass)
         {
             Offset = offset;
             Type = ConvertEnumToNumType(t);
             bool charIs2byte = isUnicodeClass;
-            if(Type == typeof(char) && charIs2byte)
+            if (Type == typeof(char) && charIs2byte)
             {
                 Size = 2;
             }
@@ -56,7 +56,7 @@ namespace EPI.Comm.Utils
             if (!Type.IsPrimitive)
                 InitSubNodes(isUnicodeClass);
         }
-        
+
         private void InitSubNodes(bool isUnicodeClass)
         {
             var fields = from field in GetFields(Type)
@@ -101,7 +101,7 @@ namespace EPI.Comm.Utils
     {
         public MarshalNode ItemType { get; set; }
         public int Count { get; set; }
-        public MarshalArrayNode(FieldInfo fieldInfo, int offset,bool isUnicodeClass)
+        public MarshalArrayNode(FieldInfo fieldInfo, int offset, bool isUnicodeClass)
         {
             int sizeConst = fieldInfo.GetCustomAttribute<MarshalAsAttribute>().SizeConst;
 

@@ -11,8 +11,12 @@ namespace EPI.Comm.Utils
         {
             return sourceSize >= dstSize;
         }
-        public static T Deserialize<T>(byte[] srcBytes)
+        public static T Deserialize<T>(byte[] srcBytes, bool isBigEndian = false)
         {
+            if (isBigEndian)
+            {
+                ReverseEndian<T>(srcBytes, 0);
+            }
             var handle = GCHandle.Alloc(srcBytes, GCHandleType.Pinned);
             var result = Marshal.PtrToStructure<T>(handle.AddrOfPinnedObject());
             handle.Free();
@@ -22,13 +26,18 @@ namespace EPI.Comm.Utils
         {
             return sourceSize <= dstSize - dstOffset;
         }
-        public static void Serialize<T>(T src, byte[] dst, int dstOffset, int srcSize)
+        public static void Serialize<T>(T src, byte[] dst, int dstOffset, int srcSize, bool isBigEndian = false)
         {
             if (IsEnoughSizeToSerialize(srcSize, dst.Length, dstOffset))
             {
                 var handle = GCHandle.Alloc(dst, GCHandleType.Pinned);
-                Marshal.StructureToPtr(src, handle.AddrOfPinnedObject() + dstOffset, false);
-                Marshal.DestroyStructure(handle.AddrOfPinnedObject() + dstOffset, typeof(T));
+                var ptr = handle.AddrOfPinnedObject() + dstOffset;
+                Marshal.StructureToPtr(src, ptr, false);
+                Marshal.DestroyStructure(ptr, typeof(T));
+                if (isBigEndian)
+                {
+                    ReverseEndian<T>(dst, dstOffset);
+                }
                 handle.Free();
             }
             else

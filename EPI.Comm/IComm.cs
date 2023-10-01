@@ -1,6 +1,5 @@
 ﻿using EPI.Comm.Net.Events;
 using EPI.Comm.Net.Generic.Events;
-using System.Net;
 
 namespace EPI.Comm
 {
@@ -13,7 +12,6 @@ namespace EPI.Comm
         void Send(byte[] bytes);
         event PacketEventHandler Received;
     }
-
     public interface IComm<Theader, Tfooter> : IEndian
     {
         void Send(Theader header, byte[] body, Tfooter footer);
