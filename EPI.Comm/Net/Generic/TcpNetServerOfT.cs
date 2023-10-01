@@ -46,7 +46,7 @@ namespace EPI.Comm.Net.Generic
         #region Send Receive
         public void Send(Theader header, byte[] body)
         {
-            var result = Parallel.ForEach(clients, c =>
+            var result = Parallel.ForEach(Clients, c =>
             {
                 c.Send(header, body);
             });
@@ -138,7 +138,7 @@ namespace EPI.Comm.Net.Generic
         #region Send Receive
         public void Send(Theader header, byte[] body, Tfooter footer)
         {
-            var result = Parallel.ForEach(clients, c =>
+            var result = Parallel.ForEach(Clients, c =>
             {
                 c.Send(header, body, footer);
             });

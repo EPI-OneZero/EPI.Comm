@@ -25,7 +25,7 @@ namespace EPI.Comm.Net
         #region Send
         public void Send(byte[] bytes)
         {
-            var result = Parallel.ForEach(clients, c =>
+            var result = Parallel.ForEach(Clients, c =>
             {
                 c.Send(bytes);
             });

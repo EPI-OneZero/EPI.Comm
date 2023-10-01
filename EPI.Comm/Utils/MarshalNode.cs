@@ -9,9 +9,8 @@ namespace EPI.Comm.Utils
     internal abstract class MarshalNodeBase
     {
         public abstract void GenerateInfo(List<EndianInfo> infos);
-
         public int Offset { get; internal set; }
-        public int Size { get; internal set; }
+       
         internal static EndianInfo[] Create(Type type)
         {
             var item = new MarshalNode(type, 0, type.IsUnicodeClass);
@@ -23,7 +22,7 @@ namespace EPI.Comm.Utils
     internal sealed class MarshalNode : MarshalNodeBase
     {
         public Type Type { get; set; }
-
+        public int Size { get; internal set; }
         public List<MarshalNodeBase> TypeNodes { get; set; } = new List<MarshalNodeBase>();
         public MarshalNode(Type t, int offset, bool isUnicodeClass)
         {
