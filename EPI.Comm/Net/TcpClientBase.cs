@@ -31,7 +31,7 @@ namespace EPI.Comm.Net
         private volatile bool isConnecting;
         private string ipToConnect;
         private int portToConnect;
-        public bool IsConnected => TcpClient?.Connected ?? false;
+        public bool IsConnected => isSocketAttached;
         private readonly AutoConnectHelper connectHelper;
         private readonly string HolderName = "";
         #endregion
@@ -100,7 +100,7 @@ namespace EPI.Comm.Net
         public void Connect(string ip, int port)
         {
             SetRemoteEndPoint(ip, port);
-            if (!(isConnecting || IsConnected))
+            if (!(isConnecting || isSocketAttached))
             {
                 lock (ConnectLock)
                 {
@@ -132,7 +132,7 @@ namespace EPI.Comm.Net
             {
                 var asyncHandle = client.BeginConnect(IPAddress.Parse(ipToConnect), portToConnect, null, null);
                 var returned = asyncHandle.AsyncWaitHandle.WaitOne(5000);
-                if (IsConnected && returned)
+                if (client.Connected && returned)
                 {
                     AttachSocket(client.Client);
                     OnSocketConnected();

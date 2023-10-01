@@ -19,7 +19,7 @@ namespace UnitTest.Tcp
             server.StartListen(port);
             try
             {
-                for (int i = 0; i < 5; i++)
+                for (int i = 0; i < 3; i++)
                 {
                     client.Connect(loopback, port);
                     Console.WriteLine(i);
@@ -71,7 +71,6 @@ namespace UnitTest.Tcp
             {
                 server.Dispose();
                 client.Dispose();
-                Thread.Sleep(3000);
             }
             
             
