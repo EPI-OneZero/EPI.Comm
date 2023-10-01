@@ -137,7 +137,7 @@ namespace EPI.Comm.Net
 
         private void SetRemoteEndPoint(string ip, int port)
         {
-            connectHelper.SetEndPoint(ip, port, true);
+            connectHelper.SetEndPoint(ip, port);
             ipToConnect = ip;
             portToConnect = port;
         }
@@ -193,7 +193,7 @@ namespace EPI.Comm.Net
             {
                 userConnectIp = ip;
                 userConnectPort = port;
-                userRequestConnect = requestConnect;
+                userRequestConnect = true;
             }
             public void RunAutoConnectIfUserWant()
             {
