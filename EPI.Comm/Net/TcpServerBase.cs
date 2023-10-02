@@ -93,7 +93,6 @@ namespace EPI.Comm.Net
                     Listener.Stop();
                     while (isListening)
                     {
-                        Thread.Sleep(1);
                     }
                     Listener = null;
                     Port = 0;
