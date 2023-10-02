@@ -48,6 +48,41 @@ namespace EPI.Comm.Net
             }
 
         }
+
+        #region Accept
+        private void AcceptLoop()
+        {
+            try
+            {
+                while (isListening)
+                {
+                    var tcpClient = Listener.AcceptTcpClient();
+                    if (tcpClient != null)
+                    {
+                        var client = CreateClient(tcpClient);
+                        AttachClient(client);
+                    }
+                }
+            }
+            catch (SocketException e)
+            {
+                Logger.Default.WriteLine(e.Message);
+            }
+            finally
+            {
+                Logger.Default.WriteLineCaller();
+                isListening = false;
+            }
+
+        }
+        private protected virtual void AttachClient(TcpClientBase client)
+        {
+            clients.Add(client);
+            client.Disconnected += OnDisconnected;
+        }
+        private protected abstract TcpClientBase CreateClient(TcpClient client);
+        #endregion
+
         public void Stop()
         {
             lock (startStopLock)
@@ -93,39 +128,7 @@ namespace EPI.Comm.Net
         }
         #endregion
 
-        #region Accept
-        private void AcceptLoop()
-        {
-            try
-            {
-                while (isListening)
-                {
-                    var tcpClient = Listener.AcceptTcpClient();
-                    if (tcpClient != null)
-                    {
-                        var client = CreateClient(tcpClient);
-                        AttachClient(client);
-                    }
-                }
-            }
-            catch (SocketException e)
-            {
-                Logger.Default.WriteLine(e.Message);
-            }
-            finally
-            {
-                Logger.Default.WriteLineCaller();
-                isListening = false;
-            }
-
-        }
-        private protected virtual void AttachClient(TcpClientBase client)
-        {
-            clients.Add(client);
-            client.Disconnected += OnDisconnected;
-        }
-        private protected abstract TcpClientBase CreateClient(TcpClient client);
-        #endregion
+      
 
         #region IDISPOSE
         protected virtual void Dispose(bool disposing)
