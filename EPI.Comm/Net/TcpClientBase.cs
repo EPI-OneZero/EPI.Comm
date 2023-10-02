@@ -63,8 +63,6 @@ namespace EPI.Comm.Net
             RemoteEndPoint = NetSocket.RemoteEndPoint;
             isSocketAttached = true;
         }
-
-
         private void DetachSocket()
         {
             isSocketAttached = false;

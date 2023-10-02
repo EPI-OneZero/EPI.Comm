@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading;
 
@@ -111,7 +109,7 @@ namespace UnitTest.Models
             AddBytesTostring(builder, FullPacket);
             return builder.ToString();
         }
-        private void AddBytesTostring(StringBuilder builder,byte[] bytes)
+        private void AddBytesTostring(StringBuilder builder, byte[] bytes)
         {
             for (int i = 0; i < bytes.Length; i++)
             {
@@ -140,7 +138,7 @@ namespace UnitTest.Models
         }
         public override string ToString()
         {
-            return Message; 
+            return Message;
         }
     }
     [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Ansi)]
@@ -150,7 +148,7 @@ namespace UnitTest.Models
         {
             AABB = 0xAABB,
         }
-        public Msg Message  = new Msg("한글");
+        public Msg Message = new Msg("한글");
         public MyEnum My { get; set; } = MyEnum.AABB;
         public ushort Etx { get; set; }
         public static Footer Get()

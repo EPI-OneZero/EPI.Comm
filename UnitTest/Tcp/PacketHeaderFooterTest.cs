@@ -5,7 +5,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Net;
-using System.Text;
 using System.Threading;
 using UnitTest.Models;
 
@@ -34,14 +33,14 @@ namespace UnitTest.Tcp
             {
                 var packet = new PacketWithHeaderFooter();
                 packet.SetRandom();
-               
+
                 Data.Add(packet);
             }
             Server.StartListen(Port);
             Client.Connect(IPAddress.Loopback.ToString(), Port);
             Console.WriteLine(Port);
             Port++;
-        
+
         }
 
         [TestCleanup]
@@ -105,10 +104,10 @@ namespace UnitTest.Tcp
             }
             void OnReceived(object s, PacketEventArgs<Header, Footer> e)
             {
-                recv = new PacketWithHeaderFooter() 
-                { Header = e.Header, Body = e.Body, Footer = e.Footer, FullPacket =e.FullPacket };
+                recv = new PacketWithHeaderFooter()
+                { Header = e.Header, Body = e.Body, Footer = e.Footer, FullPacket = e.FullPacket };
                 Console.WriteLine($"{recv}");
-               
+
                 count++;
             }
         }

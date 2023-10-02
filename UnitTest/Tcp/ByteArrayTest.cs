@@ -23,7 +23,7 @@ namespace UnitTest.Tcp
         [TestInitialize]
         public void Init()
         {
-       
+
             Server = new TcpNetServer();
             Client = new TcpNetClient();
             Data = new List<byte[]>();
@@ -49,7 +49,7 @@ namespace UnitTest.Tcp
             random.NextBytes(result);
             return result;
         }
-       
+
         [TestMethod]
         public void ClientsToServer()
         {
@@ -90,7 +90,7 @@ namespace UnitTest.Tcp
             finally
             {
                 receiver.Received -= OnReceived;
-               
+
             }
             void OnReceived(object s, EPI.Comm.Net.Events.PacketEventArgs e)
             {

@@ -47,7 +47,7 @@ namespace UnitTest.Tcp
             client.AutoConnect = true;
             const int port = 5551;
             var loopback = IPAddress.Loopback.ToString();
-          
+
             try
             {
                 server.StartListen(port);
@@ -72,8 +72,8 @@ namespace UnitTest.Tcp
                 server.Dispose();
                 client.Dispose();
             }
-            
-            
+
+
         }
     }
 }

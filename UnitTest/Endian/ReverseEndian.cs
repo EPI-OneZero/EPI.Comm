@@ -1,13 +1,11 @@
-﻿using EPI.Comm.Net.Generic.Packets;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using System.CodeDom;
 using System.Net;
 using System.Runtime.InteropServices;
 using static EPI.Comm.Utils.MarshalSerializer;
 namespace UnitTest.Endian
 {
-    
+
     [TestClass]
     public class EndianTest
     {
@@ -15,7 +13,7 @@ namespace UnitTest.Endian
         public void TestMethod1()
         {
             var outer = new Outer();
-            var size= Marshal.SizeOf(outer);
+            var size = Marshal.SizeOf(outer);
             var bytes = new byte[size];
             Serialize(outer, bytes, 0, size);
             var now0 = DateTime.Now;
@@ -29,19 +27,19 @@ namespace UnitTest.Endian
             var dt1 = now1 - now0;
             Console.WriteLine(dt1.TotalMilliseconds);
             Console.WriteLine(dt2.TotalMilliseconds);
-            var t = Deserialize<Outer>(bytes,false);
+            var t = Deserialize<Outer>(bytes, false);
             Assert.AreEqual(outer, t);
         }
 
         [TestMethod]
-        public void TestMethod2() 
+        public void TestMethod2()
         {
             Console.WriteLine(Marshal.SizeOf(typeof(Myenum)));
             var type = Enum.GetUnderlyingType(typeof(MyEnum));
-            Console.WriteLine(Marshal.OffsetOf(typeof(Myenum), "a")) ;
-            Console.WriteLine(Marshal.SizeOf(type)) ;
+            Console.WriteLine(Marshal.OffsetOf(typeof(Myenum), "a"));
+            Console.WriteLine(Marshal.SizeOf(type));
         }
-       
+
 
     }
     #region Model
@@ -57,8 +55,8 @@ namespace UnitTest.Endian
         public Outer()
         {
             var random = new Random();
-            B= (short)random.Next(short.MinValue,short.MaxValue);
-            C= random.Next(int.MinValue,int.MaxValue);
+            B = (short)random.Next(short.MinValue, short.MaxValue);
+            C = random.Next(int.MinValue, int.MaxValue);
             D = (((long)random.Next(int.MinValue, int.MaxValue)) << 32) | (long)random.Next(int.MinValue, int.MaxValue);
             for (int i = 0; i < Inners.Length; i++)
             {
@@ -78,11 +76,11 @@ namespace UnitTest.Endian
         public override bool Equals(object obj)
         {
             var other = obj as Outer;
-            if(A !=other.A)
+            if (A != other.A)
             {
                 return false;
             }
-            if(B != other.B)
+            if (B != other.B)
             {
                 return false;
             }
@@ -101,7 +99,7 @@ namespace UnitTest.Endian
                     return false;
                 }
             }
-           
+
             return true;
         }
         public override int GetHashCode()
@@ -116,7 +114,7 @@ namespace UnitTest.Endian
         public short B = 0x1234;
         public int C = 0x23456789;
         public long D = 0x7891234567803210;
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst =5)]
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 5)]
         public short[] shorts = new short[5];
         public Inner()
         {
@@ -163,18 +161,18 @@ namespace UnitTest.Endian
     }
     #endregion
     #region Model2
-    [StructLayout( LayoutKind.Sequential, Pack =1)]
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     struct Myenum
     {
         int b;
         MyEnum a;
     }
-    enum MyEnum :byte
+    enum MyEnum : byte
     {
-        a,b,c= 2
+        a, b, c = 2
     }
 
-    [StructLayout(LayoutKind.Sequential, Pack =1)]
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
     class AAA
     {
 

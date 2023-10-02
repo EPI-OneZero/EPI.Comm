@@ -12,8 +12,7 @@ namespace EPI.Comm.Net
     {
         #region Field & Property
         private readonly object SendLock = new object();
-        private readonly object ReceiveLock = new object();
-        private readonly KeepAlive KeepAliveConfig = new KeepAlive();
+        private static readonly byte[] KeepAliveConfig = new KeepAlive().Generate();
         internal Socket Socket { get; private set; }
         internal byte[] ReceiveBuffer { get; private set; }
         public bool IsConnected => Socket != null && Socket.Connected;
@@ -33,7 +32,6 @@ namespace EPI.Comm.Net
             SetSocketOption(socket);
             ThreadUtil.Start(ReceiveLoop);
         }
-
         #endregion
 
         #region Method
@@ -45,10 +43,10 @@ namespace EPI.Comm.Net
             socket.LingerState = lingerOption;
             SetKeepAlive(socket);
         }
-        private void SetKeepAlive(Socket socket)
+        private static void SetKeepAlive(Socket socket)
         {
 
-            socket.IOControl(IOControlCode.KeepAliveValues, KeepAliveConfig.Generate(), null);
+            socket.IOControl(IOControlCode.KeepAliveValues, KeepAliveConfig, null);
         }
         public void Send(byte[] bytes)
         {
@@ -99,7 +97,6 @@ namespace EPI.Comm.Net
             {
                 Logger.Default.WriteLineCaller();
             }
-
         }
         private void ReceiveLoop()
         {
@@ -107,11 +104,8 @@ namespace EPI.Comm.Net
             {
                 try
                 {
-                    byte[] recv;
-                    lock (ReceiveLock)
-                    {
-                        recv = Receive();
-                    }
+                    byte[] recv = Receive();
+
                     Received?.Invoke(this, new PacketEventArgs(RemoteEndPoint, recv));
                 }
                 catch (CommException e) // 연결을 끊었을 때

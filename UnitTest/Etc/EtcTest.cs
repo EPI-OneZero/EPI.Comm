@@ -1,12 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace UnitTest.Etc
 {
@@ -29,18 +24,18 @@ namespace UnitTest.Etc
             Console.WriteLine(xff.Name);
         }
     }
-    [StructLayout(LayoutKind.Sequential , Pack =1 , CharSet = CharSet.Unicode)]
+    [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Unicode)]
     unsafe struct MyStruct
     {
-        [MarshalAs( UnmanagedType.ByValArray , SizeConst =20)]
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 20)]
         public char[] x;
         public char a;
-     
+
     }
     [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Ansi)]
     unsafe struct MyClass
     {
         public fixed char x[2];
     }
-  
+
 }
