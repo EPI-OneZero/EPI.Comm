@@ -45,7 +45,7 @@ namespace UnitTest.Tcp
             var server = new TcpNetServer();
             var client = new TcpNetClient();
             client.AutoConnect = true;
-            const int port = 4103;
+            const int port = 5551;
             var loopback = IPAddress.Loopback.ToString();
           
             try
@@ -55,10 +55,10 @@ namespace UnitTest.Tcp
                 for (int i = 0; i < 3; i++)
                 {
                     server.Stop();
-                    Thread.Sleep(200);
+                    Thread.Sleep(750);
                     Assert.IsFalse(client.IsConnected);
                     server.StartListen(port);
-                    Thread.Sleep(600);
+                    Thread.Sleep(750);
                     Assert.IsTrue(client.IsConnected);
                 }
             }

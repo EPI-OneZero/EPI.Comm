@@ -59,8 +59,8 @@ namespace EPI.Comm.Net
 
             NetSocket.Received += SocketReceived;
             NetSocket.Closed += SocketClosed;
-            LocalEndPoint = client.LocalEndPoint as IPEndPoint;
-            RemoteEndPoint = client.RemoteEndPoint as IPEndPoint;
+            LocalEndPoint = NetSocket.LocalEndPoint;
+            RemoteEndPoint = NetSocket.RemoteEndPoint;
             isSocketAttached = true;
         }
 
