@@ -25,7 +25,7 @@ namespace EPI.Comm.Net
             BufferSize = bufferSize;
         }
         #endregion
-        #region Start Stop
+        #region Method
         public void Start(int recvPort, string sendIp, int sendPort)
         {
             lock (StartStopLock)
@@ -77,9 +77,6 @@ namespace EPI.Comm.Net
         {
             UdpClient?.DropMulticastGroup(IPAddress.Parse(ip));
         }
-        #endregion
-
-
         internal void SendBytes(byte[] bytes)
         {
             try
@@ -130,7 +127,7 @@ namespace EPI.Comm.Net
             }
         }
         private protected abstract void OnReceived(PacketEventArgs e);
-
+        #endregion
         #region IDISPOSE
         private bool disposedValue;
         protected virtual void Dispose(bool disposing)

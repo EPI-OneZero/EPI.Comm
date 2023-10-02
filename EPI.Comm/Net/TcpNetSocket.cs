@@ -34,7 +34,7 @@ namespace EPI.Comm.Net
         }
         #endregion
 
-        #region Method
+        #region Method & Event
         private void SetSocketOption(Socket socket)
         {
             socket.ReceiveBufferSize = ReceiveBuffer.Length;
@@ -121,29 +121,27 @@ namespace EPI.Comm.Net
 
             }
         }
-
-        #endregion
-
-        #region Event
         public event PacketEventHandler Received;
         public event EventHandler Closed;
         #endregion
-    }
-    #region KeepAlive
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    internal sealed class KeepAlive
-    {
-        public uint OnOff = 1;
-        public uint IntervalMilliseconds = 3 * 1000;
-        public uint RetryMilliseconds = 100;
 
-        public byte[] Generate()
+        #region KeepAlive
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
+        internal sealed class KeepAlive
         {
-            const int Size = 12;
-            var result = new byte[Size];
-            MarshalSerializer.Serialize(this, result, 0, Size);
-            return result;
+            public uint OnOff = 1;
+            public uint IntervalMilliseconds = 3 * 1000;
+            public uint RetryMilliseconds = 100;
+
+            public byte[] Generate()
+            {
+                const int Size = 12;
+                var result = new byte[Size];
+                MarshalSerializer.Serialize(this, result, 0, Size);
+                return result;
+            }
         }
+        #endregion
     }
-    #endregion
+
 }

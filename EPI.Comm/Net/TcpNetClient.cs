@@ -5,7 +5,6 @@ namespace EPI.Comm.Net
 {
     public class TcpNetClient : TcpClientBase, IComm
     {
-        #region CTOR
         public TcpNetClient(int bufferSize) : base(bufferSize)
         {
 
@@ -18,8 +17,6 @@ namespace EPI.Comm.Net
         {
 
         }
-        #endregion
-        #region Send Receive
         public void Send(byte[] bytes)
         {
             SendBytes(bytes);
@@ -29,6 +26,5 @@ namespace EPI.Comm.Net
             Received?.Invoke(this, e);
         }
         public event PacketEventHandler Received;
-        #endregion
     }
 }

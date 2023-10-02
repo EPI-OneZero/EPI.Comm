@@ -32,23 +32,6 @@ namespace EPI.Comm.Net
         }
         #endregion
 
-        #region Client Attach Detach 
-        private protected virtual void AttachClient(TcpClientBase client)
-        {
-            clients.Add(client);
-            client.Disconnected += OnDisconnected;
-        }
-        private protected virtual void DetachClient(TcpClientBase client)
-        {
-            client.Disconnected -= OnDisconnected;
-            if (clients.Contains(client))
-            {
-                clients.Remove(client);
-                client.Dispose();
-            }
-        }
-        #endregion
-
         #region StartStop
         public void StartListen(int port)
         {
@@ -99,7 +82,15 @@ namespace EPI.Comm.Net
                 DetachClient(client);
             }
         }
-
+        private protected virtual void DetachClient(TcpClientBase client)
+        {
+            client.Disconnected -= OnDisconnected;
+            if (clients.Contains(client))
+            {
+                clients.Remove(client);
+                client.Dispose();
+            }
+        }
         #endregion
 
         #region Accept
@@ -127,6 +118,11 @@ namespace EPI.Comm.Net
                 isListening = false;
             }
 
+        }
+        private protected virtual void AttachClient(TcpClientBase client)
+        {
+            clients.Add(client);
+            client.Disconnected += OnDisconnected;
         }
         private protected abstract TcpClientBase CreateClient(TcpClient client);
         #endregion
