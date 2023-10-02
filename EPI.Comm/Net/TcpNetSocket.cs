@@ -135,7 +135,7 @@ namespace EPI.Comm.Net
     {
         public uint OnOff = 1;
         public uint IntervalMilliseconds = 3 * 1000;
-        public uint RetryMiliseconds = 100;
+        public uint RetryMilliseconds = 100;
 
         public byte[] Generate()
         {
