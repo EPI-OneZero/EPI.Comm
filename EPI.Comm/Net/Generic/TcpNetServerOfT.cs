@@ -103,7 +103,6 @@ namespace EPI.Comm.Net.Generic
        where Theader : new() where Tfooter : new()
     {
         #region Field & Property
-        private readonly object clientLock = new object();
         private readonly List<TcpNetClient<Theader, Tfooter>> clients = new List<TcpNetClient<Theader, Tfooter>>();
         public ClientCollection<Theader, Tfooter> Clients => new ClientCollection<Theader, Tfooter>(clients.ToArray());
         internal Func<Theader, int> GetBodySize { get; private set; }
