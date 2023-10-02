@@ -43,7 +43,7 @@ namespace EPI.Comm.Net
             BufferSize = bufferSize;
             AutoConnect = true;
         }
-        private protected TcpClientBase(TcpClient client, int bufferSize) : base()
+        private protected TcpClientBase(TcpClient client, int bufferSize)
         {
             TcpClient = client;
             BufferSize = bufferSize;

@@ -9,23 +9,23 @@ namespace EPI.Comm.Net
 {
     public abstract class UdpBase : IDisposable
     {
+        #region Field & Property
         private readonly object StartStopLock = new object();
         private readonly object SendLock = new object();
-        private readonly object RecvLock = new object();
         public UdpClient UdpClient { get; private set; }
         public IPEndPoint LocalEndPoint { get; private set; }
         public IPEndPoint RemoteEndPoint { get; private set; }
         public int BufferSize { get; private set; }
         private volatile bool isStarted;
-
         public bool IsStarted => isStarted;
-        protected UdpBase(int bufferSize)
+        #endregion
+        #region CTOR
+        private protected UdpBase(int bufferSize)
         {
             BufferSize = bufferSize;
         }
-        protected UdpBase() : this(DefaultBufferSize)
-        {
-        }
+        #endregion
+        #region Start Stop
         public void Start(int recvPort, string sendIp, int sendPort)
         {
             lock (StartStopLock)
@@ -38,7 +38,7 @@ namespace EPI.Comm.Net
                     SetSocketOption();
                     ThreadUtil.Start(() =>
                     {
-                        while (Receive());
+                        while (Receive()) ;
                     });
                     isStarted = true;
                 }
@@ -51,15 +51,23 @@ namespace EPI.Comm.Net
         }
         public void Stop()
         {
+
             lock (StartStopLock)
             {
-                UdpClient?.Dispose();
-                UdpClient = null;
-                LocalEndPoint = null;
-                RemoteEndPoint = null;
-                isStarted = false;
-            }
+                if (isStarted)
+                {
+                    UdpClient?.Dispose();
+                    UdpClient = null;
+                    LocalEndPoint = null;
+                    RemoteEndPoint = null;
+                    OnStop();
+                    isStarted = false;
+                }
 
+            }
+        }
+        private protected virtual void OnStop()
+        {
         }
         public void JoinMulticastGroup(string ip)
         {
@@ -69,6 +77,8 @@ namespace EPI.Comm.Net
         {
             UdpClient?.DropMulticastGroup(IPAddress.Parse(ip));
         }
+        #endregion
+
 
         internal void SendBytes(byte[] bytes)
         {
@@ -79,15 +89,17 @@ namespace EPI.Comm.Net
                     UdpClient?.Send(bytes, bytes.Length, RemoteEndPoint);
                 }
             }
-
-            catch (SocketException)
+            catch (SocketException e)
             {
+                Logger.Default.WriteLine(e.Message);
             }
-            catch (ObjectDisposedException)
+            catch (ObjectDisposedException e)
             {
+                Logger.Default.WriteLine(e.Message);
             }
-            catch (NullReferenceException)
+            catch (NullReferenceException e)
             {
+                Logger.Default.WriteLine(e.Message);
             }
             finally
             {
@@ -100,10 +112,7 @@ namespace EPI.Comm.Net
             {
                 var from = new IPEndPoint(IPAddress.Any, 0);
                 byte[] recv = null;
-                lock (RecvLock)
-                {
-                    recv = UdpClient.Receive(ref from);
-                }
+                recv = UdpClient.Receive(ref from);
                 OnReceived(new PacketEventArgs(new IPEndPoint(from.Address, from.Port), recv));
                 return true;
             }
@@ -120,8 +129,8 @@ namespace EPI.Comm.Net
                 return false;
             }
         }
-     
         private protected abstract void OnReceived(PacketEventArgs e);
+
         #region IDISPOSE
         private bool disposedValue;
         protected virtual void Dispose(bool disposing)

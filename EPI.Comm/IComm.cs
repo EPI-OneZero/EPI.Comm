@@ -16,8 +16,6 @@ namespace EPI.Comm
     {
         void Send(Theader header, byte[] body, Tfooter footer);
         event PacketEventHandler<Theader, Tfooter> Received;
-
-
     }
     public interface IComm<Theader> : IEndian
     {
