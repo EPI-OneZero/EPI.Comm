@@ -42,9 +42,10 @@ namespace UnitTest.Tcp
             Server?.Dispose();
             Client?.Dispose();
         }
+        private int c = 0;
         private byte[] GetBytes()
         {
-            var random = new Random();
+            var random = new Random((int)DateTime.Now.Ticks + c++);
             var result = new byte[256];
             random.NextBytes(result);
             return result;

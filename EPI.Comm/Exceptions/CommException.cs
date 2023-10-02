@@ -8,13 +8,10 @@ namespace EPI.Comm
     {
         internal CommException(string message, Exception e) : base(message, e.InnerException)
         {
-
         }
         internal CommException(string message) : base(message)
         {
-
         }
-
         internal static CommException CreateCommException(string message)
         {
             return new CommException(message);

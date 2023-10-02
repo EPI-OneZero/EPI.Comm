@@ -18,7 +18,6 @@ namespace EPI.Comm.Buffers
         #region CTOR
         public QueueBuffer() : this(DefaultBufferSize)
         {
-
         }
         public QueueBuffer(int capacity)
         {
@@ -34,26 +33,21 @@ namespace EPI.Comm.Buffers
         public byte[] GetBytes(int count)
         {
             var array = new byte[count];
-
-            int headerToLength = buffer.Length - head;
+            int headToLength = buffer.Length - head;
             if (count > 0)
             {
-                if (count <= headerToLength)
+                if (count <= headToLength)
                 {
                     Buffer.BlockCopy(buffer, head, array, 0, count);
-
                 }
                 else
                 {
-                    Buffer.BlockCopy(buffer, head, array, 0, headerToLength);
-                    Buffer.BlockCopy(buffer, 0, array, headerToLength, count - headerToLength);
-
+                    Buffer.BlockCopy(buffer, head, array, 0, headToLength);
+                    Buffer.BlockCopy(buffer, 0, array, headToLength, count - headToLength);
                 }
                 head = (head + count) % buffer.Length;
                 queueDataCount -= count;
-
             }
-
             return array;
         }
 
@@ -133,7 +127,6 @@ namespace EPI.Comm.Buffers
         {
             return GetEnumerator();
         }
-
         #endregion
     }
 
