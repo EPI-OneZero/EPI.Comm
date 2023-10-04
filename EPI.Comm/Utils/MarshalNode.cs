@@ -10,7 +10,7 @@ namespace EPI.Comm.Utils
     {
         public abstract void GenerateInfo(List<EndianInfo> infos);
         public int Offset { get; internal set; }
-       
+
         internal static EndianInfo[] Create(Type type)
         {
             var item = new MarshalNode(type, 0, type.IsUnicodeClass);
@@ -39,12 +39,22 @@ namespace EPI.Comm.Utils
             if (!Type.IsPrimitive)
                 InitSubNodes(Type.IsUnicodeClass);
         }
+        class InfoPair
+        {
+            public InfoPair(FieldInfo info, int off)
+            {
+                this.info = info;
+                this.off = off;
+            }
+            public FieldInfo info;
+            public int off;
 
+        }
         private void InitSubNodes(bool isUnicodeClass)
         {
             var fields = from info in GetFieldInfos(Type)
                          let off = (int)Marshal.OffsetOf(Type, info.Name)
-                         select (info, off);
+                         select new InfoPair(info, off);
             foreach (var field in fields)
             {
                 var fieldType = field.info.FieldType;
@@ -75,7 +85,7 @@ namespace EPI.Comm.Utils
                 item.GenerateInfo(infos);
             }
         }
-     
+
     }
     internal sealed class MarshalArrayNode : MarshalNodeBase
     {
