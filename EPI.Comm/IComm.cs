@@ -7,17 +7,24 @@ namespace EPI.Comm
     {
         public const int DefaultBufferSize = 8192;
     }
-    public interface IComm
+    public interface IComm : ICommSend, ICommReceive
+    {
+    
+    }
+    public interface ICommSend
     {
         void Send(byte[] bytes);
+    }
+    public interface ICommReceive
+    {
         event PacketEventHandler Received;
     }
-    public interface IComm<Theader, Tfooter> : IEndian
+    public interface IComm<Theader, Tfooter> : ICommSend, IEndian
     {
         void Send(Theader header, byte[] body, Tfooter footer);
         event PacketEventHandler<Theader, Tfooter> Received;
     }
-    public interface IComm<Theader> : IEndian
+    public interface IComm<Theader> : ICommSend, IEndian
     {
         void Send(Theader header, byte[] body);
         event PacketEventHandler<Theader> Received;

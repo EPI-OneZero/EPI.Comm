@@ -77,7 +77,7 @@ namespace EPI.Comm.Net
         #endregion
 
         #region Send Receive
-        internal void SendBytes(byte[] bytes)
+        public void Send(byte[] bytes)
         {
             NetSocket?.Send(bytes);
         }

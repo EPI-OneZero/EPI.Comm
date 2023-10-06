@@ -44,7 +44,7 @@ namespace EPI.Comm.Net.Generic
             };
             var fullPacketBytes = packetToSend.SerializePacket(IsBigEndian);
 
-            SendBytes(fullPacketBytes);
+            Send(fullPacketBytes);
         }
         private protected override void OnReceived(PacketEventArgs e)
         {
@@ -100,7 +100,7 @@ namespace EPI.Comm.Net.Generic
             };
             var fullPacketBytes = packetToSend.SerializePacket(IsBigEndian);
 
-            SendBytes(fullPacketBytes);
+            Send(fullPacketBytes);
         }
 
         private protected override void OnReceived(PacketEventArgs e)

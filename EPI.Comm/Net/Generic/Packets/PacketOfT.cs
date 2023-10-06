@@ -158,7 +158,6 @@ namespace EPI.Comm.Net.Generic.Packets
             }
         }
 
-
         internal override byte[] SerializePacket(bool isBigEndian)
         {
             var fullPacketBytes = base.SerializePacket(isBigEndian);

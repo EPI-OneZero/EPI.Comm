@@ -22,15 +22,7 @@ namespace EPI.Comm.Net
         }
         #endregion
 
-        #region Send
-        public void Send(byte[] bytes)
-        {
-            Parallel.ForEach(Clients, c =>
-            {
-                c.Send(bytes);
-            });
-        }
-        #endregion
+      
 
         #region Receive
         private void OnClientReceived(object sender, PacketEventArgs e)

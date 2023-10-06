@@ -4,6 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading.Tasks;
+
 namespace EPI.Comm.Net
 {
     public abstract class TcpServerBase : IDisposable
@@ -122,6 +124,16 @@ namespace EPI.Comm.Net
                 clients.Remove(client);
                 client.Dispose();
             }
+        }
+        #endregion
+
+        #region Send
+        public void Send(byte[] bytes)
+        {
+            Parallel.ForEach(clients.ToArray(), c =>
+            {
+                c.Send(bytes);
+            });
         }
         #endregion
 

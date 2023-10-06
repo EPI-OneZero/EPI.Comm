@@ -17,10 +17,7 @@ namespace EPI.Comm.Net
         {
 
         }
-        public void Send(byte[] bytes)
-        {
-            SendBytes(bytes);
-        }
+       
         private protected override void SocketReceived(object sender, PacketEventArgs e)
         {
             Received?.Invoke(this, e);

@@ -11,10 +11,7 @@ namespace EPI.Comm.Net
         public UdpNet() : base(DefaultBufferSize)
         {
         }
-        public void Send(byte[] bytes)
-        {
-            SendBytes(bytes);
-        }
+    
         private protected override void OnReceived(PacketEventArgs e)
         {
             Received?.Invoke(this, e);

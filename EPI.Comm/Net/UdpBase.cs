@@ -76,7 +76,7 @@ namespace EPI.Comm.Net
         {
             UdpClient?.DropMulticastGroup(IPAddress.Parse(ip));
         }
-        internal void SendBytes(byte[] bytes)
+        public void Send(byte[] bytes)
         {
             try
             {
