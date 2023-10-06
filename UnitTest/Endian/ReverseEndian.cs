@@ -30,7 +30,7 @@ namespace UnitTest.Endian
             var t = Deserialize<Outer>(bytes, false);
             Assert.AreEqual(outer, t);
         }
-
+        
         [TestMethod]
         public void TestMethod2()
         {
@@ -39,9 +39,8 @@ namespace UnitTest.Endian
             Console.WriteLine(Marshal.OffsetOf(typeof(Myenum), "a"));
             Console.WriteLine(Marshal.SizeOf(type));
         }
-
-
     }
+
     #region Model
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public class Outer
@@ -160,6 +159,7 @@ namespace UnitTest.Endian
         }
     }
     #endregion
+
     #region Model2
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     struct Myenum

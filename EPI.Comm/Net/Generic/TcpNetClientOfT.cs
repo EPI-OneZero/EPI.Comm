@@ -67,8 +67,7 @@ namespace EPI.Comm.Net.Generic
                 ReceiveBuffer.AddBytes(e.FullPacket);
                 while (PacketToReceive.TryDeserialize(ReceiveBuffer, IsBigEndian))
                 {
-                    var packet = PacketToReceive;
-                    Received?.Invoke(this, new PacketEventArgs<Theader>(e.From, packet));
+                    Received?.Invoke(this, new PacketEventArgs<Theader>(e.From, PacketToReceive));
                     PacketToReceive.Clear();
                 }
             }

@@ -107,7 +107,6 @@ namespace EPI.Comm.Net
             var client = sender as TcpClientBase;
             DetachClient(client);
         }
-
         private void DisposeAllClients()
         {
             var clients = this.clients.ToArray();
@@ -126,8 +125,6 @@ namespace EPI.Comm.Net
             }
         }
         #endregion
-
-      
 
         #region IDISPOSE
         protected virtual void Dispose(bool disposing)

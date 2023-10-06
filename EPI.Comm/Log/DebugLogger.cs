@@ -3,15 +3,9 @@ using System.Runtime.CompilerServices;
 
 namespace EPI.Comm.Log
 {
-    internal interface ILogger
+    internal abstract class Logger 
     {
-        bool IsEnabled { get; set; }
-        void WriteLineCaller([CallerMemberName] string caller = "");
-        void WriteLine(string message);
-    }
-    internal abstract class Logger : ILogger
-    {
-        public static ILogger Default { get; private set; } = new DebugLogger();
+        public static Logger Default { get; private set; } = new DebugLogger();
 
         public bool IsEnabled { get; set; }
         public void WriteLine(string message)
