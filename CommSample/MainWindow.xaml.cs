@@ -40,7 +40,7 @@ namespace CommSample
             {
                 source.Focus();
                 return source;
-            } 
+            }
             else
             {
                 var result = new T();

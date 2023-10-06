@@ -2,8 +2,6 @@
 using EPI.Comm.Net.Events;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using System.Text;
 using System.Windows;
 
@@ -47,11 +45,11 @@ namespace CommSample.Sample
         {
             ///MessageBox.Show("Server Client Closed");
         }
-        private  volatile int count = 0;
+        private volatile int count = 0;
         private void Server_BytesReceived(object sender, PacketEventArgs e)
         {
             //server.Clients.FirstOrDefault().Send(e.ReceivedBytes);
- 
+
             Dispatcher.BeginInvoke(new Action(() =>
             {
                 var build = new StringBuilder();

@@ -1,21 +1,9 @@
-﻿using EPI.Comm;
-using EPI.Comm.Net.Generic;
+﻿using EPI.Comm.Net.Generic;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace CommSample.Sample.Packet1
 {
@@ -60,7 +48,7 @@ namespace CommSample.Sample.Packet1
             //{
             //    Debug.WriteLine(data[i]);
             //}
-            if(count == 0)
+            if (count == 0)
             {
                 time = DateTime.Now;
             }
@@ -69,7 +57,7 @@ namespace CommSample.Sample.Packet1
             //Debug.WriteLine(data.Length);
             if (count < 10000)
             {
-               Button_Click1(null, null);
+                Button_Click1(null, null);
             }
             else
             {
