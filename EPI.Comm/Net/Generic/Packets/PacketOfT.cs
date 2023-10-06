@@ -85,7 +85,7 @@ namespace EPI.Comm.Net.Generic.Packets
         private bool TryDeserializeBody(IBuffer buffer)
         {
             var bodySize = CalculateBodySize();
-            if (buffer.Count>= bodySize)
+            if (buffer.Count >= bodySize)
             {
                 var bytes = buffer.GetBytes(bodySize);
                 queue.AddBytes(bytes);
@@ -149,7 +149,7 @@ namespace EPI.Comm.Net.Generic.Packets
                 var bytes = buffer.GetBytes(FooterSize);
                 queue.AddBytes(bytes);
                 Footer = Deserialize<Tfooter>(bytes, isBigEndian);
-                
+
                 return true;
             }
             else

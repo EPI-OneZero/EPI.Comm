@@ -75,6 +75,8 @@ namespace CommSample.Sample.Packet1
             {
                 var dt = DateTime.Now - time;
                 var ms = dt.TotalSeconds;
+                var s = new byte[0];
+                s.ToArray();
                 MessageBox.Show(ms.ToString());
                 count = 0;
             }

@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace EPI.Comm.Log
 {
-    internal abstract class Logger 
+    internal abstract class Logger
     {
         public static Logger Default { get; private set; } = new DebugLogger();
 

@@ -4,7 +4,6 @@ using EPI.Comm.Net.Generic.Events;
 using EPI.Comm.Net.Generic.Packets;
 using System;
 using System.Net.Sockets;
-using System.Runtime.InteropServices;
 using static EPI.Comm.CommConfig;
 
 namespace EPI.Comm.Net.Generic
@@ -46,7 +45,7 @@ namespace EPI.Comm.Net.Generic
         private void SetPacketProperties(Func<Theader, int> getBodySize)
         {
             GetBodySize = getBodySize;
-           
+
             PacketToReceive = new Packet<Theader>(getBodySize);
             HeaderSize = PacketToReceive.HeaderSize;
         }

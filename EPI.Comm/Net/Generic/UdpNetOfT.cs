@@ -3,12 +3,10 @@ using EPI.Comm.Net.Events;
 using EPI.Comm.Net.Generic.Events;
 using EPI.Comm.Net.Generic.Packets;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using static EPI.Comm.CommConfig;
 namespace EPI.Comm.Net.Generic
 {
-    internal class UdpNet<Theader> : UdpBase,IComm<Theader>
+    internal class UdpNet<Theader> : UdpBase, IComm<Theader>
     {
         #region Field & Property
         internal IBuffer ReceiveBuffer { get; set; } = new QueueBuffer();

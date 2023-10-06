@@ -2,7 +2,6 @@
 using EPI.Comm.Net.Events;
 using EPI.Comm.Utils;
 using System;
-using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
@@ -33,7 +32,7 @@ namespace EPI.Comm.Net
         private int portToConnect;
         public bool IsConnected => isSocketAttached;
         private readonly AutoConnectHelper connectHelper;
-     
+
         #endregion
 
         #region CTOR
@@ -95,7 +94,7 @@ namespace EPI.Comm.Net
                 {
                     isConnecting = true;
                     TcpClient = new TcpClient();
-                    if(!Connect(TcpClient))
+                    if (!Connect(TcpClient))
                     {
                         TcpClient?.Dispose();
                         TcpClient = null;

@@ -4,7 +4,6 @@ using EPI.Comm.Utils;
 using System;
 using System.Net;
 using System.Net.Sockets;
-using static EPI.Comm.CommConfig;
 namespace EPI.Comm.Net
 {
     public abstract class UdpBase : IDisposable
