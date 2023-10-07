@@ -130,15 +130,15 @@ namespace UnitTest.Models
     [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Unicode)]
     public class Msg
     {
-        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 5)]
-        public string Message;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 2)]
+        public char[] Message;
         public Msg(string msg)
         {
-            Message = msg;
+            Message = msg.ToCharArray();
         }
         public override string ToString()
         {
-            return Message;
+            return new string( Message);
         }
     }
     [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Ansi)]
@@ -159,7 +159,6 @@ namespace UnitTest.Models
         }
         public override bool Equals(object obj)
         {
-
             return Equals(obj as Footer);
         }
         public bool Equals(Footer other)

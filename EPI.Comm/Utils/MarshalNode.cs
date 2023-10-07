@@ -28,41 +28,58 @@ namespace EPI.Comm.Utils
         {
             Offset = offset;
             Type = !t.IsEnum ? t : Enum.GetUnderlyingType(t);
-            if (Type == typeof(char))
-            {
-                if(!unmanagedType.HasValue)
-                {
-                    if(isUnicodeClass)
-                    {
-                        Size = 2;
-                    }
-                    else
-                    {
-                        Size = 1;
-                    }
-                }
-                else if(IsSize2(unmanagedType.Value))
-                {
-                    Size = 2;
-                }
-                else
-                {
-                    Size = 1;
-                }
-            }
-            else
-            {
-                Size = Marshal.SizeOf(Type);
-            }
+           
+            Size = GetSize(Type, isUnicodeClass, unmanagedType);
             if (!Type.IsPrimitive)
                 InitSubNodes(Type.IsUnicodeClass);
         }
-        private static bool IsSize2(UnmanagedType unmanagedType)
+        private static int GetSize(Type t, bool isUnicodeClass, UnmanagedType? unmanagedType)
+        {
+            var result = 0;
+            if (t == typeof(char))
+            {
+                if (unmanagedType.HasValue && unmanagedType.Value != 0x00)
+                {
+                    result = GetSize(unmanagedType.Value);
+                }
+                else if (isUnicodeClass)
+                {
+                    result = 2;
+                }
+                else
+                {
+                    result = 1;
+                }
+            }
+            else if (t == typeof(bool) && unmanagedType.HasValue && IsSize1(unmanagedType.Value))
+            {
+                result = 1;
+            }
+            else
+            {
+                result = Marshal.SizeOf(t);
+            }
+            return result;
+        }
+        private static int GetSize(UnmanagedType unmanagedType)
         {
             switch (unmanagedType)
             {
                 case UnmanagedType.I2:
                 case UnmanagedType.U2:
+                    return 2;
+                case UnmanagedType.I1:
+                case UnmanagedType.U1:
+                default:
+                    return 1;
+            }
+        }
+        private static bool IsSize1(UnmanagedType unmanagedType)
+        {
+            switch (unmanagedType)
+            {
+                case UnmanagedType.I1:
+                case UnmanagedType.U1:
                     return true;
                 default:
                     return false;
