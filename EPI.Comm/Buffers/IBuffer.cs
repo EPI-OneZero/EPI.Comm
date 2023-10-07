@@ -3,7 +3,7 @@
 namespace EPI.Comm.Buffers
 {
 
-    internal interface IBuffer : IEnumerable<byte>
+    public interface IBuffer : IEnumerable<byte>
     {
         int Count { get; }
         byte[] GetBytes(int count);

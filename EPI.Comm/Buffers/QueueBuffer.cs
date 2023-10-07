@@ -5,7 +5,7 @@ using static EPI.Comm.CommConfig;
 namespace EPI.Comm.Buffers
 {
 
-    internal sealed class QueueBuffer : IBuffer
+    public sealed class QueueBuffer : IBuffer
     {
         #region Field & Property
         private byte[] buffer;
