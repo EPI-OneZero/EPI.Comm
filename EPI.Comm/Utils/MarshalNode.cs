@@ -35,7 +35,7 @@ namespace EPI.Comm.Utils
         }
         private static int GetSize(Type t, bool isUnicodeClass, UnmanagedType? unmanagedType)
         {
-            var result = 0;
+            int result;
             if (t == typeof(char))
             {
                 if (unmanagedType.HasValue && unmanagedType.Value != 0x00)
