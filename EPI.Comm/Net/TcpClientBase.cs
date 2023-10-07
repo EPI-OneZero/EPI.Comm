@@ -140,7 +140,10 @@ namespace EPI.Comm.Net
         }
 
         public event EventHandler Connected;
+        protected virtual void OnConnected()
+        {
 
+        }
         #endregion
 
         #region Stop
@@ -157,16 +160,17 @@ namespace EPI.Comm.Net
             }
         }
 
-        protected virtual void OnSocketDisconnected()
+        protected virtual void OnDisconnected()
         {
-            Disconnected?.Invoke(this, EventArgs.Empty);
+           
         }
         private void SocketClosed(object sender, EventArgs e)
         {
             DetachSocket();
             TcpClient?.Dispose();
             TcpClient = null;
-            OnSocketDisconnected();
+            OnDisconnected();
+            Disconnected?.Invoke(this, EventArgs.Empty);
             connectHelper?.RunAutoConnectIfUserWant();
         }
         public event EventHandler Disconnected;

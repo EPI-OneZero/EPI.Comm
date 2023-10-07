@@ -33,11 +33,11 @@ namespace EPI.Comm.Net.Generic
         #endregion
 
         #region Method & Event
-        protected override void OnSocketDisconnected()
+        protected override void OnDisconnected()
         {
             PacketMakerToReceive.ClearReceiveBuffer();
             PacketMakerToReceive.ClearPacketInfo();
-            base.OnSocketDisconnected();
+            base.OnDisconnected();
         }
 
         private void SetPacketProperties(Func<Theader, int> getBodySize)
@@ -97,11 +97,11 @@ namespace EPI.Comm.Net.Generic
             PacketMakerToReceive = new PacketMaker<Theader, Tfooter>(getBodySize, true);
 
         }
-        protected override void OnSocketDisconnected()
+        protected override void OnDisconnected()
         {
             PacketMakerToReceive.ClearReceiveBuffer();
             PacketMakerToReceive.ClearPacketInfo();
-            base.OnSocketDisconnected();
+            base.OnDisconnected();
         }
         public void Send(Theader header, byte[] body, Tfooter footer)
         {
