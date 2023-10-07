@@ -30,6 +30,11 @@ namespace EPI.Comm.Buffers
 
         #region IBuffer
         public int Count => queueDataCount;
+        /// <summary>
+        /// Dequeue
+        /// </summary>
+        /// <param name="count"></param>
+        /// <returns></returns>
         public byte[] GetBytes(int count)
         {
             var array = new byte[count];
@@ -50,7 +55,10 @@ namespace EPI.Comm.Buffers
             }
             return array;
         }
-
+        /// <summary>
+        /// Enqueue로 동작
+        /// </summary>
+        /// <param name="bytes"></param>
         public void AddBytes(byte[] bytes)
         {
             var count = bytes.Length;

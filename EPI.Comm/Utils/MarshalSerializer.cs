@@ -45,6 +45,5 @@ namespace EPI.Comm.Utils
                 Array.Reverse(bytes, infos[i].Offset + offset, infos[i].Size);
             }
         }
-
     }
 }
