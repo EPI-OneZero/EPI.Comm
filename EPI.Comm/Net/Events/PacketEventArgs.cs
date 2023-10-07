@@ -16,6 +16,4 @@ namespace EPI.Comm.Net.Events
     }
 
     public delegate void PacketEventHandler(object sender, PacketEventArgs e);
-
-
 }

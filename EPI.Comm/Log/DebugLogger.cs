@@ -3,9 +3,9 @@ using System.Runtime.CompilerServices;
 
 namespace EPI.Comm.Log
 {
-    internal abstract class Logger
+    public abstract class Logger
     {
-        public static Logger Default { get; private set; } = new DebugLogger();
+        public static Logger Default { get; set; } = new DebugLogger();
 
         public bool IsEnabled { get; set; }
         public void WriteLine(string message)
@@ -24,10 +24,8 @@ namespace EPI.Comm.Log
         }
         protected abstract void WriteLineMessage(string message);
         protected abstract void WriteMessage(string message);
-
-
     }
-    internal sealed class DebugLogger : Logger
+    public sealed class DebugLogger : Logger
     {
         internal DebugLogger()
         {
