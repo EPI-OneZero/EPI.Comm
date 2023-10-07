@@ -116,7 +116,7 @@ namespace EPI.Comm.Net.Generic.Packets
                 return false;
             }
         }
-        internal virtual byte[] SerializePacket(bool isBigEndian)
+        public virtual byte[] SerializePacket(bool isBigEndian)
         {
             int bodySize = Body.Length;
             var headerDefinedBodySize = CalculateBodySize();
@@ -134,14 +134,14 @@ namespace EPI.Comm.Net.Generic.Packets
                     ($"바디의 크기가 헤더 정의와 다릅니다. 헤더에서 계산된 바디 크기 : {headerDefinedBodySize} 바이트");
             }
         }
-        internal virtual void ClearPacketInfo()
+        public virtual void ClearPacketInfo()
         {
             Header = default(Theader);
             Body = null;
             state = DeserializeState.None;
             FullPacketBuffer?.Clear();
         }
-        internal void ClearReceiveBuffer()
+        public void ClearReceiveBuffer()
         {
             ReceiveBuffer?.Clear();
         }
@@ -179,14 +179,14 @@ namespace EPI.Comm.Net.Generic.Packets
             }
         }
 
-        internal override byte[] SerializePacket(bool isBigEndian)
+        public override byte[] SerializePacket(bool isBigEndian)
         {
             var fullPacketBytes = base.SerializePacket(isBigEndian);
             Serialize(Footer, fullPacketBytes, base.FullSize, isBigEndian);
             return fullPacketBytes;
         }
 
-        internal override void ClearPacketInfo()
+        public override void ClearPacketInfo()
         {
             base.ClearPacketInfo();
             Footer = default(Tfooter);
