@@ -40,7 +40,7 @@ namespace EPI.Comm.Utils
             {
                 if (unmanagedType.HasValue && unmanagedType.Value != 0x00)
                 {
-                    result = GetSize(unmanagedType.Value);
+                    result = GetCharSize(unmanagedType.Value);
                 }
                 else if (isUnicodeClass)
                 {
@@ -61,7 +61,7 @@ namespace EPI.Comm.Utils
             }
             return result;
         }
-        private static int GetSize(UnmanagedType unmanagedType)
+        private static int GetCharSize(UnmanagedType unmanagedType)
         {
             switch (unmanagedType)
             {
