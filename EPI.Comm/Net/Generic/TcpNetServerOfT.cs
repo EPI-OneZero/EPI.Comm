@@ -59,14 +59,14 @@ namespace EPI.Comm.Net.Generic
         #endregion
 
         #region Accept
-        private protected override TcpClientBase CreateClient(TcpClient client)
+        protected override TcpClientBase CreateClient(TcpClient client)
         {
             var result = new TcpNetClient<Theader>(client, BufferSize, GetBodySize)
             { IsBigEndian = IsBigEndian };
             return result;
         }
 
-        private protected override void AttachClient(TcpClientBase client)
+        protected override void AttachClient(TcpClientBase client)
         {
             base.AttachClient(client);
             var newClient = client as TcpNetClient<Theader>;
@@ -83,7 +83,7 @@ namespace EPI.Comm.Net.Generic
 
         #region Close
 
-        private protected override void DetachClient(TcpClientBase client)
+        protected override void DetachClient(TcpClientBase client)
         {
             base.DetachClient(client);
 
@@ -150,13 +150,13 @@ namespace EPI.Comm.Net.Generic
         #endregion
 
         #region Accept
-        private protected override TcpClientBase CreateClient(TcpClient client)
+        protected override TcpClientBase CreateClient(TcpClient client)
         {
             var result = new TcpNetClient<Theader, Tfooter>(client, BufferSize, GetBodySize)
             { IsBigEndian = IsBigEndian };
             return result;
         }
-        private protected override void AttachClient(TcpClientBase client)
+        protected override void AttachClient(TcpClientBase client)
         {
             base.AttachClient(client);
             var newClient = client as TcpNetClient<Theader, Tfooter>;
@@ -168,7 +168,7 @@ namespace EPI.Comm.Net.Generic
         #endregion
 
         #region Close
-        private protected override void DetachClient(TcpClientBase client)
+        protected override void DetachClient(TcpClientBase client)
         {
             base.DetachClient(client);
             var oldClient = client as TcpNetClient<Theader, Tfooter>;

@@ -18,7 +18,7 @@ namespace EPI.Comm.Net
 
         }
        
-        private protected override void SocketReceived(object sender, PacketEventArgs e)
+        protected override void SocketReceived(object sender, PacketEventArgs e)
         {
             Received?.Invoke(this, e);
         }

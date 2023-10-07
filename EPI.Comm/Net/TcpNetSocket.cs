@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 using static EPI.Comm.CommException;
 namespace EPI.Comm.Net
 {
-    internal sealed class TcpNetSocket
+    public sealed class TcpNetSocket
     {
         #region Field & Property
         private readonly object SendLock = new object();

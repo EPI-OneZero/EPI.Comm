@@ -111,7 +111,7 @@ namespace EPI.Comm.Net
 
             }
         }
-        private protected virtual void OnStop()
+        protected virtual void OnStop()
         {
         }
         //public void JoinMulticastGroup(string ip)
@@ -171,7 +171,7 @@ namespace EPI.Comm.Net
                 return false;
             }
         }
-        private protected abstract void OnReceived(PacketEventArgs e);
+        protected abstract void OnReceived(PacketEventArgs e);
         #endregion
 
         #region IDISPOSE

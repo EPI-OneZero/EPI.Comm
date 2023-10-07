@@ -46,7 +46,7 @@ namespace EPI.Comm.Net.Generic
 
             Send(fullPacketBytes);
         }
-        private protected override void OnReceived(PacketEventArgs e)
+        protected override void OnReceived(PacketEventArgs e)
         {
             if(!PacketMakers.ContainsKey(e.From))
             {
@@ -98,7 +98,7 @@ namespace EPI.Comm.Net.Generic
             Send(fullPacketBytes);
         }
 
-        private protected override void OnReceived(PacketEventArgs e)
+        protected override void OnReceived(PacketEventArgs e)
         {
             if (!PacketMakers.ContainsKey(e.From))
             {
@@ -109,7 +109,7 @@ namespace EPI.Comm.Net.Generic
                 Received?.Invoke(this, new PacketEventArgs<Theader, Tfooter>(e.From, PacketMakers[e.From]));
             });
         }
-        private protected override void OnStop()
+        protected override void OnStop()
         {
             PacketToReceive.ClearReceiveBuffer();
             PacketToReceive.ClearPacketInfo();

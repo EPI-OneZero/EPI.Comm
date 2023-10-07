@@ -76,12 +76,12 @@ namespace EPI.Comm.Net
             }
 
         }
-        private protected virtual void AttachClient(TcpClientBase client)
+        protected virtual void AttachClient(TcpClientBase client)
         {
             clients.Add(client);
             client.Disconnected += OnDisconnected;
         }
-        private protected abstract TcpClientBase CreateClient(TcpClient client);
+        protected abstract TcpClientBase CreateClient(TcpClient client);
         #endregion
 
         public void Stop()
@@ -116,7 +116,7 @@ namespace EPI.Comm.Net
                 DetachClient(client);
             }
         }
-        private protected virtual void DetachClient(TcpClientBase client)
+        protected virtual void DetachClient(TcpClientBase client)
         {
             client.Disconnected -= OnDisconnected;
             if (clients.Contains(client))

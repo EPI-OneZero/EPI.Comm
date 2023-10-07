@@ -66,7 +66,7 @@ namespace EPI.Comm.Net.Generic.Packets
             }
             return success;
         }
-        private protected virtual bool TryDeserializePacket(IBuffer buffer, bool isBigEndian)
+        protected virtual bool TryDeserializePacket(IBuffer buffer, bool isBigEndian)
         {
             switch (state)
             {
@@ -163,7 +163,7 @@ namespace EPI.Comm.Net.Generic.Packets
 
         #region Method
        
-        private protected override bool TryDeserializePacket(IBuffer buffer, bool isBigEndian)
+        protected override bool TryDeserializePacket(IBuffer buffer, bool isBigEndian)
         {
             if (base.TryDeserializePacket(buffer, isBigEndian) && buffer.Count >= FooterSize)
             {

@@ -12,7 +12,7 @@ namespace EPI.Comm.Net
         {
         }
     
-        private protected override void OnReceived(PacketEventArgs e)
+        protected override void OnReceived(PacketEventArgs e)
         {
             Received?.Invoke(this, e);
         }

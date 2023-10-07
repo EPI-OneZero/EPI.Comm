@@ -33,7 +33,7 @@ namespace EPI.Comm.Net.Generic
         #endregion
 
         #region Method & Event
-        private protected override void OnSocketDisconnected()
+        protected override void OnSocketDisconnected()
         {
             PacketMakerToReceive.ClearReceiveBuffer();
             PacketMakerToReceive.ClearPacketInfo();
@@ -56,7 +56,7 @@ namespace EPI.Comm.Net.Generic
             var fullPacketBytes = packetMakerToSend.SerializePacket(IsBigEndian);
             Send(fullPacketBytes);
         }
-        private protected override void SocketReceived(object sender, PacketEventArgs e)
+        protected override void SocketReceived(object sender, PacketEventArgs e)
         {
 
             PacketMakerToReceive.TryDeserializeLoop(e.FullPacket, IsBigEndian, () =>
@@ -97,7 +97,7 @@ namespace EPI.Comm.Net.Generic
             PacketMakerToReceive = new PacketMaker<Theader, Tfooter>(getBodySize, true);
 
         }
-        private protected override void OnSocketDisconnected()
+        protected override void OnSocketDisconnected()
         {
             PacketMakerToReceive.ClearReceiveBuffer();
             PacketMakerToReceive.ClearPacketInfo();
@@ -115,7 +115,7 @@ namespace EPI.Comm.Net.Generic
 
             Send(fullPacketBytes);
         }
-        private protected override void SocketReceived(object sender, PacketEventArgs e)
+        protected override void SocketReceived(object sender, PacketEventArgs e)
         {
             PacketMakerToReceive.TryDeserializeLoop(e.FullPacket, IsBigEndian, () =>
             {

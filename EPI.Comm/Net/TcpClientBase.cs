@@ -12,8 +12,8 @@ namespace EPI.Comm.Net
         #region Field & Property
         private readonly object ConnectLock = new object();
 
-        internal TcpClient TcpClient { get; private set; }
-        internal TcpNetSocket NetSocket { get; private set; }
+        protected TcpClient TcpClient { get; private set; }
+        protected TcpNetSocket NetSocket { get; private set; }
         public int BufferSize { get; private set; }
         public IPEndPoint LocalEndPoint { get; private set; }
         public IPEndPoint RemoteEndPoint { get; private set; }
@@ -81,7 +81,7 @@ namespace EPI.Comm.Net
         {
             NetSocket?.Send(bytes);
         }
-        private protected abstract void SocketReceived(object sender, PacketEventArgs e);
+        protected abstract void SocketReceived(object sender, PacketEventArgs e);
         #endregion
 
         #region Connect
@@ -157,7 +157,7 @@ namespace EPI.Comm.Net
             }
         }
 
-        private protected virtual void OnSocketDisconnected()
+        protected virtual void OnSocketDisconnected()
         {
             Disconnected?.Invoke(this, EventArgs.Empty);
         }
