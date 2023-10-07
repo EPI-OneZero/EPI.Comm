@@ -75,7 +75,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\EPI.Comm\EPI.Comm.csproj">
-      <Project>{E765ABE9-2B15-4CB4-9553-57CE2479D6BA}</Project>
+      <Project>{e765abe9-2b15-4cb4-9553-57ce2479d6ba}</Project>
       <Name>EPI.Comm</Name>
     </ProjectReference>
   </ItemGroup>
