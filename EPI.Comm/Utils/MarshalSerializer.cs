@@ -18,7 +18,7 @@ namespace EPI.Comm.Utils
             handle.Free();
             return result;
         }
-        public static void Serialize<T>(T src, byte[] dst, int dstOffset, int srcSize, bool isBigEndian = false)
+        public static void Serialize<T>(T src, byte[] dst, int dstOffset, bool isBigEndian = false)
         {
             var handle = GCHandle.Alloc(dst, GCHandleType.Pinned);
             var ptr = handle.AddrOfPinnedObject() + dstOffset;

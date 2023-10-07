@@ -9,10 +9,9 @@ namespace EPI.Comm.Net.Generic
     internal class UdpNet<Theader> : UdpBase, IComm<Theader>
     {
         #region Field & Property
-        internal IBuffer ReceiveBuffer { get; set; } = new QueueBuffer();
         public int HeaderSize { get; private set; }
         public Func<Theader, int> GetBodySize { get; private set; }
-        internal Packet<Theader> PacketToReceive { get; set; }
+        internal PacketMaker<Theader> PacketToReceive { get; set; }
         public bool IsBigEndian { get; set; }
         #endregion
 
@@ -31,13 +30,13 @@ namespace EPI.Comm.Net.Generic
         private void SetPacketProperties(Func<Theader, int> getBodySize)
         {
             GetBodySize = getBodySize;
-            PacketToReceive = new Packet<Theader>(getBodySize);
+            PacketToReceive = new PacketMaker<Theader>(getBodySize);
             HeaderSize = PacketToReceive.HeaderSize;
         }
 
         public void Send(Theader header, byte[] body)
         {
-            var packetToSend = new Packet<Theader>(GetBodySize)
+            var packetToSend = new PacketMaker<Theader>(GetBodySize)
             {
                 Header = header,
                 Body = body
@@ -51,10 +50,10 @@ namespace EPI.Comm.Net.Generic
             lock (this)
             {
                 ReceiveBuffer.AddBytes(e.FullPacket);
-                while (PacketToReceive.TryDeserialize(ReceiveBuffer, IsBigEndian))
+                while (PacketToReceive.TryDeserialize(e.FullPacket, IsBigEndian))
                 {
                     Received?.Invoke(this, new PacketEventArgs<Theader>(e.From, PacketToReceive));
-                    PacketToReceive.Clear();
+                    PacketToReceive.ClearPacketInfo();
                 }
             }
         }
@@ -67,8 +66,7 @@ namespace EPI.Comm.Net.Generic
         public int HeaderSize { get; private set; }
         public int FooterSize { get; private set; }
         public Func<Theader, int> GetBodySize { get; private set; }
-        internal IBuffer ReceiveBuffer { get; set; } = new QueueBuffer();
-        internal Packet<Theader, Tfooter> PacketToReceive { get; set; }
+        internal PacketMaker<Theader, Tfooter> PacketToReceive { get; set; }
         public bool IsBigEndian { get; set; }
         #endregion
 
@@ -86,13 +84,13 @@ namespace EPI.Comm.Net.Generic
         private void SetPacketProperties(Func<Theader, int> getBodySize)
         {
             GetBodySize = getBodySize;
-            PacketToReceive = new Packet<Theader, Tfooter>(getBodySize);
+            PacketToReceive = new PacketMaker<Theader, Tfooter>(getBodySize);
             HeaderSize = PacketToReceive.HeaderSize;
             FooterSize = PacketToReceive.FooterSize;
         }
         public void Send(Theader header, byte[] body, Tfooter footer)
         {
-            var packetToSend = new Packet<Theader, Tfooter>(GetBodySize)
+            var packetToSend = new PacketMaker<Theader, Tfooter>(GetBodySize)
             {
                 Header = header,
                 Body = body,
@@ -107,18 +105,17 @@ namespace EPI.Comm.Net.Generic
         {
             lock (this)
             {
-                ReceiveBuffer.AddBytes(e.FullPacket);
-                while (PacketToReceive.TryDeserialize(ReceiveBuffer, IsBigEndian))
+                while (PacketToReceive.TryDeserialize(e.FullPacket, IsBigEndian))
                 {
                     Received?.Invoke(this, new PacketEventArgs<Theader, Tfooter>(e.From, PacketToReceive));
-                    PacketToReceive.Clear();
+                    PacketToReceive.ClearPacketInfo();
                 }
             }
         }
         private protected override void OnStop()
         {
-            ReceiveBuffer.Clear();
-            PacketToReceive.Clear();
+            PacketToReceive.ClearReceiveBuffer();
+            PacketToReceive.ClearPacketInfo();
             base.OnStop();
         }
         public event PacketEventHandler<Theader, Tfooter> Received;

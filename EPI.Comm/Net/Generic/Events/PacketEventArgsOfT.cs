@@ -10,7 +10,7 @@ namespace EPI.Comm.Net.Generic.Events
         public byte[] FullPacket { get; private set; }
         public Theader Header { get; private set; }
         public byte[] Body { get; private set; }
-        internal PacketEventArgs(IPEndPoint from, Packet<Theader> packet)
+        internal PacketEventArgs(IPEndPoint from, PacketMaker<Theader> packet)
         {
             From = from;
             Header = packet.Header;
@@ -27,7 +27,7 @@ namespace EPI.Comm.Net.Generic.Events
         public Theader Header { get; private set; }
         public byte[] Body { get; private set; }
         public Tfooter Footer { get; private set; }
-        internal PacketEventArgs(IPEndPoint from, Packet<Theader, Tfooter> packet)
+        internal PacketEventArgs(IPEndPoint from, PacketMaker<Theader, Tfooter> packet)
         {
             From = from;
             Header = packet.Header;

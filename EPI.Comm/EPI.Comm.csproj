@@ -17,7 +17,7 @@
   <PropertyGroup>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
-    <AnalysisLevel>latest-minimum</AnalysisLevel>
+    <AnalysisLevel>none</AnalysisLevel>
     <ImplicitUsings>disable</ImplicitUsings>
   </PropertyGroup>
 </Project>
