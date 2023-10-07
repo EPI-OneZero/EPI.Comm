@@ -9,6 +9,9 @@ namespace EPI.Comm.Net
     public abstract class UdpBase : IDisposable
     {
         #region Field & Property
+        public static uint MulticastMin { get; private set; } = ConvertAddressToUint("224.0.0.0");
+        public static uint MulticastMax { get; private set; } = ConvertAddressToUint("239.255.255.255");
+
         private readonly object StartStopLock = new object();
         private readonly object SendLock = new object();
         public UdpClient UdpClient { get; private set; }
@@ -27,6 +30,7 @@ namespace EPI.Comm.Net
         #endregion
 
         #region Method
+       
         public void Start(int recvPort, string sendIp, int sendPort)
         {
             lock (StartStopLock)
@@ -36,19 +40,59 @@ namespace EPI.Comm.Net
                     UdpClient = new UdpClient(new IPEndPoint(IPAddress.Any, recvPort));
                     LocalEndPoint = UdpClient.Client.LocalEndPoint as IPEndPoint;
                     RemoteEndPoint = new IPEndPoint(IPAddress.Parse(sendIp), sendPort);
-                    SetSocketOption();
+                   
+                    SetSocketOption(UdpClient.Client);
                     ThreadUtil.Start(() =>
                     {
-                        while (Receive()) ;
+                        while (Receive());
                     });
                     isStarted = true;
                 }
             }
         }
-        private void SetSocketOption()
+        public void JoinMulticast(string ip, bool multicastLoopback)
         {
-            UdpClient.Client.ReceiveBufferSize = BufferSize;
-            UdpClient.Client.SendBufferSize = BufferSize;
+            if (CheckInMulticastRange(ip))
+            {
+                UdpClient.JoinMulticastGroup(RemoteEndPoint.Address);
+                UdpClient.MulticastLoopback = multicastLoopback;
+            }
+            else
+            {
+                throw CommException.CreateCommException("멀티캐스트 대역이 아닙니다.");
+            }
+        }
+        public void DropMulticast(string ip)
+        {
+            if (CheckInMulticastRange(ip))
+            {
+                UdpClient.DropMulticastGroup(RemoteEndPoint.Address);
+            }
+            else
+            {
+                throw CommException.CreateCommException("멀티캐스트 대역이 아닙니다.");
+            }
+        }
+        private static bool CheckInMulticastRange(string address)
+        {
+            uint ip = ConvertAddressToUint(address);
+            if (MulticastMin <= ip && ip <= MulticastMax)
+            {
+               return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        private static uint ConvertAddressToUint(string ip)
+        {
+            return (uint)IPAddress.HostToNetworkOrder(BitConverter.ToInt32(IPAddress.Parse(ip).GetAddressBytes(), 0));
+        }
+        private void SetSocketOption(Socket socket)
+        {
+            socket.ReceiveBufferSize = BufferSize;
+            socket.SendBufferSize = BufferSize;
         }
         public void Stop()
         {
@@ -70,14 +114,14 @@ namespace EPI.Comm.Net
         private protected virtual void OnStop()
         {
         }
-        public void JoinMulticastGroup(string ip)
-        {
-            UdpClient?.JoinMulticastGroup(IPAddress.Parse(ip));
-        }
-        public void DropMulticastGroup(string ip)
-        {
-            UdpClient?.DropMulticastGroup(IPAddress.Parse(ip));
-        }
+        //public void JoinMulticastGroup(string ip)
+        //{
+        //    UdpClient?.JoinMulticastGroup(IPAddress.Parse(ip));
+        //}
+        //public void DropMulticastGroup(string ip)
+        //{
+        //    UdpClient?.DropMulticastGroup(IPAddress.Parse(ip));
+        //}
         public void Send(byte[] bytes)
         {
             try
