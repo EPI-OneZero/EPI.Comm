@@ -52,15 +52,10 @@ namespace EPI.Comm.Net.Generic
             {
                 PacketMakers.Add(e.From, new PacketMaker<Theader>(GetBodySize, true));
             }
-            lock (PacketMakers[e.From])
+            PacketMakers[e.From].TryDeserializeLoop(e.FullPacket, IsBigEndian, () =>
             {
-                PacketMakers[e.From].AddBytes(e.FullPacket);
-                while (PacketMakers[e.From].TryDeserialize(IsBigEndian))
-                {
-                    Received?.Invoke(this, new PacketEventArgs<Theader>(e.From, PacketMakers[e.From]));
-                    PacketMakers[e.From].ClearPacketInfo();
-                }
-            }
+                Received?.Invoke(this, new PacketEventArgs<Theader>(e.From, PacketMakers[e.From]));
+            });
         }
         public event PacketEventHandler<Theader> Received;
         #endregion
@@ -109,15 +104,10 @@ namespace EPI.Comm.Net.Generic
             {
                 PacketMakers.Add(e.From, new PacketMaker<Theader,Tfooter>(GetBodySize, true));
             }
-            lock (PacketMakers[e.From])
+            PacketMakers[e.From].TryDeserializeLoop(e.FullPacket, IsBigEndian, () =>
             {
-                PacketMakers[e.From].AddBytes(e.FullPacket);
-                while (PacketMakers[e.From].TryDeserialize(IsBigEndian))
-                {
-                    Received?.Invoke(this, new PacketEventArgs<Theader, Tfooter>(e.From, PacketMakers[e.From]));
-                    PacketMakers[e.From].ClearPacketInfo();
-                }
-            }
+                Received?.Invoke(this, new PacketEventArgs<Theader, Tfooter>(e.From, PacketMakers[e.From]));
+            });
         }
         private protected override void OnStop()
         {

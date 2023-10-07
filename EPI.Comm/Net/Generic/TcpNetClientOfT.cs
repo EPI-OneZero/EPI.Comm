@@ -12,7 +12,6 @@ namespace EPI.Comm.Net.Generic
         where Theader : new()
     {
         #region Field & Property
-        private readonly object recvLock = new object();
         internal Func<Theader, int> GetBodySize { get; private set; }
         internal PacketMaker<Theader> PacketMakerToReceive { get; set; }
         public bool IsBigEndian { get; set; }
@@ -59,17 +58,12 @@ namespace EPI.Comm.Net.Generic
         }
         private protected override void SocketReceived(object sender, PacketEventArgs e)
         {
-            lock (recvLock)
-            {
-                PacketMakerToReceive.AddBytes(e.FullPacket);
-                while (PacketMakerToReceive.TryDeserialize(IsBigEndian))
-                {
-                    Received?.Invoke(this, new PacketEventArgs<Theader>(e.From, PacketMakerToReceive));
-                    PacketMakerToReceive.ClearPacketInfo();
-                }
-            }
-        }
 
+            PacketMakerToReceive.TryDeserializeLoop(e.FullPacket, IsBigEndian, () =>
+            {
+                Received?.Invoke(this, new PacketEventArgs<Theader>(e.From, PacketMakerToReceive));
+            });
+        }
         public event PacketEventHandler<Theader> Received;
         #endregion
     }
@@ -77,7 +71,6 @@ namespace EPI.Comm.Net.Generic
         where Theader : new()
     {
         #region Field & Property
-        private readonly object recvLock = new object();
         public Func<Theader, int> GetBodySize { get; private set; }
         internal PacketMaker<Theader, Tfooter> PacketMakerToReceive { get; set; }
         public bool IsBigEndian { get; set; }
@@ -124,15 +117,10 @@ namespace EPI.Comm.Net.Generic
         }
         private protected override void SocketReceived(object sender, PacketEventArgs e)
         {
-            lock (recvLock)
+            PacketMakerToReceive.TryDeserializeLoop(e.FullPacket, IsBigEndian, () =>
             {
-                PacketMakerToReceive.AddBytes(e.FullPacket);
-                while (PacketMakerToReceive.TryDeserialize(IsBigEndian))
-                {
-                    Received?.Invoke(this, new PacketEventArgs<Theader, Tfooter>(e.From, PacketMakerToReceive));
-                    PacketMakerToReceive.ClearPacketInfo();
-                }
-            }
+                Received?.Invoke(this, new PacketEventArgs<Theader, Tfooter>(e.From, PacketMakerToReceive));
+            });
         }
         public event PacketEventHandler<Theader, Tfooter> Received;
         #endregion
