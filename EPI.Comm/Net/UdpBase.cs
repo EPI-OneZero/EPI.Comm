@@ -18,12 +18,14 @@ namespace EPI.Comm.Net
         private volatile bool isStarted;
         public bool IsStarted => isStarted;
         #endregion
+
         #region CTOR
         private protected UdpBase(int bufferSize)
         {
             BufferSize = bufferSize;
         }
         #endregion
+
         #region Method
         public void Start(int recvPort, string sendIp, int sendPort)
         {
@@ -127,6 +129,7 @@ namespace EPI.Comm.Net
         }
         private protected abstract void OnReceived(PacketEventArgs e);
         #endregion
+
         #region IDISPOSE
         private bool disposedValue;
         protected virtual void Dispose(bool disposing)

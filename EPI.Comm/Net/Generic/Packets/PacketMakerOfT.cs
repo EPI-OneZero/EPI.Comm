@@ -25,11 +25,15 @@ namespace EPI.Comm.Net.Generic.Packets
         #endregion
 
         #region CTOR
-        internal PacketMaker(Func<Theader, int> getBodySize)
+        internal PacketMaker(Func<Theader, int> getBodySize, bool enableDeserialize)
         {
             GetBodySize = getBodySize;
-            FullPacketBuffer = new QueueBuffer();
-            ReceiveBuffer = new QueueBuffer();
+            if(enableDeserialize)
+            {
+                FullPacketBuffer = new QueueBuffer();
+                ReceiveBuffer = new QueueBuffer();
+            }
+        
         }
 
         #endregion
@@ -40,9 +44,13 @@ namespace EPI.Comm.Net.Generic.Packets
             return GetBodySize?.Invoke(Header) ?? 0;
         }
         private DeserializeState state = DeserializeState.None;
-        internal bool TryDeserialize(byte[] bytes, bool isBigEndian)
+        internal void AddBytes(byte[] bytes)
         {
             ReceiveBuffer.AddBytes(bytes);
+        }
+        internal bool TryDeserialize(bool isBigEndian)
+        {
+     
             var success = TryDeserializePacket(ReceiveBuffer, isBigEndian);
             if (success)
             {
@@ -123,15 +131,15 @@ namespace EPI.Comm.Net.Generic.Packets
             Header = default(Theader);
             Body = null;
             state = DeserializeState.None;
-            FullPacketBuffer.Clear();
+            FullPacketBuffer?.Clear();
         }
         internal void ClearReceiveBuffer()
         {
-            ReceiveBuffer.Clear();
+            ReceiveBuffer?.Clear();
         }
         #endregion
     }
-    internal class PacketMaker<Theader, Tfooter> : PacketMaker<Theader>
+    internal sealed class PacketMaker<Theader, Tfooter> : PacketMaker<Theader>
     {
         #region Field & Property
         public override int FullSize => base.FullSize + FooterSize;
@@ -140,7 +148,7 @@ namespace EPI.Comm.Net.Generic.Packets
         #endregion
 
         #region CTOR
-        internal PacketMaker(Func<Theader, int> getBodySize) : base(getBodySize)
+        internal PacketMaker(Func<Theader, int> getBodySize, bool enableDeserialize) : base(getBodySize, enableDeserialize)
         {
         }
         #endregion

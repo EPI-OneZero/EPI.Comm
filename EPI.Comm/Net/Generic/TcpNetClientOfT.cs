@@ -12,8 +12,9 @@ namespace EPI.Comm.Net.Generic
         where Theader : new()
     {
         #region Field & Property
+        private readonly object recvLock = new object();
         internal Func<Theader, int> GetBodySize { get; private set; }
-        internal PacketMaker<Theader> PacketToReceive { get; set; }
+        internal PacketMaker<Theader> PacketMakerToReceive { get; set; }
         public bool IsBigEndian { get; set; }
         #endregion
 
@@ -35,8 +36,8 @@ namespace EPI.Comm.Net.Generic
         #region Method & Event
         private protected override void OnSocketDisconnected()
         {
-            PacketToReceive.ClearReceiveBuffer();
-            PacketToReceive.ClearPacketInfo();
+            PacketMakerToReceive.ClearReceiveBuffer();
+            PacketMakerToReceive.ClearPacketInfo();
             base.OnSocketDisconnected();
         }
 
@@ -44,26 +45,27 @@ namespace EPI.Comm.Net.Generic
         {
             GetBodySize = getBodySize;
 
-            PacketToReceive = new PacketMaker<Theader>(getBodySize);
+            PacketMakerToReceive = new PacketMaker<Theader>(getBodySize, true);
         }
         public void Send(Theader header, byte[] body)
         {
-            var packetToSend = new PacketMaker<Theader>(GetBodySize)
+            var packetMakerToSend = new PacketMaker<Theader>(GetBodySize, false)
             {
                 Header = header,
                 Body = body
             };
-            var fullPacketBytes = packetToSend.SerializePacket(IsBigEndian);
+            var fullPacketBytes = packetMakerToSend.SerializePacket(IsBigEndian);
             Send(fullPacketBytes);
         }
         private protected override void SocketReceived(object sender, PacketEventArgs e)
         {
-            lock (this)
+            lock (recvLock)
             {
-                while (PacketToReceive.TryDeserialize(e.FullPacket, IsBigEndian))
+                PacketMakerToReceive.AddBytes(e.FullPacket);
+                while (PacketMakerToReceive.TryDeserialize(IsBigEndian))
                 {
-                    Received?.Invoke(this, new PacketEventArgs<Theader>(e.From, PacketToReceive));
-                    PacketToReceive.ClearPacketInfo();
+                    Received?.Invoke(this, new PacketEventArgs<Theader>(e.From, PacketMakerToReceive));
+                    PacketMakerToReceive.ClearPacketInfo();
                 }
             }
         }
@@ -75,8 +77,9 @@ namespace EPI.Comm.Net.Generic
         where Theader : new()
     {
         #region Field & Property
+        private readonly object recvLock = new object();
         public Func<Theader, int> GetBodySize { get; private set; }
-        internal PacketMaker<Theader, Tfooter> PacketToReceive { get; set; }
+        internal PacketMaker<Theader, Tfooter> PacketMakerToReceive { get; set; }
         public bool IsBigEndian { get; set; }
         #endregion
 
@@ -98,39 +101,39 @@ namespace EPI.Comm.Net.Generic
         private void SetPacketProperties(Func<Theader, int> getBodySize)
         {
             GetBodySize = getBodySize;
-            PacketToReceive = new PacketMaker<Theader, Tfooter>(getBodySize);
+            PacketMakerToReceive = new PacketMaker<Theader, Tfooter>(getBodySize, true);
 
         }
         private protected override void OnSocketDisconnected()
         {
-            PacketToReceive.ClearReceiveBuffer();
-            PacketToReceive.ClearPacketInfo();
+            PacketMakerToReceive.ClearReceiveBuffer();
+            PacketMakerToReceive.ClearPacketInfo();
             base.OnSocketDisconnected();
         }
         public void Send(Theader header, byte[] body, Tfooter footer)
         {
-            var packetToSend = new PacketMaker<Theader, Tfooter>(GetBodySize)
+            var packetMakerToSend = new PacketMaker<Theader, Tfooter>(GetBodySize, false)
             {
                 Header = header,
                 Body = body,
                 Footer = footer
             };
-            var fullPacketBytes = packetToSend.SerializePacket(IsBigEndian);
+            var fullPacketBytes = packetMakerToSend.SerializePacket(IsBigEndian);
 
             Send(fullPacketBytes);
         }
         private protected override void SocketReceived(object sender, PacketEventArgs e)
         {
-            lock (this)
+            lock (recvLock)
             {
-                while (PacketToReceive.TryDeserialize(e.FullPacket, IsBigEndian))
+                PacketMakerToReceive.AddBytes(e.FullPacket);
+                while (PacketMakerToReceive.TryDeserialize(IsBigEndian))
                 {
-                    Received?.Invoke(this, new PacketEventArgs<Theader, Tfooter>(e.From, PacketToReceive));
-                    PacketToReceive.ClearPacketInfo();
+                    Received?.Invoke(this, new PacketEventArgs<Theader, Tfooter>(e.From, PacketMakerToReceive));
+                    PacketMakerToReceive.ClearPacketInfo();
                 }
             }
         }
-
         public event PacketEventHandler<Theader, Tfooter> Received;
         #endregion
     }

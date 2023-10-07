@@ -3,15 +3,18 @@ using EPI.Comm.Net.Events;
 using EPI.Comm.Net.Generic.Events;
 using EPI.Comm.Net.Generic.Packets;
 using System;
+using System.Collections.Generic;
+using System.Net;
 using static EPI.Comm.CommConfig;
+
 namespace EPI.Comm.Net.Generic
 {
     internal class UdpNet<Theader> : UdpBase, IComm<Theader>
     {
         #region Field & Property
-        public int HeaderSize { get; private set; }
         public Func<Theader, int> GetBodySize { get; private set; }
-        internal PacketMaker<Theader> PacketToReceive { get; set; }
+
+        internal PacketMakerDictionary<Theader> PacketMakers { get; private set; } = new PacketMakerDictionary<Theader>();
         public bool IsBigEndian { get; set; }
         #endregion
 
@@ -30,13 +33,11 @@ namespace EPI.Comm.Net.Generic
         private void SetPacketProperties(Func<Theader, int> getBodySize)
         {
             GetBodySize = getBodySize;
-            PacketToReceive = new PacketMaker<Theader>(getBodySize);
-            HeaderSize = PacketToReceive.HeaderSize;
         }
 
         public void Send(Theader header, byte[] body)
         {
-            var packetToSend = new PacketMaker<Theader>(GetBodySize)
+            var packetToSend = new PacketMaker<Theader>(GetBodySize, false)
             {
                 Header = header,
                 Body = body
@@ -47,13 +48,17 @@ namespace EPI.Comm.Net.Generic
         }
         private protected override void OnReceived(PacketEventArgs e)
         {
-            lock (this)
+            if(!PacketMakers.ContainsKey(e.From))
             {
-                ReceiveBuffer.AddBytes(e.FullPacket);
-                while (PacketToReceive.TryDeserialize(e.FullPacket, IsBigEndian))
+                PacketMakers.Add(e.From, new PacketMaker<Theader>(GetBodySize, true));
+            }
+            lock (PacketMakers[e.From])
+            {
+                PacketMakers[e.From].AddBytes(e.FullPacket);
+                while (PacketMakers[e.From].TryDeserialize(IsBigEndian))
                 {
-                    Received?.Invoke(this, new PacketEventArgs<Theader>(e.From, PacketToReceive));
-                    PacketToReceive.ClearPacketInfo();
+                    Received?.Invoke(this, new PacketEventArgs<Theader>(e.From, PacketMakers[e.From]));
+                    PacketMakers[e.From].ClearPacketInfo();
                 }
             }
         }
@@ -63,8 +68,7 @@ namespace EPI.Comm.Net.Generic
     internal class UdpNet<Theader, Tfooter> : UdpBase, IComm<Theader, Tfooter>
     {
         #region Field & Property
-        public int HeaderSize { get; private set; }
-        public int FooterSize { get; private set; }
+        internal PacketMakerDictionary<Theader, Tfooter> PacketMakers { get; private set; } = new PacketMakerDictionary<Theader, Tfooter>();
         public Func<Theader, int> GetBodySize { get; private set; }
         internal PacketMaker<Theader, Tfooter> PacketToReceive { get; set; }
         public bool IsBigEndian { get; set; }
@@ -84,13 +88,11 @@ namespace EPI.Comm.Net.Generic
         private void SetPacketProperties(Func<Theader, int> getBodySize)
         {
             GetBodySize = getBodySize;
-            PacketToReceive = new PacketMaker<Theader, Tfooter>(getBodySize);
-            HeaderSize = PacketToReceive.HeaderSize;
-            FooterSize = PacketToReceive.FooterSize;
+            PacketToReceive = new PacketMaker<Theader, Tfooter>(getBodySize, true);
         }
         public void Send(Theader header, byte[] body, Tfooter footer)
         {
-            var packetToSend = new PacketMaker<Theader, Tfooter>(GetBodySize)
+            var packetToSend = new PacketMaker<Theader, Tfooter>(GetBodySize, false)
             {
                 Header = header,
                 Body = body,
@@ -103,12 +105,17 @@ namespace EPI.Comm.Net.Generic
 
         private protected override void OnReceived(PacketEventArgs e)
         {
-            lock (this)
+            if (!PacketMakers.ContainsKey(e.From))
             {
-                while (PacketToReceive.TryDeserialize(e.FullPacket, IsBigEndian))
+                PacketMakers.Add(e.From, new PacketMaker<Theader,Tfooter>(GetBodySize, true));
+            }
+            lock (PacketMakers[e.From])
+            {
+                PacketMakers[e.From].AddBytes(e.FullPacket);
+                while (PacketMakers[e.From].TryDeserialize(IsBigEndian))
                 {
-                    Received?.Invoke(this, new PacketEventArgs<Theader, Tfooter>(e.From, PacketToReceive));
-                    PacketToReceive.ClearPacketInfo();
+                    Received?.Invoke(this, new PacketEventArgs<Theader, Tfooter>(e.From, PacketMakers[e.From]));
+                    PacketMakers[e.From].ClearPacketInfo();
                 }
             }
         }
@@ -120,5 +127,13 @@ namespace EPI.Comm.Net.Generic
         }
         public event PacketEventHandler<Theader, Tfooter> Received;
         #endregion
+    }
+    internal class PacketMakerDictionary<Theader> : Dictionary<IPEndPoint, PacketMaker<Theader>>
+    {
+
+    }
+    internal class PacketMakerDictionary<Theader, Tfooter> : Dictionary<IPEndPoint, PacketMaker<Theader,Tfooter>>
+    {
+
     }
 }
