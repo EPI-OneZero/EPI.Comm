@@ -1,4 +1,5 @@
 ﻿using EPI.Comm.Net.Generic.Events;
+using EPI.Comm.Net.Generic.Packets;
 using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
@@ -46,9 +47,15 @@ namespace EPI.Comm.Net.Generic
         #region Send Receive
         public void Send(Theader header, byte[] body)
         {
+            var packetMakerToSend = new PacketMaker<Theader>(GetBodySize, false)
+            {
+                Header = header,
+                Body = body,
+            };
+            var fullPacketBytes = packetMakerToSend.SerializePacket(IsBigEndian);
             Parallel.ForEach(Clients, c =>
             {
-                c.Send(header, body);
+                c.Send(fullPacketBytes);
             });
         }
         private void OnClientReceived(object sender, PacketEventArgs<Theader> e)
@@ -137,9 +144,16 @@ namespace EPI.Comm.Net.Generic
         #region Send Receive
         public void Send(Theader header, byte[] body, Tfooter footer)
         {
+            var packetMakerToSend = new PacketMaker<Theader, Tfooter>(GetBodySize, false)
+            {
+                Header = header,
+                Body = body,
+                Footer = footer
+            };
+            var fullPacketBytes = packetMakerToSend.SerializePacket(IsBigEndian);
             Parallel.ForEach(Clients, c =>
             {
-                c.Send(header, body, footer);
+                c.Send(fullPacketBytes);
             });
         }
         private void OnClientReceived(object sender, PacketEventArgs<Theader, Tfooter> e)
