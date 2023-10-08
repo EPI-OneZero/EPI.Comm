@@ -199,21 +199,18 @@ namespace EPI.Comm.Net
             public void RunAutoConnectIfUserWant()
             {
                 if (AutoConnect && userRequestConnect && !isAutoConnectLoopOn)
-                    RunAutoConnect();
-            }
-            private void RunAutoConnect()
-            {
-                ThreadUtil.Start(() =>
                 {
-                    lock (this)
+                    ThreadUtil.Start(() =>
                     {
-                        isAutoConnectLoopOn = true;
-                        AutoConnectLoop();
-                        isAutoConnectLoopOn = false;
-                    }
+                        lock (this)
+                        {
+                            isAutoConnectLoopOn = true;
+                            AutoConnectLoop();
+                            isAutoConnectLoopOn = false;
+                        }
 
-                });
-
+                    });
+                }
             }
             private void AutoConnectLoop()
             {
