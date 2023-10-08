@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net472;netstandard2.0;</TargetFrameworks>
+    <TargetFrameworks>net472;netstandard2.0;net7.0-windows</TargetFrameworks>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
     <GenerateDocumentationFile>False</GenerateDocumentationFile>
@@ -19,5 +19,15 @@
     <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
     <AnalysisLevel>none</AnalysisLevel>
     <ImplicitUsings>disable</ImplicitUsings>
+    <Title>$(AssemblyName)</Title>
+    <Authors>EPI10</Authors>
+    <PackageId>EPIComm</PackageId>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0-windows|AnyCPU'">
+    <WarningLevel>7</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net7.0-windows|AnyCPU'">
+    <WarningLevel>7</WarningLevel>
   </PropertyGroup>
 </Project>
