@@ -162,7 +162,7 @@ namespace EPI.Comm.Net
 
         protected virtual void OnDisconnected()
         {
-           
+
         }
         private void SocketClosed(object sender, EventArgs e)
         {

@@ -1,5 +1,4 @@
-﻿using EPI.Comm.Buffers;
-using EPI.Comm.Net.Events;
+﻿using EPI.Comm.Net.Events;
 using EPI.Comm.Net.Generic.Events;
 using EPI.Comm.Net.Generic.Packets;
 using System;
@@ -48,7 +47,7 @@ namespace EPI.Comm.Net.Generic
         }
         protected override void OnReceived(PacketEventArgs e)
         {
-            if(!PacketMakers.ContainsKey(e.From))
+            if (!PacketMakers.ContainsKey(e.From))
             {
                 PacketMakers.Add(e.From, new PacketMaker<Theader>(GetBodySize, true));
             }
@@ -102,7 +101,7 @@ namespace EPI.Comm.Net.Generic
         {
             if (!PacketMakers.ContainsKey(e.From))
             {
-                PacketMakers.Add(e.From, new PacketMaker<Theader,Tfooter>(GetBodySize, true));
+                PacketMakers.Add(e.From, new PacketMaker<Theader, Tfooter>(GetBodySize, true));
             }
             PacketMakers[e.From].TryDeserializeLoop(e.FullPacket, IsBigEndian, () =>
             {
@@ -122,7 +121,7 @@ namespace EPI.Comm.Net.Generic
     {
 
     }
-    internal class PacketMakerDictionary<Theader, Tfooter> : Dictionary<IPEndPoint, PacketMaker<Theader,Tfooter>>
+    internal class PacketMakerDictionary<Theader, Tfooter> : Dictionary<IPEndPoint, PacketMaker<Theader, Tfooter>>
     {
 
     }

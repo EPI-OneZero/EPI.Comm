@@ -28,7 +28,7 @@ namespace EPI.Comm.Utils
         {
             Offset = offset;
             Type = !t.IsEnum ? t : Enum.GetUnderlyingType(t);
-           
+
             Size = GetSize(Type, isUnicodeClass, unmanagedType);
             if (!Type.IsPrimitive)
                 InitSubNodes(Type.IsUnicodeClass);

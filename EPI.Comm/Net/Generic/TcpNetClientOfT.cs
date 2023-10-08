@@ -1,5 +1,4 @@
-﻿using EPI.Comm.Buffers;
-using EPI.Comm.Net.Events;
+﻿using EPI.Comm.Net.Events;
 using EPI.Comm.Net.Generic.Events;
 using EPI.Comm.Net.Generic.Packets;
 using System;

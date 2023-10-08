@@ -30,7 +30,7 @@ namespace EPI.Comm.Net
         #endregion
 
         #region Method
-       
+
         public void Start(int recvPort, string sendIp, int sendPort)
         {
             lock (StartStopLock)
@@ -40,11 +40,11 @@ namespace EPI.Comm.Net
                     UdpClient = new UdpClient(new IPEndPoint(IPAddress.Any, recvPort));
                     LocalEndPoint = UdpClient.Client.LocalEndPoint as IPEndPoint;
                     RemoteEndPoint = new IPEndPoint(IPAddress.Parse(sendIp), sendPort);
-                   
+
                     SetSocketOption(UdpClient.Client);
                     ThreadUtil.Start(() =>
                     {
-                        while (Receive());
+                        while (Receive()) ;
                     });
                     isStarted = true;
                 }
@@ -78,7 +78,7 @@ namespace EPI.Comm.Net
             uint ip = ConvertAddressToUint(address);
             if (MulticastMin <= ip && ip <= MulticastMax)
             {
-               return true;
+                return true;
             }
             else
             {

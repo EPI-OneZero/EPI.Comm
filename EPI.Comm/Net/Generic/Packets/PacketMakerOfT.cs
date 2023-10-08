@@ -29,12 +29,12 @@ namespace EPI.Comm.Net.Generic.Packets
         internal PacketMaker(Func<Theader, int> getBodySize, bool enableDeserialize)
         {
             GetBodySize = getBodySize;
-            if(enableDeserialize)
+            if (enableDeserialize)
             {
                 FullPacketBuffer = new QueueBuffer();
                 ReceiveBuffer = new QueueBuffer();
             }
-        
+
         }
 
         #endregion
@@ -44,7 +44,7 @@ namespace EPI.Comm.Net.Generic.Packets
         {
             return GetBodySize?.Invoke(Header) ?? 0;
         }
-        internal void TryDeserializeLoop(byte[] bytes,bool isBigEndian ,Action callback)
+        internal void TryDeserializeLoop(byte[] bytes, bool isBigEndian, Action callback)
         {
             lock (this)
             {
@@ -58,7 +58,7 @@ namespace EPI.Comm.Net.Generic.Packets
         }
         private bool TryDeserialize(bool isBigEndian)
         {
-     
+
             var success = TryDeserializePacket(ReceiveBuffer, isBigEndian);
             if (success)
             {
@@ -162,7 +162,7 @@ namespace EPI.Comm.Net.Generic.Packets
         #endregion
 
         #region Method
-       
+
         protected override bool TryDeserializePacket(IBuffer buffer, bool isBigEndian)
         {
             if (base.TryDeserializePacket(buffer, isBigEndian) && buffer.Count >= FooterSize)

@@ -9,7 +9,7 @@ namespace EPI.Comm
     }
     public interface IComm : ICommSend, ICommReceive
     {
-    
+
     }
     public interface ICommSend
     {

@@ -1,7 +1,6 @@
 ﻿using EPI.Comm.Net.Events;
 using System.Collections.Generic;
 using System.Net.Sockets;
-using System.Threading.Tasks;
 using static EPI.Comm.CommConfig;
 namespace EPI.Comm.Net
 {
@@ -22,7 +21,7 @@ namespace EPI.Comm.Net
         }
         #endregion
 
-      
+
 
         #region Receive
         private void OnClientReceived(object sender, PacketEventArgs e)

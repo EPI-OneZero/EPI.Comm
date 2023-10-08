@@ -11,7 +11,7 @@ namespace EPI.Comm.Net
         public UdpNet() : base(DefaultBufferSize)
         {
         }
-    
+
         protected override void OnReceived(PacketEventArgs e)
         {
             Received?.Invoke(this, e);

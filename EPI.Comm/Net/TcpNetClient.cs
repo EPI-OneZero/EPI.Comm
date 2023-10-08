@@ -17,7 +17,7 @@ namespace EPI.Comm.Net
         {
 
         }
-       
+
         protected override void SocketReceived(object sender, PacketEventArgs e)
         {
             Received?.Invoke(this, e);
