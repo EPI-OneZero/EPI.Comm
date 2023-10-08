@@ -110,6 +110,7 @@ namespace EPI.Comm.Net.Generic
        where Theader : new() where Tfooter : new()
     {
         #region Field & Property
+        private readonly object clientLock = new object();
         private readonly List<TcpNetClient<Theader, Tfooter>> clients = new List<TcpNetClient<Theader, Tfooter>>();
         public ClientCollection<Theader, Tfooter> Clients => new ClientCollection<Theader, Tfooter>(clients.ToArray());
         internal Func<Theader, int> GetBodySize { get; private set; }
@@ -174,7 +175,10 @@ namespace EPI.Comm.Net.Generic
         {
             base.AttachClient(client);
             var newClient = client as TcpNetClient<Theader, Tfooter>;
-            clients.Add(newClient);
+            lock (clientLock)
+            {
+                clients.Add(newClient);
+            }
             newClient.Received += OnClientReceived;
             ClientConnected?.Invoke(this, new TcpEventArgs<Theader, Tfooter>(newClient));
         }
@@ -186,7 +190,10 @@ namespace EPI.Comm.Net.Generic
         {
             base.DetachClient(client);
             var oldClient = client as TcpNetClient<Theader, Tfooter>;
-            clients.Remove(oldClient);
+            lock (clientLock)
+            {
+                clients.Remove(oldClient);
+            }
             oldClient.Received -= OnClientReceived;
             ClientDisconnected?.Invoke(this, new TcpEventArgs<Theader, Tfooter>(oldClient));
         }
