@@ -105,7 +105,7 @@ namespace EPI.Comm.Buffers
             }
             buffer = array;
             head = 0;
-            tail = ((queueDataCount != capacity) ? queueDataCount : 0);
+            tail = (queueDataCount != capacity) ? queueDataCount : 0;
         }
         #endregion
 
@@ -125,7 +125,7 @@ namespace EPI.Comm.Buffers
                 {
                     yield return buffer[i];
                 }
-                for (int i = 0; i < head; i++)
+                for (int i = 0; i < tail; i++)
                 {
                     yield return buffer[i];
                 }
