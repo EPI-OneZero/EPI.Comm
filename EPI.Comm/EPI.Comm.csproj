@@ -22,7 +22,7 @@
     <Title>$(AssemblyName)</Title>
     <Authors>EPI10</Authors>
     <PackageId>EPIComm</PackageId>
-    <Version>1.0.0.1</Version>
+    <Version>1.0.0.2</Version>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0-windows|AnyCPU'">
     <WarningLevel>7</WarningLevel>
