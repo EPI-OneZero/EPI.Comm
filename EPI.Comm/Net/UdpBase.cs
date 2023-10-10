@@ -23,14 +23,13 @@ namespace EPI.Comm.Net
         #endregion
 
         #region CTOR
-        private protected UdpBase(int bufferSize)
+        protected UdpBase(int bufferSize)
         {
             BufferSize = bufferSize;
         }
         #endregion
 
         #region Method
-
         public void Start(int recvPort, string sendIp, int sendPort)
         {
             lock (StartStopLock)
@@ -60,6 +59,13 @@ namespace EPI.Comm.Net
             else
             {
                 throw CommException.CreateCommException("멀티캐스트 대역이 아닙니다.");
+            }
+        }
+        public void SetBroadCast(bool enable)
+        {
+            if(UdpClient != null)
+            {
+                UdpClient.EnableBroadcast = enable;
             }
         }
         public void DropMulticast(string ip)

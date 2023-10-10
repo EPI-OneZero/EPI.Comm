@@ -36,13 +36,13 @@ namespace EPI.Comm.Net
         #endregion
 
         #region CTOR
-        private protected TcpClientBase(int bufferSize)
+        protected TcpClientBase(int bufferSize)
         {
             connectHelper = new AutoConnectHelper(this);
             BufferSize = bufferSize;
             AutoConnect = true;
         }
-        private protected TcpClientBase(TcpClient client, int bufferSize)
+        protected TcpClientBase(TcpClient client, int bufferSize)
         {
             TcpClient = client;
             BufferSize = bufferSize;
