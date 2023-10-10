@@ -114,6 +114,7 @@ namespace EPI.Comm.Net
                 if (client.Connected && returned)
                 {
                     AttachSocket(client.Client);
+                    OnConnected();
                     Connected?.Invoke(this, EventArgs.Empty);
                     return true;
                 }
