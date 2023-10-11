@@ -48,8 +48,7 @@ namespace UnitTest.Endian
         public byte A = 0x01;
         public short B = 0x2345;
         public int C = 0x67890123;
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 10)]
-        public Inner[] Inners = new Inner[10];
+        public Inner Inner = new Inner();
         public long D = 0x4567890123456789;
         public Outer()
         {
@@ -57,20 +56,14 @@ namespace UnitTest.Endian
             B = (short)random.Next(short.MinValue, short.MaxValue);
             C = random.Next(int.MinValue, int.MaxValue);
             D = (((long)random.Next(int.MinValue, int.MaxValue)) << 32) | (long)random.Next(int.MinValue, int.MaxValue);
-            for (int i = 0; i < Inners.Length; i++)
-            {
-                Inners[i] = new Inner();
-            }
+          
         }
         public void ReverseEndian()
         {
             B = IPAddress.HostToNetworkOrder(B);
             C = IPAddress.HostToNetworkOrder(C);
             D = IPAddress.HostToNetworkOrder(D);
-            for (int i = 0; i < Inners.Length; i++)
-            {
-                Inners[i].ReverseEndian();
-            }
+            Inner.ReverseEndian();
         }
         public override bool Equals(object obj)
         {
@@ -91,12 +84,9 @@ namespace UnitTest.Endian
             {
                 return false;
             }
-            for (int i = 0; i < Inners.Length; i++)
+            if (!Inner.Equals(other.Inner))
             {
-                if (!Inners[i].Equals(other.Inners[i]))
-                {
-                    return false;
-                }
+                return false;
             }
 
             return true;
