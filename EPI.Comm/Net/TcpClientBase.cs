@@ -96,7 +96,7 @@ namespace EPI.Comm.Net
                     TcpClient = new TcpClient();
                     if (Connect(TcpClient))
                     {
-                        AttachSocket(client.Client);
+                        AttachSocket(TcpClient.Client);
                         OnConnected();
                         Connected?.Invoke(this, EventArgs.Empty);
                     }
