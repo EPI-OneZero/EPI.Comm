@@ -131,7 +131,7 @@ namespace EPI.Comm.Net.Generic.Packets
             else
             {
                 throw new ArgumentOutOfRangeException
-                    ($"바디의 크기가 헤더 정의와 다릅니다. 헤더에서 계산된 바디 크기 : {headerDefinedBodySize} 바이트");
+                    ($"헤더에 넣은 바디의 길이가 잘못되었습니다. 헤더에 넣은 바디 크기 : {headerDefinedBodySize} 바이트, 실제 길이 : {bodySize} 바이트");
             }
         }
         public virtual void ClearPacketInfo()
