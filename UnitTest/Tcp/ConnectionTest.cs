@@ -52,6 +52,8 @@ namespace UnitTest.Tcp
             {
                 server.StartListen(port);
                 client.Connect(loopback, port);
+                Thread.Sleep(750);
+                Assert.IsTrue(client.IsConnected);
                 for (int i = 0; i < 3; i++)
                 {
                     server.Stop();
