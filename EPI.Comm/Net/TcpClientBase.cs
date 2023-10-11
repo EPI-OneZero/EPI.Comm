@@ -28,8 +28,8 @@ namespace EPI.Comm.Net
         }
         private volatile bool isSocketAttached;
         private volatile bool isConnecting;
-        private string ipToConnect;
-        private int portToConnect;
+        private volatile string ipToConnect;
+        private volatile int portToConnect;
         public bool IsConnected => isSocketAttached;
         private readonly AutoConnectHelper connectHelper;
 
@@ -131,7 +131,7 @@ namespace EPI.Comm.Net
 
         private void SetRemoteEndPoint(string ip, int port)
         {
-            connectHelper.SetEndPoint(ip, port);
+            connectHelper.EnableUserRequestConnect();
             ipToConnect = ip;
             portToConnect = port;
         }
@@ -179,18 +179,14 @@ namespace EPI.Comm.Net
             public bool AutoConnect { get; set; }
             private volatile bool isAutoConnectLoopOn;
             private volatile bool userRequestConnect;
-            private volatile string userConnectIp;
-            private volatile int userConnectPort = -1;
             public TcpClientBase Tcp { get; private set; }
 
             public AutoConnectHelper(TcpClientBase tcp)
             {
                 Tcp = tcp;
             }
-            public void SetEndPoint(string ip, int port)
+            public void EnableUserRequestConnect()
             {
-                userConnectIp = ip;
-                userConnectPort = port;
                 userRequestConnect = true;
             }
             public void RunAutoConnectIfUserWant()
@@ -213,7 +209,7 @@ namespace EPI.Comm.Net
             {
                 while (AutoConnect && userRequestConnect)
                 {
-                    Tcp.Connect(userConnectIp, userConnectPort);
+                    Tcp.Connect(Tcp.ipToConnect, Tcp.portToConnect);
                     if (Tcp.IsConnected)
                     {
                         break;
