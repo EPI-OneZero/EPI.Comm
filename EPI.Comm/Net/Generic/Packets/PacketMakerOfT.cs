@@ -49,22 +49,13 @@ namespace EPI.Comm.Net.Generic.Packets
             lock (this)
             {
                 ReceiveBuffer.AddBytes(bytes);
-                while (TryDeserialize(isBigEndian))
+                while (TryDeserializePacket(ReceiveBuffer, isBigEndian))
                 {
+                    FullPacket = FullPacketBuffer.GetBytes(FullPacketBuffer.Count);
                     callback();
                     ClearPacketInfo();
                 }
             }
-        }
-        private bool TryDeserialize(bool isBigEndian)
-        {
-
-            var success = TryDeserializePacket(ReceiveBuffer, isBigEndian);
-            if (success)
-            {
-                FullPacket = FullPacketBuffer.GetBytes(FullPacketBuffer.Count);
-            }
-            return success;
         }
         protected virtual bool TryDeserializePacket(IBuffer buffer, bool isBigEndian)
         {
