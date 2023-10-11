@@ -94,7 +94,13 @@ namespace EPI.Comm.Net
                 {
                     isConnecting = true;
                     TcpClient = new TcpClient();
-                    if (!Connect(TcpClient))
+                    if (Connect(TcpClient))
+                    {
+                        AttachSocket(client.Client);
+                        OnConnected();
+                        Connected?.Invoke(this, EventArgs.Empty);
+                    }
+                    else
                     {
                         TcpClient?.Dispose();
                         TcpClient = null;
@@ -111,17 +117,7 @@ namespace EPI.Comm.Net
             {
                 var asyncHandle = client.BeginConnect(IPAddress.Parse(ipToConnect), portToConnect, null, null);
                 var returned = asyncHandle.AsyncWaitHandle.WaitOne(5000);
-                if (client.Connected && returned)
-                {
-                    AttachSocket(client.Client);
-                    OnConnected();
-                    Connected?.Invoke(this, EventArgs.Empty);
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
+                return client.Connected && returned;
             }
             catch (SocketException)
             {
