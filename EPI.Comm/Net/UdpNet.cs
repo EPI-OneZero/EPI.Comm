@@ -2,7 +2,7 @@
 using static EPI.Comm.CommConfig;
 namespace EPI.Comm.Net
 {
-    internal class UdpNet : UdpBase, IComm
+    public class UdpNet : UdpBase, IComm
     {
         public event PacketEventHandler Received;
         public UdpNet(int bufferSize) : base(bufferSize)

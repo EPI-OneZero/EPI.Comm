@@ -8,7 +8,7 @@ using static EPI.Comm.CommConfig;
 
 namespace EPI.Comm.Net.Generic
 {
-    internal class UdpNet<Theader> : UdpBase, IComm<Theader>
+    public class UdpNet<Theader> : UdpBase, IComm<Theader>
     {
         #region Field & Property
         public Func<Theader, int> GetBodySize { get; private set; }
@@ -59,7 +59,7 @@ namespace EPI.Comm.Net.Generic
         public event PacketEventHandler<Theader> Received;
         #endregion
     }
-    internal class UdpNet<Theader, Tfooter> : UdpBase, IComm<Theader, Tfooter>
+    public class UdpNet<Theader, Tfooter> : UdpBase, IComm<Theader, Tfooter>
     {
         #region Field & Property
         internal PacketMakerDictionary<Theader, Tfooter> PacketMakers { get; private set; } = new PacketMakerDictionary<Theader, Tfooter>();
