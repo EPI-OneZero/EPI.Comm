@@ -7,27 +7,21 @@ namespace EPI.Comm.Utils
     public static class MarshalSerializer
     {
         private static readonly Dictionary<Type, EndianInfo[]> EndianInfos = new Dictionary<Type, EndianInfo[]>();
-        public static T Deserialize<T>(byte[] srcBytes, bool isBigEndian = false)
+        public static T Deserialize<T>(byte[] srcBytes)
         {
-            if (isBigEndian)
-            {
-                ReverseEndian<T>(srcBytes, 0);
-            }
+            
             var handle = GCHandle.Alloc(srcBytes, GCHandleType.Pinned);
             var result = Marshal.PtrToStructure<T>(handle.AddrOfPinnedObject());
             handle.Free();
             return result;
         }
-        public static void Serialize<T>(T src, byte[] dst, int dstOffset, bool isBigEndian = false)
+        public static void Serialize<T>(T src, byte[] dst, int dstOffset)
         {
             var handle = GCHandle.Alloc(dst, GCHandleType.Pinned);
             var ptr = handle.AddrOfPinnedObject() + dstOffset;
             Marshal.StructureToPtr(src, ptr, false);
             Marshal.DestroyStructure(ptr, typeof(T));
-            if (isBigEndian)
-            {
-                ReverseEndian<T>(dst, dstOffset);
-            }
+           
             handle.Free();
         }
         public static void ReverseEndian<T>(byte[] bytes, int offset)

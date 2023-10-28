@@ -1,6 +1,8 @@
 ﻿using EPI.Comm.Buffers;
 using System;
+using System.Data.SqlTypes;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 using static EPI.Comm.Utils.MarshalSerializer;
 namespace EPI.Comm.Net.Generic.Packets
 {
@@ -81,8 +83,11 @@ namespace EPI.Comm.Net.Generic.Packets
             {
                 var bytes = buffer.GetBytes(HeaderSize);
                 FullPacketBuffer.AddBytes(bytes);
-
-                Header = Deserialize<Theader>(bytes, isBigEndian);
+                if (isBigEndian)
+                {
+                    ReverseEndian<Theader>(bytes, 0);
+                }
+                Header = Deserialize<Theader>(bytes);
                 state = DeserializeState.HeaderCompleted;
                 return true;
             }
@@ -114,7 +119,12 @@ namespace EPI.Comm.Net.Generic.Packets
             if (headerDefinedBodySize == bodySize)
             {
                 var fullPacketBytes = new byte[FullSize];
-                Serialize(Header, fullPacketBytes, 0, isBigEndian);
+              
+                Serialize(Header, fullPacketBytes, 0);
+                if (isBigEndian)
+                {
+                    ReverseEndian<Theader>(fullPacketBytes, 0);
+                }
                 Buffer.BlockCopy(Body, 0, fullPacketBytes, HeaderSize, bodySize);
 
                 return fullPacketBytes;
@@ -160,7 +170,11 @@ namespace EPI.Comm.Net.Generic.Packets
             {
                 var bytes = buffer.GetBytes(FooterSize);
                 FullPacketBuffer.AddBytes(bytes);
-                Footer = Deserialize<Tfooter>(bytes, isBigEndian);
+                if (isBigEndian)
+                {
+                    ReverseEndian<Tfooter>(bytes, 0);
+                }
+                Footer = Deserialize<Tfooter>(bytes);
 
                 return true;
             }
@@ -173,7 +187,11 @@ namespace EPI.Comm.Net.Generic.Packets
         public override byte[] SerializePacket(bool isBigEndian)
         {
             var fullPacketBytes = base.SerializePacket(isBigEndian);
-            Serialize(Footer, fullPacketBytes, base.FullSize, isBigEndian);
+            Serialize(Footer, fullPacketBytes, base.FullSize);
+            if (isBigEndian)
+            {
+                ReverseEndian<Tfooter>(fullPacketBytes, base.FullSize);
+            }
             return fullPacketBytes;
         }
 

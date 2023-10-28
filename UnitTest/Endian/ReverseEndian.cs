@@ -15,7 +15,7 @@ namespace UnitTest.Endian
             var outer = new Outer();
             var size = Marshal.SizeOf(outer);
             var bytes = new byte[size];
-            Serialize(outer, bytes, 0, false);
+            Serialize(outer, bytes, 0);
             var now0 = DateTime.Now;
             ReverseEndian<Outer>(bytes, 0);
             var now1 = DateTime.Now;
@@ -27,7 +27,7 @@ namespace UnitTest.Endian
             var dt1 = now1 - now0;
             Console.WriteLine(dt1.TotalMilliseconds);
             Console.WriteLine(dt2.TotalMilliseconds);
-            var t = Deserialize<Outer>(bytes, false);
+            var t = Deserialize<Outer>(bytes);
             Assert.AreEqual(outer, t);
         }
         
