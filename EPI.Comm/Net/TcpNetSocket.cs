@@ -30,7 +30,14 @@ namespace EPI.Comm.Net
             RemoteEndPoint = socket.RemoteEndPoint as IPEndPoint;
             ReceiveBuffer = new byte[bufferSize];
             SetSocketOption(socket);
-            ThreadUtil.Start(ReceiveLoop);
+            ThreadUtil.Start(()=>
+            {
+                while (IsConnected && TryReceive())
+                {
+                }
+
+                Closed?.Invoke(this, EventArgs.Empty);
+            });
         }
         #endregion
 
@@ -71,54 +78,32 @@ namespace EPI.Comm.Net
             }
 
         }
-        private byte[] Receive()
+        private bool TryReceive()
         {
             try
             {
                 int count = Socket.Receive(ReceiveBuffer);
                 if (count <= 0)
                 {
-                    throw CreateCommException($"연결 끊김 수신 바이트 수 : {count}");
+                    return false;
                 }
                 byte[] result = new byte[count];
                 Buffer.BlockCopy(ReceiveBuffer, 0, result, 0, count);
-                return result;
+                Received?.Invoke(this, new PacketEventArgs(RemoteEndPoint, result));
+                return true;
 
             }
             catch (SocketException e)
             {
-                throw CreateCommException(e);
+                return false;
             }
             catch (ObjectDisposedException e)
             {
-                throw CreateCommException(e);
+                return false;
             }
             finally
             {
                 Logger.Default.WriteLineCaller();
-            }
-        }
-        private void ReceiveLoop()
-        {
-            while (IsConnected)
-            {
-                try
-                {
-                    byte[] recv = Receive();
-
-                    Received?.Invoke(this, new PacketEventArgs(RemoteEndPoint, recv));
-                }
-                catch (CommException e) // 연결을 끊었을 때
-                {
-                    Logger.Default.WriteLine(e.Message);
-                    Closed?.Invoke(this, EventArgs.Empty);
-                    break;
-                }
-                finally
-                {
-                    Logger.Default.WriteLineCaller();
-                }
-
             }
         }
         public event PacketEventHandler Received;

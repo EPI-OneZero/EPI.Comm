@@ -43,7 +43,7 @@ namespace EPI.Comm.Net
                     SetSocketOption(UdpClient.Client);
                     ThreadUtil.Start(() =>
                     {
-                        while (Receive()) ;
+                        while (TryReceive()) ;
                     });
                     isStarted = true;
                 }
@@ -154,7 +154,7 @@ namespace EPI.Comm.Net
                 Logger.Default.WriteLineCaller();
             }
         }
-        private bool Receive()
+        private bool TryReceive()
         {
             try
             {
