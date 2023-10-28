@@ -68,12 +68,12 @@ namespace EPI.Comm.Net
             CheckInMulticastRange(ip);
             UdpClient.DropMulticastGroup(IPAddress.Parse(ip));
         }
-        private static void CheckInMulticastRange(string address)
+        private static void CheckInMulticastRange(string ip)
         {
-            uint ip = ConvertAddressToUint(address);
-            if (MulticastMin > ip || ip > MulticastMax)
+            uint ipUint = ConvertAddressToUint(ip);
+            if (MulticastMin > ipUint || ipUint > MulticastMax)
             {
-                throw new ArgumentOutOfRangeException($"{address}는 멀티캐스트 대역이 아닙니다.");
+                throw new ArgumentOutOfRangeException($"{ip}는 멀티캐스트 대역이 아닙니다.");
             }
         }
         private static uint ConvertAddressToUint(string ip)
