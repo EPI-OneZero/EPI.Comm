@@ -49,46 +49,31 @@ namespace EPI.Comm.Net
                 }
             }
         }
-        public void JoinMulticast(string ip, bool multicastLoopback)
-        {
-            if (CheckInMulticastRange(ip))
-            {
-                UdpClient.JoinMulticastGroup(RemoteEndPoint.Address);
-                UdpClient.MulticastLoopback = multicastLoopback;
-            }
-            else
-            {
-                throw new ArgumentOutOfRangeException("멀티캐스트 대역이 아닙니다.");
-            }
-        }
         public void SetBroadCast(bool enable)
         {
-            if(UdpClient != null)
+            if (UdpClient != null)
             {
                 UdpClient.EnableBroadcast = enable;
             }
         }
+        public void JoinMulticast(string ip, bool multicastLoopback)
+        {
+            CheckInMulticastRange(ip);
+
+            UdpClient.JoinMulticastGroup(IPAddress.Parse(ip));
+            UdpClient.MulticastLoopback = multicastLoopback;
+        }
         public void DropMulticast(string ip)
         {
-            if (CheckInMulticastRange(ip))
-            {
-                UdpClient.DropMulticastGroup(RemoteEndPoint.Address);
-            }
-            else
-            {
-                throw new ArgumentOutOfRangeException("멀티캐스트 대역이 아닙니다.");
-            }
+            CheckInMulticastRange(ip);
+            UdpClient.DropMulticastGroup(IPAddress.Parse(ip));
         }
-        private static bool CheckInMulticastRange(string address)
+        private static void CheckInMulticastRange(string address)
         {
             uint ip = ConvertAddressToUint(address);
-            if (MulticastMin <= ip && ip <= MulticastMax)
+            if (MulticastMin > ip || ip > MulticastMax)
             {
-                return true;
-            }
-            else
-            {
-                return false;
+                throw new ArgumentOutOfRangeException($"{address}는 멀티캐스트 대역이 아닙니다.");
             }
         }
         private static uint ConvertAddressToUint(string ip)
