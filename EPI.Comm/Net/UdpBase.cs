@@ -78,7 +78,9 @@ namespace EPI.Comm.Net
         }
         private static uint ConvertAddressToUint(string ip)
         {
-            return (uint)IPAddress.HostToNetworkOrder(BitConverter.ToInt32(IPAddress.Parse(ip).GetAddressBytes(), 0));
+            var addressBytes = IPAddress.Parse(ip).GetAddressBytes();
+            Array.Reverse(addressBytes);
+            return BitConverter.ToUInt32(addressBytes,0);
         }
         private void SetSocketOption(Socket socket)
         {
