@@ -74,8 +74,6 @@ namespace UnitTest.Tcp
                 server.Dispose();
                 client.Dispose();
             }
-
-
         }
     }
 }
