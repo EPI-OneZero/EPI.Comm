@@ -58,7 +58,7 @@ namespace EPI.Comm.Net
             }
             else
             {
-                throw CommException.CreateCommException("멀티캐스트 대역이 아닙니다.");
+                throw new ArgumentOutOfRangeException("멀티캐스트 대역이 아닙니다.");
             }
         }
         public void SetBroadCast(bool enable)
@@ -76,7 +76,7 @@ namespace EPI.Comm.Net
             }
             else
             {
-                throw CommException.CreateCommException("멀티캐스트 대역이 아닙니다.");
+                throw new ArgumentOutOfRangeException("멀티캐스트 대역이 아닙니다.");
             }
         }
         private static bool CheckInMulticastRange(string address)
