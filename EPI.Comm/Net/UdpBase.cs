@@ -107,14 +107,6 @@ namespace EPI.Comm.Net
         protected virtual void OnStop()
         {
         }
-        //public void JoinMulticastGroup(string ip)
-        //{
-        //    UdpClient?.JoinMulticastGroup(IPAddress.Parse(ip));
-        //}
-        //public void DropMulticastGroup(string ip)
-        //{
-        //    UdpClient?.DropMulticastGroup(IPAddress.Parse(ip));
-        //}
         public void Send(byte[] bytes)
         {
             try
