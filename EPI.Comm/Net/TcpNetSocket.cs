@@ -90,11 +90,12 @@ namespace EPI.Comm.Net
                 }
                 byte[] result = new byte[count];
                 Buffer.BlockCopy(ReceiveBuffer, 0, result, 0, count);
-                ThreadUtil.Start(() =>
+                Task.Run(() =>
                 {
                     Received?.Invoke(this, new PacketEventArgs(RemoteEndPoint, result));
                 });
-              
+
+
                 return true;
 
             }
