@@ -88,6 +88,11 @@ namespace EPI.Comm.Net
         public void Connect(string ip, int port)
         {
             SetRemoteEndPoint(ip, port);
+            InternalConnect();
+
+        }
+        internal void InternalConnect()
+        {
             if (!(isConnecting || isSocketAttached))
             {
                 lock (ConnectLock)
@@ -109,7 +114,6 @@ namespace EPI.Comm.Net
                     isConnecting = false;
                 }
             }
-
         }
         private bool Connect(TcpClient client)
         {
@@ -209,7 +213,7 @@ namespace EPI.Comm.Net
             {
                 while (AutoConnect && userRequestConnect)
                 {
-                    Tcp.Connect(Tcp.ipToConnect, Tcp.portToConnect);
+                    Tcp.InternalConnect();
                     if (Tcp.IsConnected)
                     {
                         break;

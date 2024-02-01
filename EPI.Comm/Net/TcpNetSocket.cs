@@ -5,6 +5,8 @@ using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
+
 namespace EPI.Comm.Net
 {
     public sealed class TcpNetSocket
@@ -88,7 +90,11 @@ namespace EPI.Comm.Net
                 }
                 byte[] result = new byte[count];
                 Buffer.BlockCopy(ReceiveBuffer, 0, result, 0, count);
-                Received?.Invoke(this, new PacketEventArgs(RemoteEndPoint, result));
+                ThreadUtil.Start(() =>
+                {
+                    Received?.Invoke(this, new PacketEventArgs(RemoteEndPoint, result));
+                });
+              
                 return true;
 
             }
@@ -97,6 +103,10 @@ namespace EPI.Comm.Net
                 return false;
             }
             catch (ObjectDisposedException e)
+            {
+                return false;
+            }
+            catch (Exception eee)
             {
                 return false;
             }

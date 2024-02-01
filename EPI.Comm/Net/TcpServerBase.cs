@@ -11,6 +11,7 @@ namespace EPI.Comm.Net
     public abstract class TcpServerBase : IDisposable
     {
         #region Field & Property
+        private readonly object clientLock = new object();
         private readonly object startStopLock = new object();
         internal TcpListener Listener { get; private set; }
         public IPEndPoint LocalEndPoint => Listener?.Server?.LocalEndPoint as IPEndPoint;
@@ -61,7 +62,11 @@ namespace EPI.Comm.Net
                     if (tcpClient != null)
                     {
                         var client = CreateClient(tcpClient);
-                        AttachClient(client);
+                        lock (clientLock)
+                        {
+                            AttachClient(client);
+                        }
+                     
                     }
                 }
             }
@@ -78,8 +83,12 @@ namespace EPI.Comm.Net
         }
         protected virtual void AttachClient(TcpClientBase client)
         {
-            clients.Add(client);
-            client.Disconnected += OnDisconnected;
+            lock (clientLock)
+            {
+                clients.Add(client);
+                client.Disconnected += OnDisconnected;
+            }
+        
         }
         protected abstract TcpClientBase CreateClient(TcpClient client);
         #endregion
@@ -106,15 +115,23 @@ namespace EPI.Comm.Net
         private void OnDisconnected(object sender, EventArgs e)
         {
             var client = sender as TcpClientBase;
-            DetachClient(client);
+            lock (clientLock)
+            {
+                DetachClient(client);
+            }
         }
         private void DisposeAllClients()
         {
             var clients = this.clients.ToArray();
-            foreach (var client in clients)
+
+            lock (clientLock)
             {
-                DetachClient(client);
+                foreach (var client in clients)
+                {
+                    DetachClient(client);
+                }
             }
+         
         }
         protected virtual void DetachClient(TcpClientBase client)
         {
@@ -124,6 +141,7 @@ namespace EPI.Comm.Net
                 clients.Remove(client);
                 client.Dispose();
             }
+         
         }
         #endregion
 
