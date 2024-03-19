@@ -129,7 +129,7 @@ namespace EPI.Comm.Net
             {
                 const int Size = 12;
                 var result = new byte[Size];
-                MarshalSerializer.Serialize(this, result, Size);
+                MarshalSerializer.Serialize(this, result, 0);
                 return result;
             }
         }
