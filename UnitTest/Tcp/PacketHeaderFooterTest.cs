@@ -21,13 +21,13 @@ namespace UnitTest.Tcp
         public PacketHeaderFooterTest()
         {
         }
-        public static int Port = 5555;
+        public static int Port = 12345;
         [TestInitialize]
         public void Init()
         {
             Server = new TcpNetServer<Header, Footer>(Header.GetBodySize) { IsBigEndian = true };
             Client = new TcpNetClient<Header, Footer>(Header.GetBodySize) { IsBigEndian = true };
-            int packetCount = 1;
+            int packetCount = 5;
             Data = new List<PacketWithHeaderFooter>(packetCount);
             for (int i = 0; i < packetCount; i++)
             {

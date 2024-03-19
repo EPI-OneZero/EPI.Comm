@@ -3,6 +3,8 @@ using EPI.Comm.Net.Events;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 
 namespace CommSample.Sample
@@ -19,7 +21,7 @@ namespace CommSample.Sample
             server.ClientConnected += Server_Accpeted;
 
         }
-        public static int ServerPort { get; set; } = 4101;
+        public static int ServerPort { get; set; } = 12345;
         private void Server_Accpeted(object sender, TcpEventArgs e)
         {
             var client = e.TcpNetClient;
@@ -49,25 +51,33 @@ namespace CommSample.Sample
         private void Server_BytesReceived(object sender, PacketEventArgs e)
         {
             //server.Clients.FirstOrDefault().Send(e.ReceivedBytes);
-
-            Dispatcher.BeginInvoke(new Action(() =>
-            {
-                var build = new StringBuilder();
-                build.AppendLine($"받은 바이트 수 :  {e.FullPacket.Length}");
-                for (int i = 0; i < e.FullPacket.Length; i++)
-                {
-                    if (i % 8 == 0)
+            var bytes = new byte[]
                     {
-                        build.AppendLine();
-                    }
-                    var b = e.FullPacket[i];
-                    build.Append($"{b:D3}\t");
+                        1,2,3,4,5,6,7,8,
+                        1,2,3,4,5,6,7,8,
+                        1,2,3,4,5,6,7,8,
+                        1,2,3,4,5,6,7,8,
+                    };
+            server.Send(bytes);
+            Thread.Sleep(100);
+            //Dispatcher.BeginInvoke(new Action(() =>
+            //{
+            //    var build = new StringBuilder();
+            //    build.AppendLine($"받은 바이트 수 :  {e.FullPacket.Length}");
+            //    for (int i = 0; i < e.FullPacket.Length; i++)
+            //    {
+            //        if (i % 8 == 0)
+            //        {
+            //            build.AppendLine();
+            //        }
+            //        var b = e.FullPacket[i];
+            //        build.Append($"{b:D3}\t");
 
-                }
-                build.AppendLine();
-                recv.Text += build.ToString();
+            //    }
+            //    build.AppendLine();
+            //    recv.Text += build.ToString();
 
-            }));
+            //}));
         }
 
         private void Start(object sender, RoutedEventArgs e)
@@ -98,23 +108,16 @@ namespace CommSample.Sample
 
         private void Send(object sender, RoutedEventArgs e)
         {
-            var split = text.Text.Split((char[])null, StringSplitOptions.RemoveEmptyEntries);
-            var bytes = new List<byte>();
+            var bytes = new byte[]
+                    {
+                        1,2,3,4,5,6,7,8,
+                        1,2,3,4,5,6,7,8,
+                        1,2,3,4,5,6,7,8,
+                        1,2,3,4,5,6,7,8,
+                    };
 
-            foreach (var s in split)
-            {
-                try
-                {
-                    var b = byte.Parse(s);
-                    bytes.Add(b);
-                }
-                catch (Exception)
-                {
 
-                }
-            }
-            server.Send(bytes.ToArray());
-
+            server.Send(bytes);
         }
         private void Clear(object sender, RoutedEventArgs e)
         {

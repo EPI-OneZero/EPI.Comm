@@ -2,6 +2,9 @@
 using EPI.Comm.Net.Events;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading;
 using System.Windows;
@@ -54,9 +57,31 @@ namespace CommSample.Sample
             MessageBox.Show("Client Closed");
         }
         private volatile int count = 0;
+        private Stopwatch watch = new Stopwatch();
+        private int total = 0;
         private void Client_BytesReceived(object sender, PacketEventArgs e)
         {
-            Dispatcher.BeginInvoke(new Action(() =>
+           
+            if(total == 0)
+            {
+                watch.Start();
+            }
+            total += e.FullPacket.Length;
+            if(total >= 32 * 10000)
+            {
+                watch.Stop();
+                Dispatcher.Invoke(() =>
+                {
+                    MessageBox.Show(watch.ElapsedMilliseconds.ToString());
+                });
+                total = 0;
+                watch.Reset();
+            }
+            else
+            {
+                client.Send(e.FullPacket);
+            }
+            Dispatcher.Invoke(new Action(() =>
             {
                 var build = new StringBuilder();
                 build.AppendLine($"받은 바이트 수 :  {e.FullPacket.Length}");
@@ -80,9 +105,10 @@ namespace CommSample.Sample
         {
             var s = ip.Text;
             var p = port.Text;
+            
             var t = new Thread(() =>
             {
-                client.Connect(s, int.Parse(p));
+                client.Connect(s.ToString(), int.Parse(p));
 
             });
             t.Start();

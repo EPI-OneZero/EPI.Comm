@@ -19,7 +19,7 @@
 
         <StackPanel Grid.Column="2" Margin="5">
             <TextBlock Text="포트번호"/>
-            <TextBox x:Name="port" Text="4101" />
+            <TextBox x:Name="port" Text="12345" />
             <Button Width="100" Height="50" Content="Start" Click="Start"/>
             <Button Width="100" Height="50" Content="Stop" Click="Stop"/>
           
