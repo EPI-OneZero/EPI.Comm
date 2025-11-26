@@ -1,5 +1,3 @@
-﻿using EPI.Comm.Log;
-using EPI.Comm.Net.Events;
 using EPI.Comm.Utils;
 using System;
 using System.Net;
@@ -14,7 +12,8 @@ namespace EPI.Comm.Net
 
         private readonly object StartStopLock = new object();
         private readonly object SendLock = new object();
-        public UdpClient UdpClient { get; private set; }
+        public UdpClient UdpClientSender { get; private set; }
+        public UdpClient UdpClientReceiver { get; private set; }
         public IPEndPoint LocalEndPoint { get; private set; }
         public IPEndPoint RemoteEndPoint { get; private set; }
         public int BufferSize { get; private set; }
@@ -36,11 +35,14 @@ namespace EPI.Comm.Net
             {
                 if (!isStarted)
                 {
-                    UdpClient = new UdpClient(new IPEndPoint(IPAddress.Any, recvPort));
-                    LocalEndPoint = UdpClient.Client.LocalEndPoint as IPEndPoint;
+                    UdpClientSender = new UdpClient();
+                    UdpClientReceiver = new UdpClient(new IPEndPoint(IPAddress.Any, recvPort));
+                
+                    LocalEndPoint = UdpClientReceiver.Client.LocalEndPoint as IPEndPoint;
                     RemoteEndPoint = new IPEndPoint(IPAddress.Parse(sendIp), sendPort);
 
-                    SetSocketOption(UdpClient.Client);
+                    SetSocketOption(UdpClientSender.Client);
+                    SetSocketOption(UdpClientReceiver.Client);
                     ThreadUtil.Start(() =>
                     {
                         while (TryReceive()) ;
@@ -49,24 +51,25 @@ namespace EPI.Comm.Net
                 }
             }
         }
+
         public void SetBroadCast(bool enable)
         {
-            if (UdpClient != null)
+            if (UdpClientSender != null)
             {
-                UdpClient.EnableBroadcast = enable;
+                UdpClientSender.EnableBroadcast = enable;
             }
         }
         public void JoinMulticast(string ip, bool multicastLoopback)
         {
             CheckInMulticastRange(ip);
 
-            UdpClient.JoinMulticastGroup(IPAddress.Parse(ip));
-            UdpClient.MulticastLoopback = multicastLoopback;
+            UdpClientReceiver.JoinMulticastGroup(IPAddress.Parse(ip));
+            UdpClientReceiver.MulticastLoopback = multicastLoopback;
         }
         public void DropMulticast(string ip)
         {
             CheckInMulticastRange(ip);
-            UdpClient.DropMulticastGroup(IPAddress.Parse(ip));
+            UdpClientReceiver.DropMulticastGroup(IPAddress.Parse(ip));
         }
         private static void CheckInMulticastRange(string ip)
         {
@@ -80,7 +83,7 @@ namespace EPI.Comm.Net
         {
             var addressBytes = IPAddress.Parse(ip).GetAddressBytes();
             Array.Reverse(addressBytes);
-            return BitConverter.ToUInt32(addressBytes,0);
+            return BitConverter.ToUInt32(addressBytes, 0);
         }
         private void SetSocketOption(Socket socket)
         {
@@ -94,8 +97,10 @@ namespace EPI.Comm.Net
             {
                 if (isStarted)
                 {
-                    UdpClient?.Dispose();
-                    UdpClient = null;
+                    UdpClientReceiver?.Dispose();
+                    UdpClientSender?.Dispose();
+                    UdpClientSender = null;
+                    UdpClientReceiver = null;
                     LocalEndPoint = null;
                     RemoteEndPoint = null;
                     OnStop();
@@ -113,7 +118,7 @@ namespace EPI.Comm.Net
             {
                 lock (SendLock)
                 {
-                    UdpClient?.Send(bytes, bytes.Length, RemoteEndPoint);
+                    _ = UdpClientSender?.Send(bytes, bytes.Length, RemoteEndPoint);
                 }
             }
             catch (SocketException e)
@@ -135,26 +140,28 @@ namespace EPI.Comm.Net
         }
         private bool TryReceive()
         {
+            bool result;
             try
             {
                 var from = new IPEndPoint(IPAddress.Any, 0);
                 byte[] recv = null;
-                recv = UdpClient.Receive(ref from);
+                recv = UdpClientReceiver.Receive(ref from);
                 OnReceived(new PacketEventArgs(new IPEndPoint(from.Address, from.Port), recv));
-                return true;
+                result = true;
             }
             catch (ObjectDisposedException)
             {
-                return false;
+                result = false;
             }
             catch (NullReferenceException)
             {
-                return false;
+                result = false;
             }
             catch (SocketException)
             {
-                return false;
+                result = false;
             }
+            return result;
         }
         protected abstract void OnReceived(PacketEventArgs e);
         #endregion
