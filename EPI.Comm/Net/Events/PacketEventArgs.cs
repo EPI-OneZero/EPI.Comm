@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Net;
 
-namespace EPI.Comm.Net.Events
+namespace EPI.Comm.Net
 {
     public class PacketEventArgs : EventArgs
     {

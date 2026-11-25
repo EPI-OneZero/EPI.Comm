@@ -1,5 +1,4 @@
-﻿using EPI.Comm.Net.Events;
-using static EPI.Comm.CommConfig;
+﻿using static EPI.Comm.CommConfig;
 namespace EPI.Comm.Net
 {
     public class UdpNet : UdpBase, IComm

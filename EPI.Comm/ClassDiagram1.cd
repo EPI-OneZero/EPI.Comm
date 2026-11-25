@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1">
-  <Class Name="EPI.Comm.Net.Generic.TcpNetClient&lt;Theader&gt;" Collapsed="true">
+  <Class Name="EPI.Comm.Net.Generic.TcpNetClient&lt;THeader&gt;" Collapsed="true">
     <Position X="7" Y="10" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAKBAAAAAAAAAEAQAAAABAAAAAAAAQAAAAAAEAA=</HashCode>
@@ -8,7 +8,7 @@
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
-  <Class Name="EPI.Comm.Net.Generic.TcpNetClient&lt;Theader, Tfooter&gt;" Collapsed="true">
+  <Class Name="EPI.Comm.Net.Generic.TcpNetClient&lt;THeader, TFooter&gt;" Collapsed="true">
     <Position X="9.25" Y="10" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAKBAAAAAAAAAEAQAAAABAAAAAAAAQAAAAAAEAA=</HashCode>
@@ -16,7 +16,7 @@
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
-  <Class Name="EPI.Comm.Net.Generic.TcpNetServer&lt;Theader&gt;" Collapsed="true">
+  <Class Name="EPI.Comm.Net.Generic.TcpNetServer&lt;THeader&gt;" Collapsed="true">
     <Position X="17.25" Y="2" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AIAAAACBAAAAAAAAAGAAAAAgAABAAAIABQAAIAAoAAA=</HashCode>
@@ -24,7 +24,7 @@
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
-  <Class Name="EPI.Comm.Net.Generic.TcpNetServer&lt;Theader, Tfooter&gt;" Collapsed="true">
+  <Class Name="EPI.Comm.Net.Generic.TcpNetServer&lt;THeader, TFooter&gt;" Collapsed="true">
     <Position X="19.5" Y="2" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AIAAAACBAAAAAAAAAGAAAAAgAABAAAIABQAAIAAoAAA=</HashCode>
@@ -32,7 +32,7 @@
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
-  <Class Name="EPI.Comm.Net.Generic.UdpNet&lt;Theader&gt;" Collapsed="true">
+  <Class Name="EPI.Comm.Net.Generic.UdpNet&lt;THeader&gt;" Collapsed="true">
     <Position X="9.25" Y="7" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAACBAAAAAAAAAEAQAAAAAQAAAAAAAQAAAQAAAAA=</HashCode>
@@ -40,7 +40,7 @@
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
-  <Class Name="EPI.Comm.Net.Generic.UdpNet&lt;Theader, Tfooter&gt;" Collapsed="true">
+  <Class Name="EPI.Comm.Net.Generic.UdpNet&lt;THeader, TFooter&gt;" Collapsed="true">
     <Position X="7" Y="7" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAACBAAAAAAAAAEAQAAAAAQAAAAAAAUAIAQAAAAA=</HashCode>
@@ -103,14 +103,14 @@
     </TypeIdentifier>
     <Lollipop Position="0.2" />
   </Class>
-  <Class Name="EPI.Comm.Net.Generic.Packets.PacketMaker&lt;Theader&gt;" Collapsed="true">
+  <Class Name="EPI.Comm.Net.Generic.PacketMaker&lt;THeader&gt;" Collapsed="true">
     <Position X="23.75" Y="2.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>BAABgAAAAAAAIAAJAAABAAAAAAAAIAIEAQACCDQBgAA=</HashCode>
       <FileName>Net\Generic\Packets\PacketMakerOfT.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="EPI.Comm.Net.Generic.Packets.PacketMaker&lt;Theader, Tfooter&gt;" Collapsed="true">
+  <Class Name="EPI.Comm.Net.Generic.PacketMaker&lt;THeader, TFooter&gt;" Collapsed="true">
     <Position X="23.75" Y="4" Width="1.5" />
     <TypeIdentifier>
       <HashCode>BAAAgAAAAAAAAAAAAAAAAAAAAIAAIAAAAAAACAABAAA=</HashCode>
@@ -138,14 +138,14 @@
       <FileName>IComm.cs</FileName>
     </TypeIdentifier>
   </Interface>
-  <Interface Name="EPI.Comm.IComm&lt;Theader, Tfooter&gt;" Collapsed="true">
+  <Interface Name="EPI.Comm.IComm&lt;THeader, TFooter&gt;" Collapsed="true">
     <Position X="7.25" Y="1.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAABAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>IComm.cs</FileName>
     </TypeIdentifier>
   </Interface>
-  <Interface Name="EPI.Comm.IComm&lt;Theader&gt;" Collapsed="true">
+  <Interface Name="EPI.Comm.IComm&lt;THeader&gt;" Collapsed="true">
     <Position X="9.5" Y="1.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAABAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>

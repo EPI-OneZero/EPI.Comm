@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
@@ -6,33 +7,41 @@ namespace EPI.Comm.Utils
 {
     public static class MarshalSerializer
     {
-        private static readonly Dictionary<Type, EndianInfo[]> EndianInfos = new Dictionary<Type, EndianInfo[]>();
+        private static readonly ConcurrentDictionary<Type, EndianInfo[]> EndianInfos = new ConcurrentDictionary<Type, EndianInfo[]>();
         public static T Deserialize<T>(byte[] srcBytes)
         {
-            
+            T result;
             var handle = GCHandle.Alloc(srcBytes, GCHandleType.Pinned);
-            var result = Marshal.PtrToStructure<T>(handle.AddrOfPinnedObject());
-            handle.Free();
+            try
+            {
+                result = Marshal.PtrToStructure<T>(handle.AddrOfPinnedObject());
+            }
+            finally
+            {
+                handle.Free();
+            }
+
             return result;
         }
         public static void Serialize<T>(T src, byte[] dst, int dstOffset)
         {
             var handle = GCHandle.Alloc(dst, GCHandleType.Pinned);
-            var ptr = handle.AddrOfPinnedObject() + dstOffset;
-            Marshal.StructureToPtr(src, ptr, false);
-            Marshal.DestroyStructure(ptr, typeof(T));
-           
-            handle.Free();
+            try
+            {
+                var ptr = handle.AddrOfPinnedObject() + dstOffset;
+                Marshal.StructureToPtr(src, ptr, false);
+                Marshal.DestroyStructure(ptr, typeof(T));
+
+            }
+            finally 
+            {
+                handle.Free();
+            }
+
         }
         public static void ReverseEndian<T>(byte[] bytes, int offset)
         {
-            var type = typeof(T);
-            if (!EndianInfos.ContainsKey(type))
-            {
-                EndianInfos.Add(type, MarshalNodeBase.Create(typeof(T)));
-            }
-
-            var infos = EndianInfos[type];
+            var infos = EndianInfos.GetOrAdd(typeof(T), MarshalNodeBase.Create);
 
             for (int i = 0; i < infos.Length; i++)
             {

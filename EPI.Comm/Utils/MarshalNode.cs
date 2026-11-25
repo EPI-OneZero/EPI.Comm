@@ -6,12 +6,12 @@ using System.Runtime.InteropServices;
 
 namespace EPI.Comm.Utils
 {
-    internal abstract class MarshalNodeBase
+    public abstract class MarshalNodeBase
     {
         public abstract void GenerateInfo(List<EndianInfo> infos);
         public int Offset { get; internal set; }
 
-        internal static EndianInfo[] Create(Type type)
+        public static EndianInfo[] Create(Type type)
         {
             var item = new MarshalNode(type, 0, type.IsUnicodeClass);
             var result = new List<EndianInfo>();
@@ -85,40 +85,26 @@ namespace EPI.Comm.Utils
                     return false;
             }
         }
-        class Info
-        {
-            public Info(FieldInfo info, int off, MarshalAsAttribute marshalAs)
-            {
-                this.info = info;
-                this.off = off;
-                this.marshalAs = marshalAs;
-            }
-            public FieldInfo info;
-            public int off;
-            public MarshalAsAttribute marshalAs;
-
-        }
+   
         private void InitSubNodes(bool isUnicodeClass)
         {
-            var fields = from info in GetFieldInfos(Type)
-                         let off = (int)Marshal.OffsetOf(Type, info.Name)
-                         let marshal = info.GetCustomAttribute<MarshalAsAttribute>()
-                         select new Info(info, off, marshal);
-            foreach (var field in fields)
+            foreach (var field in GetFieldInfos(Type))
             {
-                var fieldType = field.info.FieldType;
-                var fieldOffset = field.off + Offset;
+                var fieldType = field.FieldType;
+                var fieldOffset = Offset + Marshal.OffsetOf(Type, field.Name).ToInt32();
+                var marshal = field.GetCustomAttribute<MarshalAsAttribute>();
+
                 if (fieldType.IsArray || fieldType == typeof(string))
                 {
-                    TypeNodes.Add(new MarshalArrayNode(fieldType, fieldOffset, isUnicodeClass, field.marshalAs));
+                    TypeNodes.Add(new MarshalArrayNode(fieldType, fieldOffset, isUnicodeClass, marshal));
                 }
                 else
                 {
-
-                    TypeNodes.Add(new MarshalNode(fieldType, fieldOffset, isUnicodeClass, field.marshalAs?.Value));
+                    TypeNodes.Add(new MarshalNode(fieldType, fieldOffset, isUnicodeClass, marshal?.Value));
                 }
             }
         }
+
         private static FieldInfo[] GetFieldInfos(Type type)
         {
             return type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
@@ -152,16 +138,23 @@ namespace EPI.Comm.Utils
         }
         public override void GenerateInfo(List<EndianInfo> infos)
         {
-            var offset = Offset;
+            var itemInfos = new List<EndianInfo>();
+            ItemType.GenerateInfo(itemInfos);
+
             for (int i = 0; i < Count; i++)
             {
-                ItemType.GenerateInfo(infos);
-                ItemType.Offset += ItemType.Size;
+                foreach (var info in itemInfos)
+                {
+                    infos.Add(new EndianInfo
+                    {
+                        Offset = info.Offset + i * ItemType.Size,
+                        Size = info.Size
+                    });
+                }
             }
-            ItemType.Offset = offset;
         }
     }
-    internal struct EndianInfo
+    public struct EndianInfo
     {
         public int Size;
         public int Offset;

@@ -1,11 +1,8 @@
-﻿using EPI.Comm.Log;
-using EPI.Comm.Net.Events;
-using EPI.Comm.Utils;
+﻿using EPI.Comm.Utils;
 using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 
 namespace EPI.Comm.Net
 {
@@ -31,13 +28,21 @@ namespace EPI.Comm.Net
             RemoteEndPoint = socket.RemoteEndPoint as IPEndPoint;
             ReceiveBuffer = new byte[bufferSize];
             SetSocketOption(socket);
-            ThreadUtil.Start(()=>
+        }
+        internal void StartReceive()
+        {
+            ThreadUtil.Start(() =>
             {
-                while (IsConnected && TryReceive())
+                try
                 {
+                    while (IsConnected && TryReceive())
+                    {
+                    }
                 }
-
-                Closed?.Invoke(this, EventArgs.Empty);
+                finally
+                {
+                    Closed?.Invoke(this, EventArgs.Empty);
+                }
             });
         }
         #endregion
@@ -81,37 +86,39 @@ namespace EPI.Comm.Net
         }
         private bool TryReceive()
         {
+            bool result = false;
+            byte[] recv = null;
             try
             {
                 int count = Socket.Receive(ReceiveBuffer);
-                if (count <= 0)
+                if (count > 0)
                 {
-                    return false;
+                    result = true;
+                    recv = new byte[count];
+                    Buffer.BlockCopy(ReceiveBuffer, 0, recv, 0, count);
                 }
-                byte[] result = new byte[count];
-                Buffer.BlockCopy(ReceiveBuffer, 0, result, 0, count);
-                Received?.Invoke(this, new PacketEventArgs(RemoteEndPoint, result));
-
-
-                return true;
-
             }
-            catch (SocketException e)
+            catch (SocketException)
             {
-                return false;
+                result = false;
             }
-            catch (ObjectDisposedException e)
+            catch (ObjectDisposedException)
             {
-                return false;
+                result = false;
             }
-            catch (Exception eee)
+            catch (Exception)
             {
-                return false;
+                result = false;
             }
             finally
             {
+                if (result)
+                {
+                    Received?.Invoke(this, new PacketEventArgs(RemoteEndPoint, recv));
+                }
                 Logger.Default.WriteLineCaller();
             }
+            return result;
         }
         public event PacketEventHandler Received;
         public event EventHandler Closed;

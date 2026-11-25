@@ -1,5 +1,4 @@
-﻿using EPI.Comm.Net.Events;
-using System.Net.Sockets;
+﻿using System.Net.Sockets;
 using static EPI.Comm.CommConfig;
 namespace EPI.Comm.Net
 {

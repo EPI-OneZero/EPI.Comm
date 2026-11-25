@@ -1,16 +1,15 @@
-﻿using EPI.Comm.Net.Generic.Packets;
-using System;
+﻿using System;
 using System.Net;
 
-namespace EPI.Comm.Net.Generic.Events
+namespace EPI.Comm.Net.Generic
 {
-    public class PacketEventArgs<Theader> : EventArgs
+    public class PacketEventArgs<THeader> : EventArgs
     {
         public IPEndPoint From { get; private set; }
         public byte[] FullPacket { get; private set; }
-        public Theader Header { get; private set; }
+        public THeader Header { get; private set; }
         public byte[] Body { get; private set; }
-        internal PacketEventArgs(IPEndPoint from, PacketMaker<Theader> packet)
+        internal PacketEventArgs(IPEndPoint from, PacketMaker<THeader> packet)
         {
             From = from;
             Header = packet.Header;
@@ -18,16 +17,16 @@ namespace EPI.Comm.Net.Generic.Events
             FullPacket = packet.FullPacket;
         }
     }
-    public delegate void PacketEventHandler<Theader>(object sender, PacketEventArgs<Theader> e);
+    public delegate void PacketEventHandler<THeader>(object sender, PacketEventArgs<THeader> e);
 
-    public class PacketEventArgs<Theader, Tfooter> : EventArgs
+    public class PacketEventArgs<THeader, TFooter> : EventArgs
     {
         public IPEndPoint From { get; private set; }
         public byte[] FullPacket { get; private set; }
-        public Theader Header { get; private set; }
+        public THeader Header { get; private set; }
         public byte[] Body { get; private set; }
-        public Tfooter Footer { get; private set; }
-        internal PacketEventArgs(IPEndPoint from, PacketMaker<Theader, Tfooter> packet)
+        public TFooter Footer { get; private set; }
+        internal PacketEventArgs(IPEndPoint from, PacketMaker<THeader, TFooter> packet)
         {
             From = from;
             Header = packet.Header;
@@ -36,5 +35,5 @@ namespace EPI.Comm.Net.Generic.Events
             FullPacket = packet.FullPacket;
         }
     }
-    public delegate void PacketEventHandler<Theader, Tfooter>(object sender, PacketEventArgs<Theader, Tfooter> e);
+    public delegate void PacketEventHandler<THeader, TFooter>(object sender, PacketEventArgs<THeader, TFooter> e);
 }

@@ -1,42 +1,39 @@
-﻿using EPI.Comm.Net.Events;
-using EPI.Comm.Net.Generic.Events;
-using EPI.Comm.Net.Generic.Packets;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Net;
 using static EPI.Comm.CommConfig;
 
 namespace EPI.Comm.Net.Generic
 {
-    public class UdpNet<Theader> : UdpBase, IComm<Theader>
+    public class UdpNet<THeader> : UdpBase, IComm<THeader>
     {
         #region Field & Property
-        public Func<Theader, int> GetBodySize { get; private set; }
+        public Func<THeader, int> GetBodySize { get; private set; }
 
-        internal PacketMakerDictionary<Theader> PacketMakers { get; private set; } = new PacketMakerDictionary<Theader>();
+        internal PacketMakerDictionary<THeader> PacketMakers { get; private set; } = new PacketMakerDictionary<THeader>();
         public bool IsBigEndian { get; set; }
         #endregion
 
         #region CTOR
-        public UdpNet(Func<Theader, int> getBodySize) : this(DefaultBufferSize, getBodySize)
+        public UdpNet(Func<THeader, int> getBodySize) : this(DefaultBufferSize, getBodySize)
         {
 
         }
-        public UdpNet(int bufferSize, Func<Theader, int> getBodySize) : base(bufferSize)
+        public UdpNet(int bufferSize, Func<THeader, int> getBodySize) : base(bufferSize)
         {
             SetPacketProperties(getBodySize);
         }
         #endregion
 
         #region Method & Event
-        private void SetPacketProperties(Func<Theader, int> getBodySize)
+        private void SetPacketProperties(Func<THeader, int> getBodySize)
         {
             GetBodySize = getBodySize;
         }
 
-        public void Send(Theader header, byte[] body)
+        public void Send(THeader header, byte[] body)
         {
-            var packetToSend = new PacketMaker<Theader>(GetBodySize, false)
+            var packetToSend = new PacketMaker<THeader>(GetBodySize, false)
             {
                 Header = header,
                 Body = body
@@ -49,44 +46,47 @@ namespace EPI.Comm.Net.Generic
         {
             if (!PacketMakers.ContainsKey(e.From))
             {
-                PacketMakers.Add(e.From, new PacketMaker<Theader>(GetBodySize, true));
+                PacketMakers.Add(e.From, new PacketMaker<THeader>(GetBodySize, true));
             }
             PacketMakers[e.From].TryDeserializeLoop(e.FullPacket, IsBigEndian, () =>
             {
-                Received?.Invoke(this, new PacketEventArgs<Theader>(e.From, PacketMakers[e.From]));
+                Received?.Invoke(this, new PacketEventArgs<THeader>(e.From, PacketMakers[e.From]));
             });
         }
-        public event PacketEventHandler<Theader> Received;
+        public event PacketEventHandler<THeader> Received;
+        protected override void OnStop()
+        {
+            PacketMakers.Clear();
+            base.OnStop();
+        }
         #endregion
     }
-    public class UdpNet<Theader, Tfooter> : UdpBase, IComm<Theader, Tfooter>
+    public class UdpNet<THeader, TFooter> : UdpBase, IComm<THeader, TFooter>
     {
         #region Field & Property
-        internal PacketMakerDictionary<Theader, Tfooter> PacketMakers { get; private set; } = new PacketMakerDictionary<Theader, Tfooter>();
-        public Func<Theader, int> GetBodySize { get; private set; }
-        internal PacketMaker<Theader, Tfooter> PacketToReceive { get; set; }
+        internal PacketMakerDictionary<THeader, TFooter> PacketMakers { get; private set; } = new PacketMakerDictionary<THeader, TFooter>();
+        public Func<THeader, int> GetBodySize { get; private set; }
         public bool IsBigEndian { get; set; }
         #endregion
 
         #region CTOR
-        public UdpNet(Func<Theader, int> getBodySize) : this(DefaultBufferSize, getBodySize)
+        public UdpNet(Func<THeader, int> getBodySize) : this(DefaultBufferSize, getBodySize)
         {
         }
-        public UdpNet(int bufferSize, Func<Theader, int> getBodySize) : base(bufferSize)
+        public UdpNet(int bufferSize, Func<THeader, int> getBodySize) : base(bufferSize)
         {
             SetPacketProperties(getBodySize);
         }
         #endregion
 
         #region Method & Event
-        private void SetPacketProperties(Func<Theader, int> getBodySize)
+        private void SetPacketProperties(Func<THeader, int> getBodySize)
         {
             GetBodySize = getBodySize;
-            PacketToReceive = new PacketMaker<Theader, Tfooter>(getBodySize, true);
         }
-        public void Send(Theader header, byte[] body, Tfooter footer)
+        public void Send(THeader header, byte[] body, TFooter footer)
         {
-            var packetToSend = new PacketMaker<Theader, Tfooter>(GetBodySize, false)
+            var packetToSend = new PacketMaker<THeader, TFooter>(GetBodySize, false)
             {
                 Header = header,
                 Body = body,
@@ -101,27 +101,26 @@ namespace EPI.Comm.Net.Generic
         {
             if (!PacketMakers.ContainsKey(e.From))
             {
-                PacketMakers.Add(e.From, new PacketMaker<Theader, Tfooter>(GetBodySize, true));
+                PacketMakers.Add(e.From, new PacketMaker<THeader, TFooter>(GetBodySize, true));
             }
             PacketMakers[e.From].TryDeserializeLoop(e.FullPacket, IsBigEndian, () =>
             {
-                Received?.Invoke(this, new PacketEventArgs<Theader, Tfooter>(e.From, PacketMakers[e.From]));
+                Received?.Invoke(this, new PacketEventArgs<THeader, TFooter>(e.From, PacketMakers[e.From]));
             });
         }
+        public event PacketEventHandler<THeader, TFooter> Received;
         protected override void OnStop()
         {
-            PacketToReceive.ClearReceiveBuffer();
-            PacketToReceive.ClearPacketInfo();
+            PacketMakers.Clear();
             base.OnStop();
         }
-        public event PacketEventHandler<Theader, Tfooter> Received;
         #endregion
     }
-    internal class PacketMakerDictionary<Theader> : Dictionary<IPEndPoint, PacketMaker<Theader>>
+    internal class PacketMakerDictionary<THeader> : Dictionary<IPEndPoint, PacketMaker<THeader>>
     {
 
     }
-    internal class PacketMakerDictionary<Theader, Tfooter> : Dictionary<IPEndPoint, PacketMaker<Theader, Tfooter>>
+    internal class PacketMakerDictionary<THeader, TFooter> : Dictionary<IPEndPoint, PacketMaker<THeader, TFooter>>
     {
 
     }

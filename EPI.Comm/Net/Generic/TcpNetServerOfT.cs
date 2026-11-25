@@ -1,19 +1,17 @@
-﻿using EPI.Comm.Net.Generic.Events;
-using EPI.Comm.Net.Generic.Packets;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using static EPI.Comm.CommConfig;
 namespace EPI.Comm.Net.Generic
 {
-    public class TcpNetServer<Theader> : TcpServerBase, IComm<Theader>
-        where Theader : new()
+    public class TcpNetServer<THeader> : TcpServerBase, IComm<THeader>
+        where THeader : new()
     {
         #region Field & Property
-        private readonly List<TcpNetClient<Theader>> clients = new List<TcpNetClient<Theader>>();
-        public ClientCollection<Theader> Clients => new ClientCollection<Theader>(clients.ToArray());
-        internal Func<Theader, int> GetBodySize { get; private set; }
+        public ClientCollection<THeader> Clients => new ClientCollection<THeader>(SafeCopyClients<TcpNetClient<THeader>>());
+        internal Func<THeader, int> GetBodySize { get; private set; }
         protected bool isBigEndian;
         public bool IsBigEndian
         {
@@ -33,20 +31,20 @@ namespace EPI.Comm.Net.Generic
         #endregion
 
         #region CTOR
-        public TcpNetServer(int bufferSize, Func<Theader, int> getBodySize) : base(bufferSize)
+        public TcpNetServer(int bufferSize, Func<THeader, int> getBodySize) : base(bufferSize)
         {
             GetBodySize = getBodySize;
 
         }
-        public TcpNetServer(Func<Theader, int> getBodySize) : this(DefaultBufferSize, getBodySize)
+        public TcpNetServer(Func<THeader, int> getBodySize) : this(DefaultBufferSize, getBodySize)
         {
         }
         #endregion
 
         #region Send Receive
-        public void Send(Theader header, byte[] body)
+        public void Send(THeader header, byte[] body)
         {
-            var packetMakerToSend = new PacketMaker<Theader>(GetBodySize, false)
+            var packetMakerToSend = new PacketMaker<THeader>(GetBodySize, false)
             {
                 Header = header,
                 Body = body,
@@ -57,17 +55,17 @@ namespace EPI.Comm.Net.Generic
                 c.Send(fullPacketBytes);
             });
         }
-        private void OnClientReceived(object sender, PacketEventArgs<Theader> e)
+        private void OnClientReceived(object sender, PacketEventArgs<THeader> e)
         {
             Received?.Invoke(this, e);
         }
-        public event PacketEventHandler<Theader> Received;
+        public event PacketEventHandler<THeader> Received;
         #endregion
 
         #region Accept
         protected override TcpClientBase CreateClient(TcpClient client)
         {
-            var result = new TcpNetClient<Theader>(client, BufferSize, GetBodySize)
+            var result = new TcpNetClient<THeader>(client, BufferSize, GetBodySize)
             { IsBigEndian = IsBigEndian };
             return result;
         }
@@ -75,12 +73,11 @@ namespace EPI.Comm.Net.Generic
         protected override void AttachClient(TcpClientBase client)
         {
             base.AttachClient(client);
-            var newClient = client as TcpNetClient<Theader>;
-            clients.Add(newClient);
+            var newClient = client as TcpNetClient<THeader>;
             newClient.Received += OnClientReceived;
-            ClientConnected?.Invoke(this, new TcpEventArgs<Theader>(newClient));
+            ClientConnected?.Invoke(this, new TcpEventArgs<THeader>(newClient));
         }
-        public event TcpEventHandler<Theader> ClientConnected;
+        public event TcpEventHandler<THeader> ClientConnected;
 
         #endregion
 
@@ -90,22 +87,20 @@ namespace EPI.Comm.Net.Generic
         {
             base.DetachClient(client);
 
-            var oldClient = client as TcpNetClient<Theader>;
-            clients.Remove(oldClient);
+            var oldClient = client as TcpNetClient<THeader>;
             oldClient.Received -= OnClientReceived;
-            ClientDisconnected?.Invoke(this, new TcpEventArgs<Theader>(oldClient));
+            ClientDisconnected?.Invoke(this, new TcpEventArgs<THeader>(oldClient));
         }
 
-        public event TcpEventHandler<Theader> ClientDisconnected;
+        public event TcpEventHandler<THeader> ClientDisconnected;
         #endregion
     }
-    public class TcpNetServer<Theader, Tfooter> : TcpServerBase, IComm<Theader, Tfooter>
-       where Theader : new() where Tfooter : new()
+    public class TcpNetServer<THeader, TFooter> : TcpServerBase, IComm<THeader, TFooter>
+       where THeader : new() where TFooter : new()
     {
         #region Field & Property
-        private readonly List<TcpNetClient<Theader, Tfooter>> clients = new List<TcpNetClient<Theader, Tfooter>>();
-        public ClientCollection<Theader, Tfooter> Clients => new ClientCollection<Theader, Tfooter>(clients.ToArray());
-        internal Func<Theader, int> GetBodySize { get; private set; }
+        public ClientCollection<THeader, TFooter> Clients => new ClientCollection<THeader, TFooter>(SafeCopyClients<TcpNetClient<THeader, TFooter>>());
+        internal Func<THeader, int> GetBodySize { get; private set; }
         protected bool isBigEndian;
         public bool IsBigEndian
         {
@@ -125,19 +120,19 @@ namespace EPI.Comm.Net.Generic
         #endregion
 
         #region CTOR
-        public TcpNetServer(int bufferSize, Func<Theader, int> getBodySize) : base(bufferSize)
+        public TcpNetServer(int bufferSize, Func<THeader, int> getBodySize) : base(bufferSize)
         {
             GetBodySize = getBodySize;
         }
-        public TcpNetServer(Func<Theader, int> getBodySize) : this(DefaultBufferSize, getBodySize)
+        public TcpNetServer(Func<THeader, int> getBodySize) : this(DefaultBufferSize, getBodySize)
         {
         }
         #endregion
 
         #region Send Receive
-        public void Send(Theader header, byte[] body, Tfooter footer)
+        public void Send(THeader header, byte[] body, TFooter footer)
         {
-            var packetMakerToSend = new PacketMaker<Theader, Tfooter>(GetBodySize, false)
+            var packetMakerToSend = new PacketMaker<THeader, TFooter>(GetBodySize, false)
             {
                 Header = header,
                 Body = body,
@@ -149,41 +144,39 @@ namespace EPI.Comm.Net.Generic
                 c.Send(fullPacketBytes);
             });
         }
-        private void OnClientReceived(object sender, PacketEventArgs<Theader, Tfooter> e)
+        private void OnClientReceived(object sender, PacketEventArgs<THeader, TFooter> e)
         {
             Received?.Invoke(this, e);
         }
-        public event PacketEventHandler<Theader, Tfooter> Received;
+        public event PacketEventHandler<THeader, TFooter> Received;
         #endregion
 
         #region Accept
         protected override TcpClientBase CreateClient(TcpClient client)
         {
-            var result = new TcpNetClient<Theader, Tfooter>(client, BufferSize, GetBodySize)
+            var result = new TcpNetClient<THeader, TFooter>(client, BufferSize, GetBodySize)
             { IsBigEndian = IsBigEndian };
             return result;
         }
         protected override void AttachClient(TcpClientBase client)
         {
             base.AttachClient(client);
-            var newClient = client as TcpNetClient<Theader, Tfooter>;
-            clients.Add(newClient);
+            var newClient = client as TcpNetClient<THeader, TFooter>;
             newClient.Received += OnClientReceived;
-            ClientConnected?.Invoke(this, new TcpEventArgs<Theader, Tfooter>(newClient));
+            ClientConnected?.Invoke(this, new TcpEventArgs<THeader, TFooter>(newClient));
         }
-        public event TcpEventHandler<Theader, Tfooter> ClientConnected;
+        public event TcpEventHandler<THeader, TFooter> ClientConnected;
         #endregion
 
         #region Close
         protected override void DetachClient(TcpClientBase client)
         {
             base.DetachClient(client);
-            var oldClient = client as TcpNetClient<Theader, Tfooter>;
-            clients.Remove(oldClient);
+            var oldClient = client as TcpNetClient<THeader, TFooter>;
             oldClient.Received -= OnClientReceived;
-            ClientDisconnected?.Invoke(this, new TcpEventArgs<Theader, Tfooter>(oldClient));
+            ClientDisconnected?.Invoke(this, new TcpEventArgs<THeader, TFooter>(oldClient));
         }
-        public event TcpEventHandler<Theader, Tfooter> ClientDisconnected;
+        public event TcpEventHandler<THeader, TFooter> ClientDisconnected;
         #endregion
     }
 }

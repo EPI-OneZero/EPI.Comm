@@ -1,9 +1,8 @@
-﻿using EPI.Comm.Log;
-using EPI.Comm.Net.Events;
-using EPI.Comm.Utils;
+﻿using EPI.Comm.Utils;
 using System;
 using System.Net;
 using System.Net.Sockets;
+using System.Net.WebSockets;
 using System.Threading;
 namespace EPI.Comm.Net
 {
@@ -60,7 +59,12 @@ namespace EPI.Comm.Net
             NetSocket.Closed += SocketClosed;
             LocalEndPoint = NetSocket.LocalEndPoint;
             RemoteEndPoint = NetSocket.RemoteEndPoint;
+     
             isSocketAttached = true;
+        }
+        internal void StartReceive()
+        {
+            NetSocket.StartReceive();
         }
         private void DetachSocket()
         {
@@ -104,6 +108,7 @@ namespace EPI.Comm.Net
                         AttachSocket(TcpClient.Client);
                         OnConnected();
                         Connected?.Invoke(this, EventArgs.Empty);
+                        StartReceive();
                     }
                     else
                     {

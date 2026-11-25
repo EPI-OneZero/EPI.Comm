@@ -5,18 +5,18 @@ using System.Net;
 
 namespace EPI.Comm.Net.Generic
 {
-    public class ClientCollection<Theader> : ReadOnlyCollection<TcpNetClient<Theader>> where Theader : new()
+    public class ClientCollection<THeader> : ReadOnlyCollection<TcpNetClient<THeader>> where THeader : new()
     {
-        protected internal ClientCollection(IList<TcpNetClient<Theader>> list) : base(list)
+        protected internal ClientCollection(IList<TcpNetClient<THeader>> list) : base(list)
         {
         }
-        public TcpNetClient<Theader> this[IPEndPoint remoteEndpoint] => this.FirstOrDefault(c => c?.RemoteEndPoint == remoteEndpoint);
+        public TcpNetClient<THeader> this[IPEndPoint remoteEndpoint] => this.FirstOrDefault(c => c?.RemoteEndPoint == remoteEndpoint);
     }
-    public class ClientCollection<Theader, Tfooter> : ReadOnlyCollection<TcpNetClient<Theader, Tfooter>> where Theader : new() where Tfooter : new()
+    public class ClientCollection<THeader, TFooter> : ReadOnlyCollection<TcpNetClient<THeader, TFooter>> where THeader : new() where TFooter : new()
     {
-        protected internal ClientCollection(IList<TcpNetClient<Theader, Tfooter>> list) : base(list)
+        protected internal ClientCollection(IList<TcpNetClient<THeader, TFooter>> list) : base(list)
         {
         }
-        public TcpNetClient<Theader, Tfooter> this[IPEndPoint remoteEndpoint] => this.FirstOrDefault(c => c?.RemoteEndPoint == remoteEndpoint);
+        public TcpNetClient<THeader, TFooter> this[IPEndPoint remoteEndpoint] => this.FirstOrDefault(c => c?.RemoteEndPoint == remoteEndpoint);
     }
 }

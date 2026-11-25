@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace EPI.Comm.Net.Events
+namespace EPI.Comm.Net
 {
     public class TcpEventArgs : EventArgs
     {

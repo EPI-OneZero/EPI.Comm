@@ -1,27 +1,27 @@
 ﻿using System;
 
-namespace EPI.Comm.Net.Generic.Events
+namespace EPI.Comm.Net.Generic
 {
-    public class TcpEventArgs<Theader> : EventArgs where Theader : new()
+    public class TcpEventArgs<THeader> : EventArgs where THeader : new()
     {
-        public TcpNetClient<Theader> TcpNetClient { get; private set; }
-        public TcpEventArgs(TcpNetClient<Theader> client)
+        public TcpNetClient<THeader> TcpNetClient { get; private set; }
+        public TcpEventArgs(TcpNetClient<THeader> client)
         {
             TcpNetClient = client;
         }
     }
-    public delegate void TcpEventHandler<Theader>(object sender, TcpEventArgs<Theader> e)
-    where Theader : new();
-    public class TcpEventArgs<Theader, Tfooter> : EventArgs where Theader : new() where Tfooter : new()
+    public delegate void TcpEventHandler<THeader>(object sender, TcpEventArgs<THeader> e)
+    where THeader : new();
+    public class TcpEventArgs<THeader, TFooter> : EventArgs where THeader : new() where TFooter : new()
     {
-        public TcpNetClient<Theader, Tfooter> TcpNetClient { get; private set; }
-        public TcpEventArgs(TcpNetClient<Theader, Tfooter> client)
+        public TcpNetClient<THeader, TFooter> TcpNetClient { get; private set; }
+        public TcpEventArgs(TcpNetClient<THeader, TFooter> client)
         {
             TcpNetClient = client;
         }
     }
-    public delegate void TcpEventHandler<Theader, Tfooter>(object sender, TcpEventArgs<Theader, Tfooter> e)
-        where Theader : new() where Tfooter : new();
+    public delegate void TcpEventHandler<THeader, TFooter>(object sender, TcpEventArgs<THeader, TFooter> e)
+        where THeader : new() where TFooter : new();
 
 
 

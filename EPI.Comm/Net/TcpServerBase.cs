@@ -1,7 +1,7 @@
-﻿using EPI.Comm.Log;
-using EPI.Comm.Utils;
+﻿using EPI.Comm.Utils;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
@@ -23,7 +23,13 @@ namespace EPI.Comm.Net
 
         private List<TcpClientBase> clients = new List<TcpClientBase>();
 
-
+        protected T[] SafeCopyClients<T>() where T : TcpClientBase
+        {
+            lock (clientLock)
+            {
+                return clients.Cast<T>().ToArray();
+            }
+        }
         #endregion
 
         #region CTOR
@@ -66,7 +72,7 @@ namespace EPI.Comm.Net
                         {
                             AttachClient(client);
                         }
-                     
+                        client.StartReceive();
                     }
                 }
             }
@@ -88,7 +94,7 @@ namespace EPI.Comm.Net
                 clients.Add(client);
                 client.Disconnected += OnDisconnected;
             }
-        
+
         }
         protected abstract TcpClientBase CreateClient(TcpClient client);
         #endregion
@@ -131,7 +137,7 @@ namespace EPI.Comm.Net
                     DetachClient(client);
                 }
             }
-         
+
         }
         protected virtual void DetachClient(TcpClientBase client)
         {
@@ -141,14 +147,21 @@ namespace EPI.Comm.Net
                 clients.Remove(client);
                 client.Dispose();
             }
-         
+
         }
         #endregion
 
         #region Send
         public void Send(byte[] bytes)
         {
-            Parallel.ForEach(clients.ToArray(), c =>
+            TcpClientBase[] snapshot;
+
+            lock (clientLock)
+            {
+                snapshot = clients.ToArray();
+            }
+
+            Parallel.ForEach(snapshot, c =>
             {
                 c.Send(bytes);
             });

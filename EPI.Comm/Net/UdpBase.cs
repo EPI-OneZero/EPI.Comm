@@ -1,4 +1,4 @@
-using EPI.Comm.Utils;
+﻿using EPI.Comm.Utils;
 using System;
 using System.Net;
 using System.Net.Sockets;
@@ -12,8 +12,9 @@ namespace EPI.Comm.Net
 
         private readonly object StartStopLock = new object();
         private readonly object SendLock = new object();
-        public UdpClient UdpClientSender { get; private set; }
-        public UdpClient UdpClientReceiver { get; private set; }
+        private volatile bool recvThreadAlive = false;
+        protected UdpClient UdpClientSender { get; private set; }
+        protected UdpClient UdpClientReceiver { get; private set; }
         public IPEndPoint LocalEndPoint { get; private set; }
         public IPEndPoint RemoteEndPoint { get; private set; }
         public int BufferSize { get; private set; }
@@ -43,9 +44,11 @@ namespace EPI.Comm.Net
 
                     SetSocketOption(UdpClientSender.Client);
                     SetSocketOption(UdpClientReceiver.Client);
+                    recvThreadAlive = true;
                     ThreadUtil.Start(() =>
                     {
                         while (TryReceive()) ;
+                        recvThreadAlive = false;
                     });
                     isStarted = true;
                 }
@@ -103,8 +106,12 @@ namespace EPI.Comm.Net
                     UdpClientReceiver = null;
                     LocalEndPoint = null;
                     RemoteEndPoint = null;
-                    OnStop();
                     isStarted = false;
+                    while (recvThreadAlive)
+                    {
+
+                    }
+                    OnStop();
                 }
 
             }
@@ -140,13 +147,15 @@ namespace EPI.Comm.Net
         }
         private bool TryReceive()
         {
+            var from = new IPEndPoint(IPAddress.Any, 0);
+            byte[] recv = null;
             bool result;
             try
             {
-                var from = new IPEndPoint(IPAddress.Any, 0);
-                byte[] recv = null;
+    
+      
                 recv = UdpClientReceiver.Receive(ref from);
-                OnReceived(new PacketEventArgs(new IPEndPoint(from.Address, from.Port), recv));
+             
                 result = true;
             }
             catch (ObjectDisposedException)
@@ -161,6 +170,11 @@ namespace EPI.Comm.Net
             {
                 result = false;
             }
+            if(result)
+            {
+                OnReceived(new PacketEventArgs(new IPEndPoint(from.Address, from.Port), recv));
+            }
+         
             return result;
         }
         protected abstract void OnReceived(PacketEventArgs e);

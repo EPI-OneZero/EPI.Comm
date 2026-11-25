@@ -112,23 +112,9 @@ namespace EPI.Comm.Buffers
         #region IEnumerable
         public IEnumerator<byte> GetEnumerator()
         {
-            if (head < tail)
+            for (int i = 0; i < queueDataCount; i++)
             {
-                for (int i = head; i < tail; i++)
-                {
-                    yield return buffer[i];
-                }
-            }
-            else
-            {
-                for (int i = head; i < buffer.Length; i++)
-                {
-                    yield return buffer[i];
-                }
-                for (int i = 0; i < tail; i++)
-                {
-                    yield return buffer[i];
-                }
+                yield return buffer[(head + i) % buffer.Length];
             }
         }
         IEnumerator IEnumerable.GetEnumerator()

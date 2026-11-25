@@ -1,13 +1,12 @@
-﻿using System.Diagnostics;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 
-namespace EPI.Comm.Log
+namespace EPI.Comm
 {
     public abstract class Logger
     {
         public static Logger Default { get; set; } = new DebugLogger();
 
-        public bool IsEnabled { get; set; }
+        public bool IsEnabled { get; set; } = true;
         public void WriteLine(string message)
         {
             if (IsEnabled)
@@ -33,12 +32,12 @@ namespace EPI.Comm.Log
         }
         protected override void WriteLineMessage(string message)
         {
-            Debug.WriteLine(message);
+            message.ToString();//Debug.WriteLine(message);
         }
 
         protected override void WriteMessage(string message)
         {
-            Debug.Write(message);
+            message.ToString();//Debug.Write(message);
         }
     }
 

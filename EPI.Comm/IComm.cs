@@ -1,5 +1,5 @@
-﻿using EPI.Comm.Net.Events;
-using EPI.Comm.Net.Generic.Events;
+﻿using EPI.Comm.Net;
+using EPI.Comm.Net.Generic;
 
 namespace EPI.Comm
 {
@@ -19,15 +19,15 @@ namespace EPI.Comm
     {
         event PacketEventHandler Received;
     }
-    public interface IComm<Theader, Tfooter> : ICommSend, IEndian
+    public interface IComm<THeader, TFooter> : ICommSend, IEndian
     {
-        void Send(Theader header, byte[] body, Tfooter footer);
-        event PacketEventHandler<Theader, Tfooter> Received;
+        void Send(THeader header, byte[] body, TFooter footer);
+        event PacketEventHandler<THeader, TFooter> Received;
     }
-    public interface IComm<Theader> : ICommSend, IEndian
+    public interface IComm<THeader> : ICommSend, IEndian
     {
-        void Send(Theader header, byte[] body);
-        event PacketEventHandler<Theader> Received;
+        void Send(THeader header, byte[] body);
+        event PacketEventHandler<THeader> Received;
     }
     public interface IEndian
     {

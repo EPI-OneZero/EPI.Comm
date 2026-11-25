@@ -1,31 +1,28 @@
-﻿using EPI.Comm.Net.Events;
-using EPI.Comm.Net.Generic.Events;
-using EPI.Comm.Net.Generic.Packets;
-using System;
+﻿using System;
 using System.Net.Sockets;
 using static EPI.Comm.CommConfig;
 
 namespace EPI.Comm.Net.Generic
 {
-    public class TcpNetClient<Theader> : TcpClientBase, IComm<Theader>
-        where Theader : new()
+    public class TcpNetClient<THeader> : TcpClientBase, IComm<THeader>
+        where THeader : new()
     {
         #region Field & Property
-        internal Func<Theader, int> GetBodySize { get; private set; }
-        internal PacketMaker<Theader> PacketMakerToReceive { get; set; }
+        internal Func<THeader, int> GetBodySize { get; private set; }
+        internal PacketMaker<THeader> PacketMakerToReceive { get; set; }
         public bool IsBigEndian { get; set; }
         #endregion
 
         #region CTOR
-        public TcpNetClient(int bufferSize, Func<Theader, int> getBodySize) : base(bufferSize)
+        public TcpNetClient(int bufferSize, Func<THeader, int> getBodySize) : base(bufferSize)
         {
             SetPacketProperties(getBodySize);
         }
-        public TcpNetClient(Func<Theader, int> getBodySize) : this(DefaultBufferSize, getBodySize)
+        public TcpNetClient(Func<THeader, int> getBodySize) : this(DefaultBufferSize, getBodySize)
         {
         }
 
-        internal TcpNetClient(TcpClient client, int bufferSize, Func<Theader, int> getBodySize) : base(client, bufferSize)
+        internal TcpNetClient(TcpClient client, int bufferSize, Func<THeader, int> getBodySize) : base(client, bufferSize)
         {
             SetPacketProperties(getBodySize);
         }
@@ -39,15 +36,15 @@ namespace EPI.Comm.Net.Generic
             base.OnDisconnected();
         }
 
-        private void SetPacketProperties(Func<Theader, int> getBodySize)
+        private void SetPacketProperties(Func<THeader, int> getBodySize)
         {
             GetBodySize = getBodySize;
 
-            PacketMakerToReceive = new PacketMaker<Theader>(getBodySize, true);
+            PacketMakerToReceive = new PacketMaker<THeader>(getBodySize, true);
         }
-        public void Send(Theader header, byte[] body)
+        public void Send(THeader header, byte[] body)
         {
-            var packetMakerToSend = new PacketMaker<Theader>(GetBodySize, false)
+            var packetMakerToSend = new PacketMaker<THeader>(GetBodySize, false)
             {
                 Header = header,
                 Body = body
@@ -60,40 +57,40 @@ namespace EPI.Comm.Net.Generic
 
             PacketMakerToReceive.TryDeserializeLoop(e.FullPacket, IsBigEndian, () =>
             {
-                Received?.Invoke(this, new PacketEventArgs<Theader>(e.From, PacketMakerToReceive));
+                Received?.Invoke(this, new PacketEventArgs<THeader>(e.From, PacketMakerToReceive));
             });
         }
-        public event PacketEventHandler<Theader> Received;
+        public event PacketEventHandler<THeader> Received;
         #endregion
     }
-    public class TcpNetClient<Theader, Tfooter> : TcpClientBase, IComm<Theader, Tfooter>
-        where Theader : new()
+    public class TcpNetClient<THeader, TFooter> : TcpClientBase, IComm<THeader, TFooter>
+        where THeader : new()
     {
         #region Field & Property
-        public Func<Theader, int> GetBodySize { get; private set; }
-        internal PacketMaker<Theader, Tfooter> PacketMakerToReceive { get; set; }
+        public Func<THeader, int> GetBodySize { get; private set; }
+        internal PacketMaker<THeader, TFooter> PacketMakerToReceive { get; set; }
         public bool IsBigEndian { get; set; }
         #endregion
 
         #region CTOR
-        public TcpNetClient(int bufferSize, Func<Theader, int> getBodySize) : base(bufferSize)
+        public TcpNetClient(int bufferSize, Func<THeader, int> getBodySize) : base(bufferSize)
         {
             SetPacketProperties(getBodySize);
         }
-        public TcpNetClient(Func<Theader, int> getBodySize) : this(DefaultBufferSize, getBodySize)
+        public TcpNetClient(Func<THeader, int> getBodySize) : this(DefaultBufferSize, getBodySize)
         {
         }
-        internal TcpNetClient(TcpClient client, int bufferSize, Func<Theader, int> getBodySize) : base(client, bufferSize)
+        internal TcpNetClient(TcpClient client, int bufferSize, Func<THeader, int> getBodySize) : base(client, bufferSize)
         {
             SetPacketProperties(getBodySize);
         }
         #endregion
 
         #region Method & Event
-        private void SetPacketProperties(Func<Theader, int> getBodySize)
+        private void SetPacketProperties(Func<THeader, int> getBodySize)
         {
             GetBodySize = getBodySize;
-            PacketMakerToReceive = new PacketMaker<Theader, Tfooter>(getBodySize, true);
+            PacketMakerToReceive = new PacketMaker<THeader, TFooter>(getBodySize, true);
 
         }
         protected override void OnDisconnected()
@@ -102,9 +99,9 @@ namespace EPI.Comm.Net.Generic
             PacketMakerToReceive.ClearPacketInfo();
             base.OnDisconnected();
         }
-        public void Send(Theader header, byte[] body, Tfooter footer)
+        public void Send(THeader header, byte[] body, TFooter footer)
         {
-            var packetMakerToSend = new PacketMaker<Theader, Tfooter>(GetBodySize, false)
+            var packetMakerToSend = new PacketMaker<THeader, TFooter>(GetBodySize, false)
             {
                 Header = header,
                 Body = body,
@@ -118,10 +115,10 @@ namespace EPI.Comm.Net.Generic
         {
             PacketMakerToReceive.TryDeserializeLoop(e.FullPacket, IsBigEndian, () =>
             {
-                Received?.Invoke(this, new PacketEventArgs<Theader, Tfooter>(e.From, PacketMakerToReceive));
+                Received?.Invoke(this, new PacketEventArgs<THeader, TFooter>(e.From, PacketMakerToReceive));
             });
         }
-        public event PacketEventHandler<Theader, Tfooter> Received;
+        public event PacketEventHandler<THeader, TFooter> Received;
         #endregion
     }
 }
