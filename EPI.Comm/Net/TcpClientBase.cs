@@ -9,8 +9,8 @@ namespace EPI.Comm.Net
     public abstract class TcpClientBase : IDisposable
     {
         #region Field & Property
-        private readonly object ConnectLock = new object();
-
+        private readonly object _connectStopLock = new object();
+        private readonly object _socketLock = new object();
         protected TcpClient TcpClient { get; private set; }
         protected TcpNetSocket NetSocket { get; private set; }
         public int BufferSize { get; private set; }
@@ -59,7 +59,7 @@ namespace EPI.Comm.Net
             NetSocket.Closed += SocketClosed;
             LocalEndPoint = NetSocket.LocalEndPoint;
             RemoteEndPoint = NetSocket.RemoteEndPoint;
-     
+
             isSocketAttached = true;
         }
         internal void StartReceive()
@@ -68,7 +68,6 @@ namespace EPI.Comm.Net
         }
         private void DetachSocket()
         {
-            isSocketAttached = false;
             if (NetSocket != null)
             {
                 NetSocket.Received -= SocketReceived;
@@ -91,51 +90,68 @@ namespace EPI.Comm.Net
         #region Connect
         public void Connect(string ip, int port)
         {
-            SetRemoteEndPoint(ip, port);
-            InternalConnect();
+            lock (_connectStopLock)
+            {
+                SetRemoteEndPoint(ip, port);
+                InternalConnect();
+            }
 
         }
         internal void InternalConnect()
         {
-            if (!(isConnecting || isSocketAttached))
+            bool result = false;
+            lock (_socketLock)
             {
-                lock (ConnectLock)
+                if (!isConnecting && !isSocketAttached)
                 {
                     isConnecting = true;
-                    TcpClient = new TcpClient();
-                    if (Connect(TcpClient))
+                    try
                     {
-                        AttachSocket(TcpClient.Client);
-                        OnConnected();
-                        Connected?.Invoke(this, EventArgs.Empty);
-                        StartReceive();
+                        var client = new TcpClient();
+
+                        if (Connect(client))
+                        {
+                            TcpClient = client;
+                            AttachSocket(client.Client);
+                            OnConnected();
+                            result = true;
+                        }
+                        else
+                        {
+                            client?.Dispose();
+                            connectHelper?.RunAutoConnectIfUserWant();
+                        }
                     }
-                    else
+                    finally
                     {
-                        TcpClient?.Dispose();
-                        TcpClient = null;
-                        connectHelper?.RunAutoConnectIfUserWant();
+                        isConnecting = false;
                     }
-                    isConnecting = false;
                 }
+            }
+            if (result)
+            {
+                Connected?.Invoke(this, EventArgs.Empty);
+                StartReceive();
             }
         }
         private bool Connect(TcpClient client)
         {
+            bool result;
             try
             {
                 var asyncHandle = client.BeginConnect(IPAddress.Parse(ipToConnect), portToConnect, null, null);
                 var returned = asyncHandle.AsyncWaitHandle.WaitOne(5000);
-                return client.Connected && returned;
+                result =  client.Connected && returned;
             }
             catch (SocketException)
             {
-                return false;
+                result = false;
             }
             finally
             {
                 Logger.Default.WriteLine($"{nameof(IsConnected)} : {IsConnected}");
             }
+            return result;
         }
 
         private void SetRemoteEndPoint(string ip, int port)
@@ -155,15 +171,20 @@ namespace EPI.Comm.Net
         #region Stop
         public void Stop()
         {
-            connectHelper?.StopAutoConnectIfLoopOn();
-            lock (ConnectLock)
+            lock (_connectStopLock)
             {
-                TcpClient?.Dispose();
-                TcpClient = null;
-                while (isSocketAttached)
+                connectHelper?.StopAutoConnectIfLoopOn();
+                lock (_socketLock)
                 {
+                    TcpClient?.Dispose();
+                    TcpClient = null;
+                    while (isSocketAttached)
+                    {
+                    }
+                    
                 }
             }
+          
         }
 
         protected virtual void OnDisconnected()
@@ -175,6 +196,8 @@ namespace EPI.Comm.Net
             DetachSocket();
             TcpClient?.Dispose();
             TcpClient = null;
+            isSocketAttached = false;
+
             OnDisconnected();
             Disconnected?.Invoke(this, EventArgs.Empty);
             connectHelper?.RunAutoConnectIfUserWant();
@@ -188,8 +211,10 @@ namespace EPI.Comm.Net
             public bool AutoConnect { get; set; }
             private volatile bool isAutoConnectLoopOn;
             private volatile bool userRequestConnect;
-            public TcpClientBase Tcp { get; private set; }
+            private AutoResetEvent _stopSignal = new AutoResetEvent(false);
 
+            public TcpClientBase Tcp { get; private set; }
+            private Thread _autoConnectThread;
             public AutoConnectHelper(TcpClientBase tcp)
             {
                 Tcp = tcp;
@@ -200,38 +225,61 @@ namespace EPI.Comm.Net
             }
             public void RunAutoConnectIfUserWant()
             {
-                if (AutoConnect && userRequestConnect && !isAutoConnectLoopOn)
+                lock (this)
                 {
-                    ThreadUtil.Start(() =>
+                    if (AutoConnect && userRequestConnect && !isAutoConnectLoopOn)
                     {
-                        lock (this)
-                        {
-                            isAutoConnectLoopOn = true;
-                            AutoConnectLoop();
-                            isAutoConnectLoopOn = false;
-                        }
-
-                    });
+                        _stopSignal.Reset();
+                        isAutoConnectLoopOn = true;
+                        _autoConnectThread = ThreadUtil.Start(AutoConnectLoop);
+                    }
                 }
             }
+            //private void AutoConnectLoop()
+            //{
+            //    while (AutoConnect && userRequestConnect)
+            //    {
+            //        Tcp.InternalConnect();
+            //        if (Tcp.IsConnected)
+            //        {
+            //            break;
+            //        }
+            //        Thread.Sleep(3000);
+            //    }
+            //}
             private void AutoConnectLoop()
             {
-                while (AutoConnect && userRequestConnect)
+                while (true)
                 {
-                    Tcp.InternalConnect();
-                    if (Tcp.IsConnected)
+                    lock (this)
                     {
-                        break;
+                        if (!AutoConnect || !userRequestConnect || Tcp.IsConnected)
+                        {
+                            isAutoConnectLoopOn = false;
+                            break;
+                        }
                     }
-                    Thread.Sleep(3000);
+
+                    Tcp.InternalConnect();
+
+                    if (!Tcp.IsConnected)
+                    {
+                        _stopSignal.WaitOne(3000);
+                    }
                 }
             }
             public void StopAutoConnectIfLoopOn()
             {
-                userRequestConnect = false;
-                while (isAutoConnectLoopOn)
+                Thread worker;
+                lock (this)
                 {
+                    userRequestConnect = false;
+                    worker = _autoConnectThread;
+                    _autoConnectThread = null;
+                    _stopSignal.Set();
                 }
+
+                worker?.Join();
             }
         }
         #endregion

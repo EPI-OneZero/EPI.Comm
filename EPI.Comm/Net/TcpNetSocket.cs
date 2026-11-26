@@ -31,11 +31,12 @@ namespace EPI.Comm.Net
         }
         internal void StartReceive()
         {
+            var socket = Socket;
             ThreadUtil.Start(() =>
             {
                 try
                 {
-                    while (IsConnected && TryReceive())
+                    while (IsConnected && TryReceive(socket))
                     {
                     }
                 }
@@ -84,13 +85,13 @@ namespace EPI.Comm.Net
             }
 
         }
-        private bool TryReceive()
+        private bool TryReceive(Socket socket)
         {
             bool result = false;
             byte[] recv = null;
             try
             {
-                int count = Socket.Receive(ReceiveBuffer);
+                int count = socket.Receive(ReceiveBuffer);
                 if (count > 0)
                 {
                     result = true;

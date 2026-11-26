@@ -25,10 +25,12 @@ namespace EPI.Comm.Net
 
         protected T[] SafeCopyClients<T>() where T : TcpClientBase
         {
+            T[] result ;
             lock (clientLock)
             {
-                return clients.Cast<T>().ToArray();
+                result = clients.Cast<T>().ToArray();
             }
+            return result;
         }
         #endregion
 
@@ -107,9 +109,6 @@ namespace EPI.Comm.Net
                 {
                     isListening = false;
                     Listener.Stop();
-                    while (isListening)
-                    {
-                    }
                     Listener = null;
                     Port = 0;
 

@@ -12,7 +12,6 @@ namespace EPI.Comm.Net
 
         private readonly object StartStopLock = new object();
         private readonly object SendLock = new object();
-        private volatile bool recvThreadAlive = false;
         protected UdpClient UdpClientSender { get; private set; }
         protected UdpClient UdpClientReceiver { get; private set; }
         public IPEndPoint LocalEndPoint { get; private set; }
@@ -44,11 +43,10 @@ namespace EPI.Comm.Net
 
                     SetSocketOption(UdpClientSender.Client);
                     SetSocketOption(UdpClientReceiver.Client);
-                    recvThreadAlive = true;
+                    var receiver = UdpClientReceiver;
                     ThreadUtil.Start(() =>
                     {
-                        while (TryReceive()) ;
-                        recvThreadAlive = false;
+                        while (TryReceive(receiver)) ;
                     });
                     isStarted = true;
                 }
@@ -107,10 +105,6 @@ namespace EPI.Comm.Net
                     LocalEndPoint = null;
                     RemoteEndPoint = null;
                     isStarted = false;
-                    while (recvThreadAlive)
-                    {
-
-                    }
                     OnStop();
                 }
 
@@ -145,17 +139,15 @@ namespace EPI.Comm.Net
                 Logger.Default.WriteLineCaller();
             }
         }
-        private bool TryReceive()
+        private bool TryReceive(UdpClient receiver)
         {
             var from = new IPEndPoint(IPAddress.Any, 0);
             byte[] recv = null;
+           
             bool result;
             try
             {
-    
-      
-                recv = UdpClientReceiver.Receive(ref from);
-             
+                recv = receiver.Receive(ref from);
                 result = true;
             }
             catch (ObjectDisposedException)
